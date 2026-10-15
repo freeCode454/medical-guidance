@@ -1,0 +1,125 @@
+[project]
+name = "medical-guidance"
+version = "0.1.0"
+description = "医疗智能导诊分诊与多学科会诊多智能体系统"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+
+# ── 一期必用依赖 ────────────────────────────────────────────────────────
+# 原则：只引入让业务闭环跑起来的必需项。算力、运维、可观测类组件
+# 放在 optional-dependencies 中，见 01 文档 8.1.1 的「分期原则」。
+dependencies = [
+    # 接口层
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "python-multipart>=0.0.12",
+
+    # 智能体编排
+    "langgraph>=0.2.50",
+    "langchain-core>=0.3.20",
+
+    # 数据访问
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "redis>=5.2",
+
+    # 检索
+    # 注意：开发/交付统一用 Milvus Standalone（Milvus Lite 官方不支持 Windows）。
+    # pymilvus 3.x 有 breaking change（milvus-lite extra 改名且不支持 win32），
+    # 因此锁定 2.5.x。
+    "pymilvus>=2.5.9,<3.0",
+
+    # 模型调用（OpenAI 兼容网关）
+    "openai>=1.54",
+    "httpx>=0.27",
+
+    # 本地向量化：ONNX Runtime 路线，**不引入 torch**（镜像体积少约 2 GB）
+    "onnxruntime>=1.20",
+    "tokenizers>=0.21",
+    "numpy>=2.0",
+
+    # 对象存储
+    "minio>=7.2",
+
+    # 安全
+    "pyjwt>=2.10",
+    "passlib[bcrypt]>=1.7",
+
+    # 异步任务
+    "celery>=5.4",
+]
+
+[project.optional-dependencies]
+# ── 二期 / 生产引入 ────────────────────────────────────────────────────
+# 对应 01 文档 8.1.1 的「二期技术」列。一期不安装，避免拖慢本地环境。
+tracing = [
+    "langfuse>=2.53",
+    "opentelemetry-sdk>=1.28",
+    "opentelemetry-instrumentation-fastapi>=0.49b0",
+]
+asr = [
+    "funasr>=1.1",
+]
+# 评测与测试工具
+eval = [
+    "ragas>=0.2.6",
+    "deepeval>=1.6",
+    "locust>=2.32",
+    "playwright>=1.49",
+]
+# 开发工具
+dev = [
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+# ══ 工具配置 ═══════════════════════════════════════════════════════════
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
+ignore = [
+    "E501",  # 行宽由 formatter 处理
+    "RUF001",  # 允许中文全角标点出现在字符串中
+    "RUF002",
+    "RUF003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"app/agents/prompts/*" = ["E501"]  # 提示词模板不限制行宽
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["pymilvus.*", "onnxruntime.*", "tokenizers.*", "minio.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/agents/prompts/*"]

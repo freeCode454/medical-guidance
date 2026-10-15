@@ -1,0 +1,183 @@
+# 开发期基础设施编排
+#
+# ── 定位 ────────────────────────────────────────────────────────────────
+# **只起基础设施，应用在宿主机运行**（02 文档 §9.2）。理由：
+#   · 应用需要热重载，容器内改代码要重建镜像
+#   · 本地向量化模型在宿主机上，容器内需额外挂载
+#   · 开发机内存有限，少跑一个容器就少一份压力
+#
+# ── 渐进式启动（本机可用内存约 4.4 GB，按顺序逐个验证）────────────────
+#   1) make db-up                         只起 PostgreSQL，验证建表
+#   2) make db-init && make db-verify     执行 init.sql 并核对 23 表 / 67 索引
+#   3) make vector-up                     Milvus Standalone（etcd + minio + milvus）
+#   4) make cache-up                      确认内存余量后再起 Redis
+#   5) make storage-up                    起 MinIO（若已随 vector 起则跳过）
+#
+# ⚠️ 向量库说明：Milvus Lite 官方**不支持 Windows**，开发/交付统一用
+#    Milvus Standalone（交付形态本来就是它，代码零差异）。
+#
+# ── 数据卷 ──────────────────────────────────────────────────────────────
+# 统一落在**项目根**的 data/ 下（02 文档 §4.3）。本文件位于 deploy/，
+# 故卷路径写作 ../data/。迁移脚本 deploy/postgres/migrations/ 不在此挂载。
+
+name: medical-guidance-infra
+
+services:
+  # ── 关系数据库 ────────────────────────────────────────────────────────
+  # 首次启动自动执行 init.sql（建 23 表 / 67 索引 / 2 触发器 + 种子数据）。
+  # 注意：docker-entrypoint-initdb.d 只在数据目录为空时执行一次；
+  #       要重新初始化需先 make db-reset（会删数据卷，谨慎）。
+  postgres:
+    image: postgres:16-alpine
+    container_name: mg-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medguide}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medguide}
+      POSTGRES_DB: ${POSTGRES_DB:-medguide}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - ../data/postgres:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medguide} -d ${POSTGRES_DB:-medguide}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    command:
+      - postgres
+      - -c
+      - max_connections=50
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - work_mem=8MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - log_min_duration_statement=500
+
+  # ── 缓存 / 限流 / 消息广播 ────────────────────────────────────────────
+  # db 划分见 03 文档 §6.7：db 0 业务缓存 / db 1 Celery broker / db 2 backend。
+  redis:
+    image: redis:7-alpine
+    container_name: mg-redis
+    profiles: ["cache"]
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - ../data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+      - --maxmemory
+      - 256mb
+      - --maxmemory-policy
+      - allkeys-lru
+
+  # ── 对象存储（S3 兼容）────────────────────────────────────────────────
+  # 两个用途：① 应用上传文件（mg_file 表对应的对象）② Milvus 的元数据存储。
+  # 因此同时属于 storage 与 vector 两个 profile。
+  minio:
+    image: minio/minio:latest
+    container_name: mg-minio
+    profiles: ["storage", "vector"]
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BROWSER_REDIRECT_URL: http://localhost:${MINIO_CONSOLE_PORT:-9001}
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - ../data/minio:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    command: server /data --console-address ":9001"
+
+  # ── 对象存储初始化：创建应用桶 + Milvus 桶 ────────────────────────────
+  minio-init:
+    image: minio/mc:latest
+    container_name: mg-minio-init
+    profiles: ["storage", "vector"]
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin} &&
+      mc mb --ignore-existing local/${MINIO_BUCKET:-medguide} &&
+      mc mb --ignore-existing local/a-bucket &&
+      echo '对象存储桶已就绪：${MINIO_BUCKET:-medguide} / a-bucket（Milvus）'
+      "
+    restart: "no"
+
+  # ── Milvus 依赖：etcd ──────────────────────────────────────────────────
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.18
+    container_name: mg-etcd
+    profiles: ["vector"]
+    restart: unless-stopped
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    volumes:
+      - ../data/etcd:/etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # ── 向量库：Milvus Standalone ─────────────────────────────────────────
+  # Milvus Lite 不支持 Windows，故开发/交付统一 Standalone。
+  # mem_limit 2g：开发机内存紧张时的上限；生产环境按向量规模调大。
+  milvus:
+    image: milvusdb/milvus:v2.5.9
+    container_name: mg-milvus
+    profiles: ["vector"]
+    restart: unless-stopped
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: mg-etcd:2379
+      MINIO_ADDRESS: mg-minio:9000
+      MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MILVUS_PORT:-19530}:19530"
+      - "${MILVUS_METRICS_PORT:-9091}:9091"
+    volumes:
+      - ../data/milvus:/var/lib/milvus
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+    mem_limit: 2g

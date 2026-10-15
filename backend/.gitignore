@@ -1,0 +1,37 @@
+# ---------------- 密钥（绝不入库） ----------------
+.env
+.env.*
+!.env.example
+!config/.env.*.example
+
+# ---------------- 本地数据 ----------------
+# 向量库为本地单文件（Milvus Lite），关系库为 SQLite，均不入库
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# ---------------- Python ----------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---------------- 模型权重 ----------------
+# 模型统一放在共享目录 D:\AIProject\models，项目内只保留软链接
+models/
+*.onnx_data
+*.bin
+*.pt
+*.safetensors
+
+# ---------------- 其它 ----------------
+.tmp/
+*.log
+.DS_Store

@@ -1,0 +1,71 @@
+# ══ 环境与凭证 ══════════════════════════════════════════════════════════
+# 示例文件必须入库，真实配置不入库（NFR17：敏感配置只经环境变量注入）
+.env
+.env.local
+backend/.env
+deploy/.env
+!.env.example
+!**/.env.example
+!*.env.development.example
+!*.env.production.example
+
+# ══ 数据卷与运行时产物 ══════════════════════════════════════════════════
+# 开发期数据卷统一在 data/ 下，便于一键清理与重建（02 文档 §4.3）
+data/
+!data/.gitkeep
+logs/
+*.log
+.tmp/
+
+# ══ 工具私有数据 ════════════════════════════════════════════════════════
+# WorkBuddy 的项目记忆与内部数据，不随仓库分发
+.workbuddy/
+
+# ══ Python ══════════════════════════════════════════════════════════════
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ══ Node / 前端 ═════════════════════════════════════════════════════════
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+.eslintcache
+
+# ══ 模型权重 ════════════════════════════════════════════════════════════
+# 模型文件不随仓库分发（NFR55 要求支持离线导入，但走制品包而非 Git）
+models/
+*.onnx
+*.onnx_data
+*.safetensors
+
+# ══ 知识库快照（生成物，源文件才入库）══════════════════════════════════
+kb/**/snapshots/
+kb/**/*.snapshot
+!kb/**/*.yaml
+!kb/**/*.yml
+
+# ══ IDE / OS ════════════════════════════════════════════════════════════
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ══ 交付物 ══════════════════════════════════════════════════════════════
+*.zip
+*.tar.gz
