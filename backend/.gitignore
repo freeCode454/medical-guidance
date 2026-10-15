@@ -25,7 +25,8 @@ htmlcov/
 
 # ---------------- 模型权重 ----------------
 # 模型统一放在共享目录 D:\AIProject\models，项目内只保留软链接
-models/
+# 注意：只忽略 backend 根目录的 models/，不能误伤 backend/app/models/（ORM 模型）
+/models/
 *.onnx_data
 *.bin
 *.pt
