@@ -1,34 +1,39 @@
 # 开发期基础设施编排
 #
 # ── 定位 ────────────────────────────────────────────────────────────────
-# **只起基础设施，应用在宿主机运行**（02 文档 §9.2）。理由：
-#   · 应用需要热重载，容器内改代码要重建镜像
-#   · 本地向量化模型在宿主机上，容器内需额外挂载
-#   · 开发机内存有限，少跑一个容器就少一份压力
+# **只起基础设施，应用在宿主机运行**（02 文档 §9.2）。
 #
-# ── 渐进式启动（本机可用内存约 4.4 GB，按顺序逐个验证）────────────────
-#   1) make db-up                         只起 PostgreSQL，验证建表
-#   2) make db-init && make db-verify     执行 init.sql 并核对 23 表 / 67 索引
-#   3) make vector-up                     Milvus Standalone（etcd + minio + milvus）
-#   4) make cache-up                      确认内存余量后再起 Redis
-#   5) make storage-up                    起 MinIO（若已随 vector 起则跳过）
+# ── 镜像前缀 MIRROR_PREFIX ─────────────────────────────────────────────
+# 国内直连 Docker Hub 不可用、公共镜像源已停服，所有 image 统一加前缀，
+# 指向个人镜像加速服务（轩辕镜像专业版）。
+# 前缀配置在 deploy/.env 的 MIRROR_PREFIX（形如 xxx.xuanyuan.run/）。
+# 交付形态：MIRROR_PREFIX 留空（走官方源），或改为离线导入（NFR55）。
 #
-# ⚠️ 向量库说明：Milvus Lite 官方**不支持 Windows**，开发/交付统一用
-#    Milvus Standalone（交付形态本来就是它，代码零差异）。
+# ── 渐进式启动（本机可用内存约 4.4 GB）────────────────────────────────
+#   make db-up          PostgreSQL（自动执行 init.sql 建 23 表）
+#   make vector-up      Milvus Standalone（单容器，内嵌 etcd + 本地存储）
+#   make cache-up       Redis（可选）
+#   make storage-up     MinIO（可选，见下方说明）
 #
-# ── 数据卷 ──────────────────────────────────────────────────────────────
-# 统一落在**项目根**的 data/ 下（02 文档 §4.3）。本文件位于 deploy/，
-# 故卷路径写作 ../data/。迁移脚本 deploy/postgres/migrations/ 不在此挂载。
+# ── 向量库说明 ──────────────────────────────────────────────────────────
+# Milvus Lite 官方不支持 Windows；Milvus Standalone 用「内嵌 etcd + 本地存储」
+# （ETCD_USE_EMBED=true + COMMON_STORAGE_TYPE=local）单容器运行，无需独立
+# etcd 与 minio 容器。开发形态最简部署；交付形态按官方三容器方案。
+#
+# ── MinIO 说明 ──────────────────────────────────────────────────────────
+# MinIO 仅用于应用文件存储（mg_file 表对应对象）。当前镜像源拉不到 minio
+# 镜像，故开发期**先不启用**，文件落本地目录（表结构与接口不变，见 03 §3.6.3）。
+# 镜像可拉后执行 make storage-up 即可切换。
 
 name: medical-guidance-infra
 
 services:
   # ── 关系数据库 ────────────────────────────────────────────────────────
   # 首次启动自动执行 init.sql（建 23 表 / 67 索引 / 2 触发器 + 种子数据）。
-  # 注意：docker-entrypoint-initdb.d 只在数据目录为空时执行一次；
-  #       要重新初始化需先 make db-reset（会删数据卷，谨慎）。
+  # 注意：docker-entrypoint-initdb.d 只在数据目录为空时执行一次。
   postgres:
-    image: postgres:16-alpine
+    # 使用内置 pgvector 扩展的镜像（init.sql 需要 CREATE EXTENSION vector）
+    image: ${MIRROR_PREFIX}pgvector/pgvector:pg16
     container_name: mg-postgres
     restart: unless-stopped
     environment:
@@ -60,10 +65,35 @@ services:
       - -c
       - log_min_duration_statement=500
 
+  # ── 向量库：Milvus Standalone（内嵌 etcd + 本地存储）─────────────────
+  # 单容器运行，无需 etcd / minio 依赖容器。开发机内存有限故 mem_limit 2g。
+  milvus:
+    image: ${MIRROR_PREFIX}milvusdb/milvus:v2.5.9
+    container_name: mg-milvus
+    profiles: ["vector"]
+    restart: unless-stopped
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_USE_EMBED: "true"
+      ETCD_DATA_DIR: /var/lib/milvus/etcd
+      COMMON_STORAGE_TYPE: local
+    ports:
+      - "${MILVUS_PORT:-19530}:19530"
+      - "${MILVUS_METRICS_PORT:-9091}:9091"
+    volumes:
+      - ../data/milvus:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 90s
+    mem_limit: 2g
+
   # ── 缓存 / 限流 / 消息广播 ────────────────────────────────────────────
   # db 划分见 03 文档 §6.7：db 0 业务缓存 / db 1 Celery broker / db 2 backend。
   redis:
-    image: redis:7-alpine
+    image: ${MIRROR_PREFIX}redis:7-alpine
     container_name: mg-redis
     profiles: ["cache"]
     restart: unless-stopped
@@ -89,12 +119,12 @@ services:
       - allkeys-lru
 
   # ── 对象存储（S3 兼容）────────────────────────────────────────────────
-  # 两个用途：① 应用上传文件（mg_file 表对应的对象）② Milvus 的元数据存储。
-  # 因此同时属于 storage 与 vector 两个 profile。
+  # 仅应用文件存储用。当前镜像源拉不到 minio，开发期暂不启用（见文件头说明）。
+  # 启用方式：make storage-up
   minio:
-    image: minio/minio:latest
+    image: ${MIRROR_PREFIX}minio/minio:RELEASE.2025-09-07T16-13-09Z
     container_name: mg-minio
-    profiles: ["storage", "vector"]
+    profiles: ["storage"]
     restart: unless-stopped
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
@@ -113,11 +143,11 @@ services:
       start_period: 15s
     command: server /data --console-address ":9001"
 
-  # ── 对象存储初始化：创建应用桶 + Milvus 桶 ────────────────────────────
+  # ── 对象存储初始化：创建应用桶 ────────────────────────────────────────
   minio-init:
-    image: minio/mc:latest
+    image: ${MIRROR_PREFIX}minio/mc:RELEASE.2025-08-13T08-35-41Z
     container_name: mg-minio-init
-    profiles: ["storage", "vector"]
+    profiles: ["storage"]
     depends_on:
       minio:
         condition: service_healthy
@@ -125,59 +155,6 @@ services:
       /bin/sh -c "
       mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin} &&
       mc mb --ignore-existing local/${MINIO_BUCKET:-medguide} &&
-      mc mb --ignore-existing local/a-bucket &&
-      echo '对象存储桶已就绪：${MINIO_BUCKET:-medguide} / a-bucket（Milvus）'
+      echo '对象存储桶已就绪：${MINIO_BUCKET:-medguide}'
       "
     restart: "no"
-
-  # ── Milvus 依赖：etcd ──────────────────────────────────────────────────
-  etcd:
-    image: quay.io/coreos/etcd:v3.5.18
-    container_name: mg-etcd
-    profiles: ["vector"]
-    restart: unless-stopped
-    environment:
-      ETCD_AUTO_COMPACTION_MODE: revision
-      ETCD_AUTO_COMPACTION_RETENTION: "1000"
-      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
-      ETCD_SNAPSHOT_COUNT: "50000"
-    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
-    volumes:
-      - ../data/etcd:/etcd
-    healthcheck:
-      test: ["CMD", "etcdctl", "endpoint", "health"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
-
-  # ── 向量库：Milvus Standalone ─────────────────────────────────────────
-  # Milvus Lite 不支持 Windows，故开发/交付统一 Standalone。
-  # mem_limit 2g：开发机内存紧张时的上限；生产环境按向量规模调大。
-  milvus:
-    image: milvusdb/milvus:v2.5.9
-    container_name: mg-milvus
-    profiles: ["vector"]
-    restart: unless-stopped
-    command: ["milvus", "run", "standalone"]
-    environment:
-      ETCD_ENDPOINTS: mg-etcd:2379
-      MINIO_ADDRESS: mg-minio:9000
-      MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
-      MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
-    ports:
-      - "${MILVUS_PORT:-19530}:19530"
-      - "${MILVUS_METRICS_PORT:-9091}:9091"
-    volumes:
-      - ../data/milvus:/var/lib/milvus
-    depends_on:
-      etcd:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
-      start_period: 60s
-    mem_limit: 2g

@@ -135,6 +135,7 @@ def probe_insert(client, report: ProbeReport) -> None:
             for i, (doc_id, text, dept, org) in enumerate(CORPUS)
         ]
         client.insert(COLLECTION, rows)
+        client.flush(COLLECTION)  # Milvus insert 是异步的，必须 flush 后才能统计与检索
         stats = client.get_collection_stats(COLLECTION)
         report.add("插入数据", "ok", f"行数={stats.get('row_count', '?')}")
     except Exception as exc:
@@ -255,17 +256,20 @@ def probe_chinese_analyzer(client, report: ProbeReport) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="探测 Milvus Lite 的能力边界")
-    parser.add_argument("--uri", default="./data/probe.db", help="本地库文件路径")
-    parser.add_argument("--keep", action="store_true", help="结束后保留探测库文件")
+    parser = argparse.ArgumentParser(description="探测 Milvus 的能力边界（Standalone / Lite 通用）")
+    parser.add_argument("--uri", default="http://localhost:19530",
+                        help="Milvus 地址。Standalone 用 http://host:19530；Lite 用本地文件路径")
+    parser.add_argument("--keep", action="store_true", help="结束后保留探测库（仅本地文件路径有效）")
     args = parser.parse_args()
 
-    db_path = Path(args.uri)
-    db_path.parent.mkdir(parents=True, exist_ok=True)
+    is_local_file = "://" not in args.uri
+    db_path = Path(args.uri) if is_local_file else None
+    if db_path is not None:
+        db_path.parent.mkdir(parents=True, exist_ok=True)
 
     print("=" * 68)
-    print("Milvus Lite 能力探测")
-    print(f"库文件：{db_path.resolve()}")
+    print("Milvus 能力探测")
+    print(f"目标地址：{args.uri}")
     print("=" * 68)
 
     try:
@@ -280,9 +284,9 @@ def main() -> int:
 
     report = ProbeReport()
     try:
-        client = MilvusClient(str(db_path))
+        client = MilvusClient(args.uri)
     except Exception as exc:
-        print(f"无法打开 Milvus Lite：{type(exc).__name__}: {exc}")
+        print(f"无法连接 Milvus：{type(exc).__name__}: {exc}")
         traceback.print_exc()
         return 1
 
@@ -309,7 +313,7 @@ def main() -> int:
             client.close()
         except Exception:
             pass
-        if not args.keep and db_path.exists():
+        if not args.keep and db_path is not None and db_path.exists():
             shutil.rmtree(db_path, ignore_errors=True) if db_path.is_dir() else db_path.unlink()
 
     print("=" * 68)
