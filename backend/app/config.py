@@ -74,7 +74,7 @@ class Settings(BaseSettings):
     # ---------------- 存储 ----------------
     # 向量库：开发/交付统一用 Milvus Standalone（Milvus Lite 不支持 Windows）
     milvus_uri: str = "http://localhost:19530"
-    database_url: str = "postgresql+asyncpg://medguide:medguide@localhost:5432/medguide"
+    database_url: str = "postgresql+asyncpg://medguide:medguide@localhost:5434/medguide"
     redis_url: str = "redis://localhost:6379/0"
 
     # 对象存储（MinIO，S3 兼容）
@@ -83,6 +83,18 @@ class Settings(BaseSettings):
     object_storage_secret_key: str = "minioadmin"
     object_storage_bucket: str = "medguide"
     object_storage_secure: bool = False
+
+    # ---------------- 认证与安全 ----------------
+    # 开发期可沿用默认值；交付形态（prod）会强制校验非默认（见 _validate）
+    # 默认值长度须 >= 32 字节（HMAC-SHA256 推荐下限），否则 pyjwt 会告警
+    jwt_secret: str = "dev-only-secret-change-me-0123456789abcdef"
+    jwt_algorithm: str = "HS256"
+    # 三档有效期（秒）：院内用户访问令牌 / 刷新令牌 / 匿名患者令牌
+    access_token_expires_seconds: int = 7200
+    refresh_token_expires_seconds: int = 28800
+    patient_token_expires_seconds: int = 1800
+    # 匿名患者绑定的默认租户（种子数据 HOSP_001）。多租户入口识别为后续扩展
+    default_tenant_id: str = "00000000000000000000000000000001"
 
     # ---------------- 能力开关 ----------------
     asr_enabled: bool = False
@@ -167,6 +179,8 @@ class Settings(BaseSettings):
 
         # ---- 交付形态不得使用默认凭证 ----
         if self.deploy_mode == "prod":
+            if self.jwt_secret == "dev-only-secret-change-me-0123456789abcdef":
+                raise ValueError("deploy_mode=prod 时必须配置 JWT_SECRET，不得使用开发默认值")
             for name, default, value in (
                 ("OBJECT_STORAGE_ACCESS_KEY", "minioadmin", self.object_storage_access_key),
                 ("OBJECT_STORAGE_SECRET_KEY", "minioadmin", self.object_storage_secret_key),
