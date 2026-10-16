@@ -27,6 +27,7 @@ from app.common.llm_client import ModelClient
 from app.api.v1 import api_v1_router
 from app.common.exceptions import register_exception_handlers
 from app.config import settings
+from app.retrieval import MilvusStore
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,6 +42,10 @@ _client: ModelClient | None = None
 async def lifespan(app: FastAPI):
     global _client
     _client = ModelClient(settings)
+    milvus_store = MilvusStore(settings.milvus_uri)
+    # 挂到 app.state，供接口与后台任务复用
+    app.state.model_client = _client
+    app.state.milvus_store = milvus_store
     logger.info(
         "启动完成 deploy_mode=%s egress_policy=%s llm=%s",
         settings.deploy_mode,
@@ -51,6 +56,7 @@ async def lifespan(app: FastAPI):
     if _client is not None:
         await _client.aclose()
     _client = None
+    milvus_store.close()
 
 
 app = FastAPI(title="MedicalGuidance", version="0.1.0", lifespan=lifespan)

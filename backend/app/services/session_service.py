@@ -212,9 +212,9 @@ async def get_triage_result(
             dept_code=c.get("dept_code", ""),
             dept_name=c.get("dept_name", ""),
             confidence=float(c.get("confidence", 0)),
-            is_primary=bool(c.get("is_primary", False)),
+            is_primary=(i == 0),  # 置信度最高者为首要推荐
         )
-        for c in candidates
+        for i, c in enumerate(candidates)
     ]
 
     return TriageResultResponse(

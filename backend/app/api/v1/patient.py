@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import CurrentPatient
@@ -19,7 +19,7 @@ from app.schemas.session import (
     SessionCreateResponse,
 )
 from app.schemas.triage import TriageResultResponse
-from app.services import session_service
+from app.services import session_service, triage_service
 
 router = APIRouter(prefix="/api/v1/patient", tags=["患者端"])
 
@@ -44,10 +44,21 @@ async def send_message(
     req: MessageSendRequest,
     db: DbSession,
     patient: CurrentPatient,
+    request: Request,
+    background_tasks: BackgroundTasks,
 ) -> ApiResponse[MessageSendResponse]:
     """发送一条患者消息，触发智能体流程（本期仅落库，AI 回复经 WS 推送）。"""
     data = await session_service.send_message(
         db, session_id, patient, req.content, req.msg_type, req.extra
+    )
+    # 后台触发分诊：响应立即返回，分诊在后台完成（符合 async=true 语义）
+    background_tasks.add_task(
+        triage_service.run_triage_and_persist,
+        session_id=session_id,
+        tenant_id=patient["tenant_id"],
+        complaint=req.content,
+        client=request.app.state.model_client,
+        store=request.app.state.milvus_store,
     )
     return ApiResponse(data=data)
 

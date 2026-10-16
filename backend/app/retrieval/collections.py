@@ -30,7 +30,12 @@ class VectorCollection:
 KB_DEPT = VectorCollection(
     name="kb_dept",
     has_sparse=True,
-    scalar_fields=(("text", "varchar4096"), ("dept_code", "varchar32"), ("tenant_id", "varchar32")),
+    scalar_fields=(
+        ("text", "varchar4096"),
+        ("dept_code", "varchar32"),
+        ("dept_name", "varchar64"),
+        ("tenant_id", "varchar32"),
+    ),
     partition_key="tenant_id",
     description="科室专长：科室匹配（F56）",
 )
