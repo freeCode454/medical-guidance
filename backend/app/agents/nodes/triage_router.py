@@ -19,23 +19,28 @@ logger = logging.getLogger(__name__)
 def _decide_route(
     confidence: float,
     depts: list[dict],
-    confidence_threshold: float = 0.6,
+    low_confidence_threshold: float = 0.3,
     gap_threshold: float = 0.1,
 ) -> str:
     """决策表路由（用 LLM 分诊置信度判定，阈值来自 mg_sys_config）。
 
-    - 无推荐科室或整体置信度低于阈值 → MANUAL
-    - 多科室且前两位置信度差值小于阈值 → MDT
+    - 无候选科室 → MANUAL（检索无依据，必须转人工）
+    - 多科室且前两位置信度差值小于阈值 → MDT（多科需会诊）
+    - 有明确推荐但整体置信度极低（< 0.3）→ MANUAL（模型自身信心不足）
     - 否则 → DIRECT
+
+    注：置信度不是硬门槛——检索召回的候选科室本身有向量依据，
+    LLM 在候选内做推荐（如 0.56 明确指向消化内科）即为有效结论，
+    不应因略低于 0.6 就转人工。仅当无候选或模型自身信心极低才 MANUAL。
     """
     if not depts:
-        return "MANUAL"
-    if confidence < confidence_threshold:
         return "MANUAL"
     if len(depts) > 1:
         confs = [d.get("confidence", 0) for d in depts]
         if (confs[0] - confs[1]) < gap_threshold:
             return "MDT"
+    if confidence < low_confidence_threshold:
+        return "MANUAL"
     return "DIRECT"
 
 

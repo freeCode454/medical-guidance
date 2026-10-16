@@ -28,6 +28,7 @@ from app.api.v1 import api_v1_router
 from app.common.exceptions import register_exception_handlers
 from app.config import settings
 from app.retrieval import MilvusStore
+from app.services.orchestration import init_orchestrator
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,6 +47,8 @@ async def lifespan(app: FastAPI):
     # 挂到 app.state，供接口与后台任务复用
     app.state.model_client = _client
     app.state.milvus_store = milvus_store
+    # 构建分诊编排器（LangGraph 图 + 多轮状态管理）
+    app.state.orchestrator = init_orchestrator(_client, _client.embedder, milvus_store)
     logger.info(
         "启动完成 deploy_mode=%s egress_policy=%s llm=%s",
         settings.deploy_mode,

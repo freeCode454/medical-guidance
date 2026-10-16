@@ -19,7 +19,7 @@ from app.schemas.session import (
     SessionCreateResponse,
 )
 from app.schemas.triage import TriageResultResponse
-from app.services import session_service, triage_service
+from app.services import session_service
 
 router = APIRouter(prefix="/api/v1/patient", tags=["患者端"])
 
@@ -28,10 +28,23 @@ DbSession = Annotated[AsyncSession, Depends(get_db)]
 
 @router.post("/sessions", response_model=ApiResponse[SessionCreateResponse])
 async def create_session(
-    req: SessionCreateRequest, db: DbSession, patient: CurrentPatient
+    req: SessionCreateRequest,
+    db: DbSession,
+    patient: CurrentPatient,
+    request: Request,
+    background_tasks: BackgroundTasks,
 ) -> ApiResponse[SessionCreateResponse]:
-    """创建一次预问诊会话。"""
+    """创建一次预问诊会话，并触发编排图（追问/分诊）。"""
     data = await session_service.create_session(db, patient, req)
+    # 后台触发编排图：主诉 → 澄清追问（interrupt）或直接分诊
+    if req.chief_complaint:
+        background_tasks.add_task(
+            request.app.state.orchestrator.start,
+            session_id=data.session_id,
+            tenant_id=patient["tenant_id"],
+            patient_id=patient["sub"],
+            chief_complaint=req.chief_complaint,
+        )
     return ApiResponse(data=data)
 
 
@@ -47,18 +60,17 @@ async def send_message(
     request: Request,
     background_tasks: BackgroundTasks,
 ) -> ApiResponse[MessageSendResponse]:
-    """发送一条患者消息，触发智能体流程（本期仅落库，AI 回复经 WS 推送）。"""
+    """发送一条患者消息，恢复编排图（患者回答追问）。"""
     data = await session_service.send_message(
         db, session_id, patient, req.content, req.msg_type, req.extra
     )
-    # 后台触发分诊：响应立即返回，分诊在后台完成（符合 async=true 语义）
+    # 后台恢复编排图：患者回答 → 继续追问或生成分诊结论
     background_tasks.add_task(
-        triage_service.run_triage_and_persist,
+        request.app.state.orchestrator.resume,
         session_id=session_id,
         tenant_id=patient["tenant_id"],
-        complaint=req.content,
-        client=request.app.state.model_client,
-        store=request.app.state.milvus_store,
+        patient_id=patient["sub"],
+        answer=req.content,
     )
     return ApiResponse(data=data)
 
