@@ -126,6 +126,67 @@
       "layer": 1,
       "action": "GUIDE_TO_EMERGENCY",
       "message": "疑似气道异物，请立即急救（海姆立克）并拨打120"
+    },
+    {
+      "rule_id": "RF11",
+      "symptom": "宫外孕破裂",
+      "keywords": [
+        "停经后剧烈腹痛",
+        "阴道出血伴腹痛",
+        "头晕晕厥"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "育龄女性停经后剧烈腹痛，请立即就医"
+    },
+    {
+      "rule_id": "RF12",
+      "symptom": "急性中毒",
+      "keywords": [
+        "误服药物",
+        "农药中毒",
+        "一氧化碳中毒",
+        "吞服异物"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疑似中毒，请立即拨打120并携带毒物样本"
+    },
+    {
+      "rule_id": "RF13",
+      "symptom": "重度脱水",
+      "keywords": [
+        "婴幼儿腹泻伴精神萎靡",
+        "尿量极少",
+        "囟门凹陷"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "孩子可能重度脱水，请立即就医"
+    },
+    {
+      "rule_id": "RF14",
+      "symptom": "颅脑外伤",
+      "keywords": [
+        "头部外伤后呕吐",
+        "意识改变",
+        "耳鼻流血"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "头部外伤后异常，请立即就医"
+    },
+    {
+      "rule_id": "RF15",
+      "symptom": "血糖危象",
+      "keywords": [
+        "糖尿病伴意识模糊",
+        "极度口渴多尿",
+        "呼吸深快"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "可能发生血糖危象，请立即就医"
     }
   ],
   "triage_rules": [
@@ -144,7 +205,8 @@
         "反酸",
         "烧心",
         "便血",
-        "黑便"
+        "黑便",
+        "腹胀"
       ]
     },
     {
@@ -160,7 +222,8 @@
         "心悸",
         "心慌",
         "气短",
-        "高血压"
+        "高血压",
+        "心前区痛"
       ]
     },
     {
@@ -193,22 +256,25 @@
         "肢体无力",
         "麻木",
         "抽搐",
-        "面瘫"
+        "面瘫",
+        "言语不清"
       ]
     },
     {
-      "dept_code": "EMER",
-      "dept_name": "急诊科",
+      "dept_code": "END",
+      "dept_name": "内分泌科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 20,
-      "note": "红旗症状直接急诊（高优先级）",
+      "priority": 8,
+      "note": "内分泌代谢症状",
       "symptoms": [
-        "剧烈胸痛",
-        "大出血",
-        "昏迷",
-        "休克",
-        "严重外伤"
+        "多饮",
+        "多尿",
+        "体重下降",
+        "怕冷",
+        "多汗",
+        "消瘦",
+        "关节红肿"
       ]
     },
     {
@@ -217,13 +283,14 @@
       "age_filter": "",
       "gender_filter": "",
       "priority": 8,
-      "note": "泌尿症状",
+      "note": "泌尿系统症状",
       "symptoms": [
         "尿频",
         "尿急",
         "尿痛",
         "血尿",
-        "腰痛"
+        "排尿困难",
+        "肾绞痛"
       ]
     },
     {
@@ -234,10 +301,10 @@
       "priority": 8,
       "note": "妇科症状（仅女性）",
       "symptoms": [
-        "下腹痛",
+        "白带异常",
         "月经不调",
         "痛经",
-        "白带异常",
+        "下腹痛",
         "阴道出血"
       ]
     },
@@ -252,7 +319,8 @@
         "停经",
         "早孕",
         "孕期腹痛",
-        "胎动异常"
+        "胎动异常",
+        "孕期出血"
       ]
     },
     {
@@ -261,12 +329,15 @@
       "age_filter": "",
       "gender_filter": "",
       "priority": 8,
-      "note": "骨关节症状",
+      "note": "骨关节与运动系统症状",
       "symptoms": [
-        "骨折",
-        "关节痛",
+        "腰痛",
         "腰背痛",
-        "扭伤"
+        "关节痛",
+        "颈痛",
+        "骨折",
+        "扭伤",
+        "活动受限"
       ]
     },
     {
@@ -279,9 +350,10 @@
       "symptoms": [
         "皮疹",
         "瘙痒",
-        "红肿",
+        "风团",
+        "水疱",
         "脱发",
-        "湿疹"
+        "红斑"
       ]
     },
     {
@@ -296,6 +368,7 @@
         "鼻塞",
         "流涕",
         "耳鸣",
+        "耳痛",
         "听力下降",
         "声音嘶哑"
       ]
@@ -311,7 +384,9 @@
         "眼红",
         "眼痛",
         "视力下降",
-        "视物模糊"
+        "视物模糊",
+        "眼干",
+        "流泪"
       ]
     },
     {
@@ -326,7 +401,196 @@
         "焦虑",
         "抑郁",
         "情绪低落",
-        "恐慌"
+        "恐慌",
+        "坐立不安"
+      ]
+    },
+    {
+      "dept_code": "EMER",
+      "dept_name": "急诊科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 20,
+      "note": "红旗症状直接急诊（最高优先级）",
+      "symptoms": [
+        "剧烈胸痛",
+        "昏迷",
+        "休克",
+        "抽搐",
+        "大出血",
+        "严重外伤",
+        "意识障碍"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "消化系统感染表现",
+      "symptoms": [
+        "呕吐伴腹泻",
+        "腹痛伴发热"
+      ]
+    },
+    {
+      "dept_code": "RES",
+      "dept_name": "呼吸内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "下呼吸道症状",
+      "symptoms": [
+        "咳嗽伴气短",
+        "喘息发作"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "神经系统复合症状",
+      "symptoms": [
+        "头痛伴头晕",
+        "肢体麻木"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "泌尿系感染可能",
+      "symptoms": [
+        "尿痛伴发热"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "女",
+      "priority": 9,
+      "note": "妇科炎症可能",
+      "symptoms": [
+        "下腹痛伴白带异常"
+      ]
+    },
+    {
+      "dept_code": "ORTH",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "关节炎症可能",
+      "symptoms": [
+        "关节痛伴红肿"
+      ]
+    },
+    {
+      "dept_code": "DERM",
+      "dept_name": "皮肤科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "皮肤过敏可能",
+      "symptoms": [
+        "皮疹伴瘙痒"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "上呼吸道感染可能",
+      "symptoms": [
+        "咽痛伴发热"
+      ]
+    },
+    {
+      "dept_code": "OPH",
+      "dept_name": "眼科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "眼部急症可能",
+      "symptoms": [
+        "视物模糊伴眼痛"
+      ]
+    },
+    {
+      "dept_code": "END",
+      "dept_name": "内分泌科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 9,
+      "note": "甲状腺功能异常可能",
+      "symptoms": [
+        "心悸伴多汗消瘦"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 7,
+      "note": "胃食管反流可能",
+      "symptoms": [
+        "夜间胸痛",
+        "餐后反酸"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 7,
+      "note": "心功能评估",
+      "symptoms": [
+        "活动后气短"
+      ]
+    },
+    {
+      "dept_code": "DERM",
+      "dept_name": "皮肤科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 7,
+      "note": "感染性皮疹可能",
+      "symptoms": [
+        "发热伴皮疹"
+      ]
+    },
+    {
+      "dept_code": "RES",
+      "dept_name": "呼吸内科",
+      "age_filter": "child",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "儿童常见感染",
+      "symptoms": [
+        "儿童发热",
+        "儿童腹泻"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "elderly",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "老年神经系统评估",
+      "symptoms": [
+        "老年人头晕",
+        "老年人乏力"
       ]
     }
   ],
@@ -356,6 +620,24 @@
       "order": "4"
     },
     {
+      "complaint_type": "腹泻",
+      "target_slot": "frequency",
+      "question": "一天腹泻几次？大便是什么样子（水样、糊状、带血）？",
+      "order": "1"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "duration",
+      "question": "腹泻多久了？",
+      "order": "2"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "accompanying",
+      "question": "有没有腹痛、发热、呕吐、脱水表现？",
+      "order": "3"
+    },
+    {
       "complaint_type": "胸痛",
       "target_slot": "nature",
       "question": "胸痛是什么样的（压榨、针刺、烧灼）？",
@@ -374,22 +656,28 @@
       "order": "3"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "location",
-      "question": "头痛在哪个部位（太阳穴、后脑勺、全头）？",
+      "complaint_type": "胸闷",
+      "target_slot": "trigger",
+      "question": "胸闷在什么情况下出现（活动、休息、夜间）？",
       "order": "1"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "nature",
-      "question": "是胀痛、跳痛还是刺痛？",
+      "complaint_type": "胸闷",
+      "target_slot": "duration",
+      "question": "每次持续多久？能否自行缓解？",
       "order": "2"
     },
     {
-      "complaint_type": "头痛",
+      "complaint_type": "心悸",
+      "target_slot": "trigger",
+      "question": "心慌在什么情况下出现？持续多久？",
+      "order": "1"
+    },
+    {
+      "complaint_type": "心悸",
       "target_slot": "accompanying",
-      "question": "有没有恶心、呕吐、畏光、发热？",
-      "order": "3"
+      "question": "有没有胸痛、气短、头晕、多汗？",
+      "order": "2"
     },
     {
       "complaint_type": "咳嗽",
@@ -422,6 +710,24 @@
       "order": "2"
     },
     {
+      "complaint_type": "头痛",
+      "target_slot": "location",
+      "question": "头痛在哪个部位（太阳穴、后脑勺、全头）？",
+      "order": "1"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "nature",
+      "question": "是胀痛、跳痛还是刺痛？",
+      "order": "2"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "accompanying",
+      "question": "有没有恶心、呕吐、畏光、发热？",
+      "order": "3"
+    },
+    {
       "complaint_type": "头晕",
       "target_slot": "nature",
       "question": "是旋转感（天旋地转）还是头重脚轻？",
@@ -444,6 +750,30 @@
       "target_slot": "location",
       "question": "是单侧还是双侧？具体哪边？",
       "order": "2"
+    },
+    {
+      "complaint_type": "尿频尿痛",
+      "target_slot": "duration",
+      "question": "尿频尿痛多久了？有没有血尿、发热？",
+      "order": "1"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "nature",
+      "question": "皮疹是什么样（红斑、丘疹、水疱）？分布在哪些部位？",
+      "order": "1"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "trigger",
+      "question": "有没有接触过敏原、用药、进食特殊食物？",
+      "order": "2"
+    },
+    {
+      "complaint_type": "下腹痛",
+      "target_slot": "relation",
+      "question": "腹痛与月经周期有关系吗？有没有阴道出血？",
+      "order": "1"
     }
   ]
 }

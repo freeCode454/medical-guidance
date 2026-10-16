@@ -50,7 +50,7 @@ def _kv(keys: list[str], row: list) -> dict:
 
 
 async def import_entries() -> None:
-    """把知识库类数据写入 mg_kb_entry（幂等 upsert）。"""
+    """把知识库类数据写入 mg_kb_entry（全量替换：先清理脚本生成的旧数据）。"""
     # (sheet, keys, kb_type, entry_code_prefix, content 字段)
     plans = [
         ("科室字典", ["dept_code", "dept_name", "aliases", "expertise", "sub_specialty", "related_diseases"],
@@ -69,6 +69,21 @@ async def import_entries() -> None:
 
     total = 0
     async with AsyncSessionFactory() as db:
+        # 清理脚本生成的旧条目（按 entry_code 前缀），保证全量替换
+        prefixes = [p for _, _, _, p, _ in plans]
+        old = (await db.scalars(
+            select(KbEntry).where(KbEntry.tenant_id == DEFAULT_TENANT_ID)
+        )).all()
+        removed = 0
+        for e in old:
+            code = e.entry_code or ""
+            if any(code.startswith(pfx + "-") for pfx in prefixes):
+                await db.delete(e)
+                removed += 1
+        if removed:
+            await db.flush()
+            print(f"清理旧条目 {removed} 条")
+
         for sheet, keys, kb_type, prefix, content_fields in plans:
             rows = _rows(sheet)
             for idx, row in enumerate(rows, start=1):
