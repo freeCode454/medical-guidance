@@ -23,6 +23,7 @@ from langgraph.types import Send
 
 from app.agents.state import TriageState
 from app.common.llm_client import ModelClient
+from app.ws import events
 
 logger = logging.getLogger(__name__)
 
@@ -75,9 +76,13 @@ def build_mdt_fanout_node():
     def mdt_fanout(state: TriageState) -> list[Send]:
         triage = state.get("triage_result", {})
         depts = triage.get("recommended_depts", [])
+        session_id = state.get("session_id", "")
         if not depts:
             # 无候选科室：直接跳过会诊（走汇总，产生空结果）
             return []
+        events.emit_node_start(
+            session_id, events.NODE_MDT_COUNCIL, "多学科会诊", "正在召集专科医生会诊"
+        )
         sends = [
             Send(
                 "mdt_specialist",
@@ -193,6 +198,7 @@ def build_mdt_aggregate_node():
     async def mdt_aggregate(state: TriageState) -> dict:
         opinions = state.get("mdt_opinions", [])
         result = _aggregate(opinions)
+        session_id = state.get("session_id", "")
 
         # 更新分诊结论：共识科室提到首位；分歧信息写入医生端视图
         triage = dict(state.get("triage_result", {}))
@@ -215,6 +221,19 @@ def build_mdt_aggregate_node():
             # 若存在分歧，route 保持 MDT 让医生关注；无分歧则收敛为 DIRECT
             if not result["divergence_flag"]:
                 triage["route"] = "DIRECT"
+
+        events.emit_node_complete(
+            session_id,
+            events.NODE_MDT_COUNCIL,
+            {
+                "candidate_depts": [o.get("dept_code", "") for o in opinions],
+                "opinion_count": len([o for o in opinions if "error" not in o]),
+                "missing_count": result["missing_count"],
+                "divergence": result["divergence_flag"],
+                "consensus_dept": result["consensus_dept"],
+                "consensus_confidence": result["consensus_confidence"],
+            },
+        )
 
         return {
             "mdt_result": result,

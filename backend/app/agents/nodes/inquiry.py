@@ -15,6 +15,7 @@ from langgraph.types import interrupt
 
 from app.agents.state import TriageState
 from app.common.llm_client import ModelClient
+from app.ws import events
 
 logger = logging.getLogger(__name__)
 
@@ -77,8 +78,15 @@ def build_inquiry_node(client: ModelClient):
     """构造澄清追问节点（绑定 client）。"""
 
     async def inquiry_node(state: TriageState) -> dict:
+        session_id = state.get("session_id", "")
+        events.emit_node_start(
+            session_id, events.NODE_INQUIRY, "信息采集与追问", "正在评估信息是否充分"
+        )
         # 轮次上限：超过则强制充分，不再追问
         if state.get("inquiry_rounds", 0) >= MAX_ROUNDS:
+            events.emit_node_complete(
+                session_id, events.NODE_INQUIRY, {"sufficient": True, "round_limit": True}
+            )
             return {"sufficient": True}
 
         prompt = _build_prompt(state)
@@ -92,6 +100,9 @@ def build_inquiry_node(client: ModelClient):
             result = json.loads(reply)
         except json.JSONDecodeError:
             logger.warning("澄清追问解析失败，视为信息充分")
+            events.emit_node_complete(
+                session_id, events.NODE_INQUIRY, {"sufficient": True, "degraded": True}
+            )
             return {"sufficient": True}
 
         collected = result.get("collected") or {}
@@ -103,11 +114,19 @@ def build_inquiry_node(client: ModelClient):
         round_now = state.get("inquiry_rounds", 0) + 1
 
         if result.get("sufficient"):
+            events.emit_node_complete(
+                session_id, events.NODE_INQUIRY, {"sufficient": True, "inquiry_rounds": round_now}
+            )
             return {"sufficient": True, "entities": entities, "inquiry_rounds": round_now}
 
-        # 不充分：挂起图，返回追问给患者
+        # 不充分：先推送本轮追问，再挂起图等待患者回答
         missing = result.get("missing", [])
         question = result.get("question", "")
+        events.emit_node_complete(
+            session_id,
+            events.NODE_INQUIRY,
+            {"sufficient": False, "content": question, "asked": missing, "inquiry_rounds": round_now},
+        )
         answer = interrupt({"pending_question": question, "asked": missing})
         # 患者回答后恢复：追问 + 回答都追加进对话，图循环回本节点
         return {

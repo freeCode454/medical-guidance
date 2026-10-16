@@ -24,6 +24,7 @@ from app.common.egress_guard import (
     is_private_host,
 )
 from app.common.llm_client import ModelClient
+from app.api import ws as ws_router
 from app.api.v1 import api_v1_router
 from app.common.exceptions import register_exception_handlers
 from app.config import settings
@@ -64,9 +65,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="MedicalGuidance", version="0.1.0", lifespan=lifespan)
 
-# 全局异常处理器（业务错误 → 统一响应）+ 业务路由
+# 全局异常处理器（业务错误 → 统一响应）+ 业务路由 + WebSocket
 register_exception_handlers(app)
 app.include_router(api_v1_router)
+app.include_router(ws_router.router)
 
 
 def _require_debug() -> None:

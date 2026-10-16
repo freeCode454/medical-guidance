@@ -18,6 +18,7 @@ import logging
 
 from app.agents.state import TriageState
 from app.common.llm_client import ModelClient
+from app.ws import events
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +69,10 @@ def build_emr_writer_node(client: ModelClient):
     """构造 SOAP 病历生成节点。"""
 
     async def emr_writer_node(state: TriageState) -> dict:
+        session_id = state.get("session_id", "")
+        events.emit_node_start(
+            session_id, events.NODE_EMR_GENERATE, "病历生成", "正在整理预问诊病历"
+        )
         prompt = _build_prompt(state)
         try:
             reply = await client.chat(
@@ -81,6 +86,9 @@ def build_emr_writer_node(client: ModelClient):
             logger.warning("SOAP 病历生成失败: %s", exc)
             # 降级：PARTIAL，保留已采集的结构化信息，不伪造
             entities = state.get("entities", {})
+            events.emit_node_complete(
+                session_id, events.NODE_EMR_GENERATE, {"generate_status": "FAILED"}
+            )
             return {
                 "emr": {
                     "subjective": state.get("chief_complaint", ""),
@@ -100,15 +108,19 @@ def build_emr_writer_node(client: ModelClient):
             logger.warning("SOAP P 段疑似含用药建议，已剔除")
             result["plan"] = "建议就诊科室进一步评估，用药方案由接诊医生根据面诊结果制定。"
 
-        return {
-            "emr": {
-                "subjective": result.get("subjective", ""),
-                "objective": result.get("objective", ""),
-                "assessment": result.get("assessment", ""),
-                "plan": result["plan"],
-                "generate_status": "SUCCESS",
-                "completeness_rate": result.get("completeness_rate", 1.0),
-            }
+        emr = {
+            "subjective": result.get("subjective", ""),
+            "objective": result.get("objective", ""),
+            "assessment": result.get("assessment", ""),
+            "plan": result["plan"],
+            "generate_status": "SUCCESS",
+            "completeness_rate": result.get("completeness_rate", 1.0),
         }
+        events.emit_node_complete(
+            session_id,
+            events.NODE_EMR_GENERATE,
+            {"generate_status": "SUCCESS", "completeness_rate": emr["completeness_rate"]},
+        )
+        return {"emr": emr}
 
     return emr_writer_node

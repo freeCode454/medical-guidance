@@ -12,6 +12,7 @@ from app.common.embedder import BaseEmbedder
 from app.common.llm_client import ModelClient
 from app.retrieval import MilvusStore
 from app.services.triage_service import generate_triage, recall_depts
+from app.ws import events
 
 logger = logging.getLogger(__name__)
 
@@ -64,17 +65,50 @@ def build_router_node(client: ModelClient, embedder: BaseEmbedder, store: Milvus
     """构造分流路由节点（绑定资源）。"""
 
     async def router_node(state: TriageState) -> dict:
+        session_id = state.get("session_id", "")
         query = _build_query(state)
         tenant_id = state["tenant_id"]
 
+        # 检索召回候选科室
+        events.emit_node_start(
+            session_id, events.NODE_RETRIEVAL, "候选科室检索", "正在检索匹配科室"
+        )
+        depts = await recall_depts(
+            embedder, store, complaint=query, tenant_id=tenant_id
+        )
+        events.emit_node_complete(
+            session_id,
+            events.NODE_RETRIEVAL,
+            {
+                "retrieval_mode": "DENSE",
+                "candidate_count": len(depts),
+                "top_depts": [
+                    {"dept_code": d["dept_code"], "dept_name": d.get("dept_name", ""), "score": round(d["score"], 4)}
+                    for d in depts[:3]
+                ],
+            },
+        )
+
+        # LLM 生成分诊结论 + 决策表路由
+        events.emit_node_start(
+            session_id, events.NODE_TRIAGE_DECIDE, "分诊决策", "正在综合判断"
+        )
         result = await generate_triage(
             client, embedder, store, complaint=query, tenant_id=tenant_id
         )
-        # 决策表路由（以 LLM 置信度判定，覆盖 LLM 自身的 route）
         route = _decide_route(
             result.get("confidence", 0.0), result.get("recommended_depts", [])
         )
         result["route"] = route
+        events.emit_node_complete(
+            session_id,
+            events.NODE_TRIAGE_DECIDE,
+            {
+                "route": route,
+                "confidence": result.get("confidence", 0.0),
+                "recommended_depts": result.get("recommended_depts", []),
+            },
+        )
         return {"route": route, "triage_result": result}
 
     return router_node

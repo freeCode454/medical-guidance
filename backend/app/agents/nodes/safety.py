@@ -13,6 +13,7 @@ from __future__ import annotations
 import re
 
 from app.agents.state import TriageState
+from app.ws import events
 
 # 急诊红线关键词（保守：宁可误拦不可漏拦）
 _EMERGENCY_PATTERNS = [
@@ -36,11 +37,23 @@ def detect_emergency(text: str) -> bool:
 
 def safety_node(state: TriageState) -> dict:
     """危重症拦截节点。命中则置 EMERGENCY 并中断。"""
+    session_id = state.get("session_id", "")
+    events.emit_node_start(
+        session_id, events.NODE_SAFETY, "危重症识别", "正在评估症状紧急程度"
+    )
+
     text = state.get("chief_complaint", "")
     hit = detect_emergency(text)
     if hit:
-        return {
-            "risk_flag": True,
-            "route": "EMERGENCY",
-        }
+        events.emit_emergency(
+            session_id,
+            "胸痛/呼吸困难/昏迷/大出血等危重症红线关键词",
+            "您的症状需要立即就医，请立即前往就近医院急诊科",
+        )
+        events.emit_node_complete(
+            session_id, events.NODE_SAFETY, {"matched": True}
+        )
+        return {"risk_flag": True, "route": "EMERGENCY"}
+
+    events.emit_node_complete(session_id, events.NODE_SAFETY, {"matched": False})
     return {"risk_flag": False}
