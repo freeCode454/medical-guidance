@@ -17,8 +17,10 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
+import zipfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Sequence
 
 import numpy as np
@@ -118,18 +120,22 @@ class ApiEmbedder(BaseEmbedder):
 
 
 class LocalBgeM3Embedder(BaseEmbedder):
-    """本地 BGE-M3，同时产出稠密与稀疏向量。
+    """本地 BGE-M3（ONNX Runtime），同时产出稠密与稀疏向量。
 
-    模型较大（fp32 约 2.2 GB），因此：
+    采用 ONNX Runtime + tokenizers + numpy，不引入 torch / FlagEmbedding
+    （镜像体积少约 2 GB，见《01 需求》8.1.1）。
 
-    - **懒加载**：首次调用时才载入，避免拖慢服务启动
-    - **线程池执行**：模型推理是 CPU 密集型，必须放到线程里，否则阻塞事件循环
-    - **只加载一次**：用锁保证并发首次调用不会重复加载
+    稀疏向量由模型自带权重计算：``relu(token_embeddings @ W.T + b)``，
+    再按 token_id 取 max。W、b 从 ``sparse_linear.pt``（torch zip 格式）读取：
+    ``data/0`` = weight (1, 1024) float16，``data/1`` = bias (1,) float16。
 
-    内存不足时请先做 ONNX int8 量化，见 docs/开发环境与后端切换方案.md 4.1 节。
+    懒加载 + 线程池执行（推理是 CPU 密集操作），用锁保证只加载一次。
     """
 
     supports_sparse = True
+
+    #: 稀疏计算需排除的特殊 token（<s>/<pad>/</s>/<unk>），避免噪声权重
+    _SPECIAL_TOKENS = ("<s>", "<pad>", "</s>", "<unk>")
 
     def __init__(
         self,
@@ -146,7 +152,11 @@ class LocalBgeM3Embedder(BaseEmbedder):
         self._use_fp16 = use_fp16
         self._sparse_top_k = sparse_top_k
 
-        self._model = None
+        self._session = None
+        self._tokenizer = None
+        self._sparse_w = None
+        self._sparse_b = None
+        self._excluded_tokens: set[int] = set()
         self._load_lock = threading.Lock()
 
     @property
@@ -154,45 +164,80 @@ class LocalBgeM3Embedder(BaseEmbedder):
         return f"local:{self._model_path}"
 
     def _ensure_loaded(self) -> None:
-        if self._model is not None:
+        if self._session is not None:
             return
         with self._load_lock:
-            if self._model is not None:
+            if self._session is not None:
                 return
-            try:
-                from FlagEmbedding import BGEM3FlagModel
-            except ImportError as exc:  # pragma: no cover - 依赖缺失时给出明确指引
-                raise RuntimeError(
-                    "本地向量化需要 FlagEmbedding，请先执行："
-                    "pip install -U FlagEmbedding"
-                ) from exc
+            import onnxruntime as ort
+            from tokenizers import Tokenizer
 
-            logger.info("载入本地向量模型：%s", self._model_path)
-            self._model = BGEM3FlagModel(self._model_path, use_fp16=self._use_fp16)
-            logger.info("本地向量模型载入完成")
+            model_dir = Path(self._model_path)
+            logger.info("载入本地向量模型（ONNX）：%s", model_dir)
+
+            self._session = ort.InferenceSession(
+                str(model_dir / "onnx" / "model.onnx"),
+                providers=["CPUExecutionProvider"],
+            )
+            self._tokenizer = Tokenizer.from_file(str(model_dir / "tokenizer.json"))
+
+            # 读取稀疏线性层权重（torch zip 格式，不依赖 torch）
+            with zipfile.ZipFile(str(model_dir / "sparse_linear.pt")) as zf:
+                self._sparse_w = np.frombuffer(
+                    zf.read("sparse_linear/data/0"), dtype=np.float16
+                ).astype(np.float32).reshape(1, 1024)
+                self._sparse_b = np.frombuffer(
+                    zf.read("sparse_linear/data/1"), dtype=np.float16
+                ).astype(np.float32).reshape(1)
+
+            for name in self._SPECIAL_TOKENS:
+                tid = self._tokenizer.token_to_id(name)
+                if tid is not None:
+                    self._excluded_tokens.add(tid)
+
+            logger.info(
+                "本地向量模型载入完成（词表 %d）", self._tokenizer.get_vocab_size()
+            )
 
     def _encode_sync(self, texts: list[str]) -> list[Embedding]:
         self._ensure_loaded()
-        assert self._model is not None
 
-        output = self._model.encode(
-            texts,
-            batch_size=self._batch_size,
-            max_length=self._max_length,
-            return_dense=True,
-            return_sparse=True,
-            return_colbert_vecs=False,  # 多向量占用大且本项目不需要
+        encodings = self._tokenizer.encode_batch(texts)
+        batch_ids = [e.ids[: self._max_length] for e in encodings]
+        max_len = max(len(ids) for ids in batch_ids)
+
+        input_ids = np.array(
+            [ids + [0] * (max_len - len(ids)) for ids in batch_ids], dtype=np.int64
+        )
+        attention_mask = np.array(
+            [[1] * len(ids) + [0] * (max_len - len(ids)) for ids in batch_ids],
+            dtype=np.int64,
         )
 
-        dense_matrix = l2_normalize(np.asarray(output["dense_vecs"], dtype=np.float32))
-        lexical = output.get("lexical_weights") or [{} for _ in texts]
+        dense, token_emb = self._session.run(
+            ["sentence_embedding", "token_embeddings"],
+            {"input_ids": input_ids, "attention_mask": attention_mask},
+        )
+        dense_norm = l2_normalize(np.asarray(dense, dtype=np.float32))
+
+        # 稀疏权重：relu(token_embeddings @ W.T + b)，按 token_id 取 max
+        scores = np.maximum(
+            np.asarray(token_emb, dtype=np.float32) @ self._sparse_w.T + self._sparse_b,
+            0.0,
+        )
 
         results: list[Embedding] = []
-        for dense_row, weights in zip(dense_matrix, lexical):
+        for i, ids in enumerate(batch_ids):
+            sparse: dict[int, float] = {}
+            for tid, score in zip(ids, scores[i].ravel()):
+                if tid in self._excluded_tokens:
+                    continue
+                if score > 0:
+                    sparse[tid] = max(sparse.get(tid, 0.0), float(score))
             results.append(
                 Embedding(
-                    dense=dense_row.tolist(),
-                    sparse=to_milvus_sparse(weights, top_k=self._sparse_top_k),
+                    dense=dense_norm[i].tolist(),
+                    sparse=to_milvus_sparse(sparse, top_k=self._sparse_top_k),
                 )
             )
         return results
@@ -204,7 +249,10 @@ class LocalBgeM3Embedder(BaseEmbedder):
         return await asyncio.to_thread(self._encode_sync, list(texts))
 
     async def aclose(self) -> None:
-        self._model = None
+        self._session = None
+        self._tokenizer = None
+        self._sparse_w = None
+        self._sparse_b = None
 
 
 def build_embedder(settings) -> BaseEmbedder:
