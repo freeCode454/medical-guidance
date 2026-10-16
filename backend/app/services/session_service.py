@@ -20,7 +20,7 @@ from app.common.error_codes import (
     SESSION_TRIAGE_NOT_READY,
 )
 from app.common.exceptions import BizError
-from app.models import Session, SessionMessage, TriageResult
+from app.models import EmrRecord, Session, SessionMessage, TriageResult
 from app.schemas.session import (
     MessageSendResponse,
     SessionCreateRequest,
@@ -228,3 +228,119 @@ async def get_triage_result(
         disclaimer="本系统仅提供分诊建议，不构成医学诊断。请以医生面诊为准。",
         generated_time=result.create_time,
     )
+
+
+async def list_messages(
+    db: AsyncSession,
+    session_id: str,
+    payload: dict,
+    page: int,
+    size: int,
+    after_seq: int | None,
+) -> dict:
+    """查询对话记录（患者视图）。过滤 SYSTEM 内部消息，按 seq_no 升序。"""
+    patient_id = payload["sub"]
+    tenant_id = payload["tenant_id"]
+    await _get_owned_session(db, session_id, patient_id, tenant_id)
+
+    conds = [
+        SessionMessage.session_id == session_id,
+        SessionMessage.tenant_id == tenant_id,
+        SessionMessage.role != "SYSTEM",
+    ]
+    if after_seq is not None:
+        conds.append(SessionMessage.seq_no > after_seq)
+
+    total = await db.scalar(select(func.count()).select_from(SessionMessage).where(*conds))
+    rows = (
+        await db.scalars(
+            select(SessionMessage)
+            .where(*conds)
+            .order_by(SessionMessage.seq_no.asc())
+            .offset((page - 1) * size)
+            .limit(size)
+        )
+    ).all()
+    return {
+        "total": total,
+        "page": page,
+        "size": size,
+        "items": [
+            {
+                "message_id": m.id,
+                "seq_no": m.seq_no,
+                "role": m.role,
+                "content": m.content,
+                "msg_type": m.msg_type,
+                "extra": m.extra_json,
+                "send_time": m.send_time.isoformat() if m.send_time else None,
+            }
+            for m in rows
+        ],
+    }
+
+
+async def get_session_detail(db: AsyncSession, session_id: str, payload: dict) -> dict:
+    """查询会话详情（患者视图）。"""
+    patient_id = payload["sub"]
+    tenant_id = payload["tenant_id"]
+    session = await _get_owned_session(db, session_id, patient_id, tenant_id)
+
+    triage = await db.scalar(
+        select(TriageResult).where(TriageResult.session_id == session_id)
+    )
+    return {
+        "session_id": session.id,
+        "session_no": session.session_no,
+        "status": session.status,
+        "chief_complaint": session.chief_complaint,
+        "inquiry_rounds": session.inquiry_rounds,
+        "has_triage": triage is not None,
+        "route": triage.route if triage else None,
+        "started_time": session.started_time.isoformat() if session.started_time else None,
+        "finished_time": session.finished_time.isoformat() if session.finished_time else None,
+    }
+
+
+async def get_emr(db: AsyncSession, session_id: str, payload: dict) -> dict:
+    """查询预问诊病历（患者视图）。A 段恒为 null（R01），不含疾病名与用药建议。"""
+    patient_id = payload["sub"]
+    tenant_id = payload["tenant_id"]
+    await _get_owned_session(db, session_id, patient_id, tenant_id)
+
+    emr = await db.scalar(
+        select(EmrRecord).where(EmrRecord.session_id == session_id)
+    )
+    if emr is None:
+        raise BizError(SESSION_TRIAGE_NOT_READY)
+
+    triage = await db.scalar(
+        select(TriageResult).where(TriageResult.session_id == session_id)
+    )
+    dept_names = [
+        c.get("dept_name", "") for c in (triage.candidates_json or []) if c.get("dept_name")
+    ]
+
+    return {
+        "emr_record_id": emr.id,
+        "schema_version": emr.schema_version,
+        "generate_status": emr.generate_status,
+        "subjective": {
+            "chief_complaint": emr.subjective or "",
+            "present_illness": "",
+            "past_history": [],
+            "allergy": [],
+        },
+        "objective": {
+            "collected_vitals": [],
+            "note": "本次为线上预问诊，未采集体格检查数据",
+        },
+        "assessment": None,  # 患者视图恒为 null
+        "plan": {
+            "recommended_depts": dept_names,
+            "suggested_workup": [],
+            "note": "以上为就诊建议，不构成诊断",
+        },
+        "disclaimer": "本系统仅提供分诊建议，不构成医学诊断。请以医生面诊为准。",
+        "generated_time": emr.create_time.isoformat() if emr.create_time else None,
+    }

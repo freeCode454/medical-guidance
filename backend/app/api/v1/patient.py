@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import CurrentPatient
@@ -84,4 +84,36 @@ async def get_triage(
 ) -> ApiResponse[TriageResultResponse]:
     """查询分诊结果（患者视图）。"""
     data = await session_service.get_triage_result(db, session_id, patient)
+    return ApiResponse(data=data)
+
+
+@router.get("/sessions/{session_id}", response_model=ApiResponse[dict])
+async def get_session_detail(
+    session_id: str, db: DbSession, patient: CurrentPatient
+) -> ApiResponse[dict]:
+    """查询会话详情（患者视图，12.2.3）。"""
+    data = await session_service.get_session_detail(db, session_id, patient)
+    return ApiResponse(data=data)
+
+
+@router.get("/sessions/{session_id}/messages", response_model=ApiResponse[dict])
+async def list_messages(
+    session_id: str,
+    db: DbSession,
+    patient: CurrentPatient,
+    page: int = Query(1, ge=1),
+    size: int = Query(50, ge=1, le=100),
+    after_seq: int | None = Query(None, ge=0),
+) -> ApiResponse[dict]:
+    """查询对话记录（患者视图，12.2.5）。"""
+    data = await session_service.list_messages(
+        db, session_id, patient, page=page, size=size, after_seq=after_seq
+    )
+    return ApiResponse(data=data)
+
+
+@router.get("/sessions/{session_id}/emr", response_model=ApiResponse[dict])
+async def get_emr(session_id: str, db: DbSession, patient: CurrentPatient) -> ApiResponse[dict]:
+    """查询预问诊病历（患者视图，12.3.2）。"""
+    data = await session_service.get_emr(db, session_id, patient)
     return ApiResponse(data=data)
