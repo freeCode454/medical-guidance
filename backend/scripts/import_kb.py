@@ -29,7 +29,7 @@ from sqlalchemy import select  # noqa: E402
 from app.common.database import AsyncSessionFactory  # noqa: E402
 from app.common.embedder import build_embedder  # noqa: E402
 from app.config import settings  # noqa: E402
-from app.models import KbEntry, User, gen_id  # noqa: E402
+from app.models import Dept, KbEntry, User, gen_id  # noqa: E402
 from app.retrieval import KB_DEPT, MilvusStore  # noqa: E402
 
 DEFAULT_TENANT_ID = "00000000000000000000000000000001"
@@ -91,8 +91,6 @@ async def import_entries() -> None:
                 entry_code = f"{prefix}-{idx:03d}"
                 if kb_type == "DEPT_EXPERTISE":
                     entry_code = f"{prefix}-{d['dept_code']}"
-                elif kb_type == "ICD-10":
-                    entry_code = f"{prefix}-{d['icd10_code'].replace('.', '')}"
                 content = " ".join(d.get(f, "") for f in content_fields)
 
                 existing = await db.scalar(
@@ -126,9 +124,11 @@ async def import_entries() -> None:
 
 
 async def import_dept_vectors(embedder, store: MilvusStore) -> None:
-    """科室专长向量化 → Milvus kb_dept（合并覆盖，不 drop）。
+    """科室专长向量化 → Milvus kb_dept。
 
-    聚焦科室用富文本覆盖同 id 的简版，其余科室简版保留（避免分诊召回退化）。
+    只导入**一级科室**（dept_code 不含连字符）——分诊推荐应到一级科室，
+    亚专科是院内细分，不参与候选科室召回，避免把患者分到亚专科。
+    合并覆盖：同 id upsert，不清空其他科室。
     """
     rows = _rows("科室字典")
     if not rows:
@@ -140,6 +140,8 @@ async def import_dept_vectors(embedder, store: MilvusStore) -> None:
     dept_rows = []
     for row in rows:
         d = _kv(["dept_code", "dept_name", "aliases", "expertise", "sub_specialty", "related_diseases"], row)
+        if "-" in d["dept_code"]:  # 跳过亚专科
+            continue
         texts.append(f"{d['dept_name']}：{d['expertise']} {d['related_diseases']}")
         dept_rows.append(d)
 
@@ -161,8 +163,40 @@ async def import_dept_vectors(embedder, store: MilvusStore) -> None:
     print(f"Milvus kb_dept 导入 {len(vec_rows)} 条科室专长")
 
 
+async def import_departments() -> None:
+    """科室字典 → mg_dept（幂等：按 dept_code upsert）。"""
+    rows = _rows("科室字典")
+    added = 0
+    async with AsyncSessionFactory() as db:
+        for idx, row in enumerate(rows, start=1):
+            d = _kv(["dept_code", "dept_name", "aliases", "expertise", "sub_specialty", "related_diseases"], row)
+            existing = await db.scalar(
+                select(Dept).where(Dept.tenant_id == DEFAULT_TENANT_ID, Dept.dept_code == d["dept_code"])
+            )
+            if existing is not None:
+                existing.dept_name = d["dept_name"]
+                existing.sub_specialty = [s for s in d["sub_specialty"].split("|") if s] or None
+                existing.common_complaints = [s for s in d["related_diseases"].split("|") if s] or None
+            else:
+                db.add(
+                    Dept(
+                        id=gen_id(),
+                        tenant_id=DEFAULT_TENANT_ID,
+                        dept_code=d["dept_code"],
+                        dept_name=d["dept_name"],
+                        sub_specialty=[s for s in d["sub_specialty"].split("|") if s] or None,
+                        common_complaints=[s for s in d["related_diseases"].split("|") if s] or None,
+                        sort_no=idx,
+                        status="1",
+                        create_by="system",
+                    )
+                )
+                added += 1
+        await db.commit()
+    print(f"mg_dept 新增 {added} 个科室（幂等）")
+
+
 async def import_doctors() -> None:
-    """医生信息 → mg_user（幂等，跳过已存在账号）。"""
     rows = _rows("医生信息")
     count = 0
     async with AsyncSessionFactory() as db:
@@ -233,6 +267,7 @@ async def main() -> None:
         print(f"未找到 {EXCEL_PATH}，请先运行 gen_kb_excel.py")
         return
     await import_entries()
+    await import_departments()
     await import_doctors()
 
     embedder = build_embedder(settings)

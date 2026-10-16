@@ -1,21 +1,20 @@
 {
   "red_flags": [
     {
-      "rule_id": "RF01",
+      "rule_id": "RF001",
       "symptom": "急性冠脉综合征",
       "keywords": [
         "剧烈胸痛",
         "压榨性胸痛",
         "胸痛伴出汗",
-        "胸痛伴放射",
-        "心梗"
+        "胸痛伴放射"
       ],
       "layer": 1,
       "action": "GUIDE_TO_EMERGENCY",
       "message": "您可能有心脏急症，请立即前往急诊或拨打120"
     },
     {
-      "rule_id": "RF02",
+      "rule_id": "RF002",
       "symptom": "呼吸困难",
       "keywords": [
         "呼吸困难",
@@ -28,7 +27,7 @@
       "message": "您呼吸严重困难，请立即拨打120或就近急诊"
     },
     {
-      "rule_id": "RF03",
+      "rule_id": "RF003",
       "symptom": "脑血管意外",
       "keywords": [
         "突发言语不清",
@@ -41,7 +40,7 @@
       "message": "您可能有卒中征兆，请立即拨打120"
     },
     {
-      "rule_id": "RF04",
+      "rule_id": "RF004",
       "symptom": "大出血",
       "keywords": [
         "大出血",
@@ -55,7 +54,7 @@
       "message": "您正在出血，请立即拨打120并保持平卧"
     },
     {
-      "rule_id": "RF05",
+      "rule_id": "RF005",
       "symptom": "意识障碍",
       "keywords": [
         "昏迷",
@@ -68,7 +67,7 @@
       "message": "患者意识障碍，请立即拨打120"
     },
     {
-      "rule_id": "RF06",
+      "rule_id": "RF006",
       "symptom": "抽搐",
       "keywords": [
         "抽搐",
@@ -80,7 +79,7 @@
       "message": "患者抽搐，请保持呼吸道通畅并立即拨打120"
     },
     {
-      "rule_id": "RF07",
+      "rule_id": "RF007",
       "symptom": "休克",
       "keywords": [
         "休克",
@@ -93,7 +92,7 @@
       "message": "您可能有休克征兆，请立即拨打120"
     },
     {
-      "rule_id": "RF08",
+      "rule_id": "RF008",
       "symptom": "高热惊厥",
       "keywords": [
         "高热惊厥",
@@ -104,7 +103,7 @@
       "message": "患者高热惊厥，请立即就医"
     },
     {
-      "rule_id": "RF09",
+      "rule_id": "RF009",
       "symptom": "严重过敏",
       "keywords": [
         "呼吸困难伴皮疹",
@@ -116,7 +115,7 @@
       "message": "您可能有严重过敏反应，请立即拨打120"
     },
     {
-      "rule_id": "RF10",
+      "rule_id": "RF010",
       "symptom": "气道异物",
       "keywords": [
         "突发窒息",
@@ -125,10 +124,10 @@
       ],
       "layer": 1,
       "action": "GUIDE_TO_EMERGENCY",
-      "message": "疑似气道异物，请立即急救（海姆立克）并拨打120"
+      "message": "疑似气道异物，请立即急救并拨打120"
     },
     {
-      "rule_id": "RF11",
+      "rule_id": "RF011",
       "symptom": "宫外孕破裂",
       "keywords": [
         "停经后剧烈腹痛",
@@ -140,7 +139,7 @@
       "message": "育龄女性停经后剧烈腹痛，请立即就医"
     },
     {
-      "rule_id": "RF12",
+      "rule_id": "RF012",
       "symptom": "急性中毒",
       "keywords": [
         "误服药物",
@@ -153,7 +152,7 @@
       "message": "疑似中毒，请立即拨打120并携带毒物样本"
     },
     {
-      "rule_id": "RF13",
+      "rule_id": "RF013",
       "symptom": "重度脱水",
       "keywords": [
         "婴幼儿腹泻伴精神萎靡",
@@ -165,7 +164,7 @@
       "message": "孩子可能重度脱水，请立即就医"
     },
     {
-      "rule_id": "RF14",
+      "rule_id": "RF014",
       "symptom": "颅脑外伤",
       "keywords": [
         "头部外伤后呕吐",
@@ -177,7 +176,7 @@
       "message": "头部外伤后异常，请立即就医"
     },
     {
-      "rule_id": "RF15",
+      "rule_id": "RF015",
       "symptom": "血糖危象",
       "keywords": [
         "糖尿病伴意识模糊",
@@ -187,6 +186,2573 @@
       "layer": 1,
       "action": "GUIDE_TO_EMERGENCY",
       "message": "可能发生血糖危象，请立即就医"
+    },
+    {
+      "rule_id": "RF016",
+      "symptom": "急性腹痛",
+      "keywords": [
+        "剧烈腹痛持续不缓解",
+        "板状腹",
+        "压痛反跳痛"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "可能为急腹症，请立即就医"
+    },
+    {
+      "rule_id": "RF017",
+      "symptom": "消化道大出血",
+      "keywords": [
+        "呕血",
+        "柏油样便",
+        "头晕心慌"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消化道大出血可能，请立即就医"
+    },
+    {
+      "rule_id": "RF018",
+      "symptom": "产科急症",
+      "keywords": [
+        "孕期剧烈腹痛",
+        "阴道大量出血",
+        "胎动消失"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "产科急症，请立即就医"
+    },
+    {
+      "rule_id": "RF019",
+      "symptom": "小儿危重症",
+      "keywords": [
+        "小儿精神萎靡",
+        "拒食",
+        "呼吸急促",
+        "发绀"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "患儿病情危重，请立即就医"
+    },
+    {
+      "rule_id": "RF020",
+      "symptom": "自杀风险",
+      "keywords": [
+        "表达自杀想法",
+        "自伤行为",
+        "情绪极度低落"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "请立即联系心理危机干预或送医"
+    },
+    {
+      "rule_id": "RF021",
+      "symptom": "发热伴意识障碍",
+      "keywords": [
+        "发烧伴意识障碍",
+        "体温高伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发热伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF022",
+      "symptom": "发热进行性加重",
+      "keywords": [
+        "发烧进行性加重",
+        "体温高进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发热进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF023",
+      "symptom": "发热持续不缓解",
+      "keywords": [
+        "发烧持续不缓解",
+        "体温高持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发热持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF024",
+      "symptom": "发热突发剧烈",
+      "keywords": [
+        "发烧突发剧烈",
+        "体温高突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发热突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF025",
+      "symptom": "发热伴血压下降",
+      "keywords": [
+        "发烧伴血压下降",
+        "体温高伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发热伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF026",
+      "symptom": "发热伴呼吸困难",
+      "keywords": [
+        "发烧伴呼吸困难",
+        "体温高伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发热伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF027",
+      "symptom": "发热反复发作",
+      "keywords": [
+        "发烧反复发作",
+        "体温高反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发热反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF028",
+      "symptom": "发热难以忍受",
+      "keywords": [
+        "发烧难以忍受",
+        "体温高难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发热难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF029",
+      "symptom": "乏力伴意识障碍",
+      "keywords": [
+        "没力气伴意识障碍",
+        "疲倦伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF030",
+      "symptom": "乏力进行性加重",
+      "keywords": [
+        "没力气进行性加重",
+        "疲倦进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF031",
+      "symptom": "乏力持续不缓解",
+      "keywords": [
+        "没力气持续不缓解",
+        "疲倦持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF032",
+      "symptom": "乏力突发剧烈",
+      "keywords": [
+        "没力气突发剧烈",
+        "疲倦突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF033",
+      "symptom": "乏力伴血压下降",
+      "keywords": [
+        "没力气伴血压下降",
+        "疲倦伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF034",
+      "symptom": "乏力伴呼吸困难",
+      "keywords": [
+        "没力气伴呼吸困难",
+        "疲倦伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF035",
+      "symptom": "乏力反复发作",
+      "keywords": [
+        "没力气反复发作",
+        "疲倦反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF036",
+      "symptom": "乏力难以忍受",
+      "keywords": [
+        "没力气难以忍受",
+        "疲倦难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF037",
+      "symptom": "消瘦伴意识障碍",
+      "keywords": [
+        "体重下降伴意识障碍",
+        "掉秤伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消瘦伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF038",
+      "symptom": "消瘦进行性加重",
+      "keywords": [
+        "体重下降进行性加重",
+        "掉秤进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消瘦进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF039",
+      "symptom": "消瘦持续不缓解",
+      "keywords": [
+        "体重下降持续不缓解",
+        "掉秤持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消瘦持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF040",
+      "symptom": "消瘦突发剧烈",
+      "keywords": [
+        "体重下降突发剧烈",
+        "掉秤突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消瘦突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF041",
+      "symptom": "消瘦伴血压下降",
+      "keywords": [
+        "体重下降伴血压下降",
+        "掉秤伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消瘦伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF042",
+      "symptom": "消瘦伴呼吸困难",
+      "keywords": [
+        "体重下降伴呼吸困难",
+        "掉秤伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消瘦伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF043",
+      "symptom": "消瘦反复发作",
+      "keywords": [
+        "体重下降反复发作",
+        "掉秤反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消瘦反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF044",
+      "symptom": "消瘦难以忍受",
+      "keywords": [
+        "体重下降难以忍受",
+        "掉秤难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "消瘦难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF045",
+      "symptom": "盗汗伴意识障碍",
+      "keywords": [
+        "夜间出汗伴意识障碍",
+        "睡着出汗伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "盗汗伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF046",
+      "symptom": "盗汗进行性加重",
+      "keywords": [
+        "夜间出汗进行性加重",
+        "睡着出汗进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "盗汗进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF047",
+      "symptom": "盗汗持续不缓解",
+      "keywords": [
+        "夜间出汗持续不缓解",
+        "睡着出汗持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "盗汗持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF048",
+      "symptom": "盗汗突发剧烈",
+      "keywords": [
+        "夜间出汗突发剧烈",
+        "睡着出汗突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "盗汗突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF049",
+      "symptom": "盗汗伴血压下降",
+      "keywords": [
+        "夜间出汗伴血压下降",
+        "睡着出汗伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "盗汗伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF050",
+      "symptom": "盗汗伴呼吸困难",
+      "keywords": [
+        "夜间出汗伴呼吸困难",
+        "睡着出汗伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "盗汗伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF051",
+      "symptom": "盗汗反复发作",
+      "keywords": [
+        "夜间出汗反复发作",
+        "睡着出汗反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "盗汗反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF052",
+      "symptom": "盗汗难以忍受",
+      "keywords": [
+        "夜间出汗难以忍受",
+        "睡着出汗难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "盗汗难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF053",
+      "symptom": "水肿伴意识障碍",
+      "keywords": [
+        "浮肿伴意识障碍",
+        "肿胀伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "水肿伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF054",
+      "symptom": "水肿进行性加重",
+      "keywords": [
+        "浮肿进行性加重",
+        "肿胀进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "水肿进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF055",
+      "symptom": "水肿持续不缓解",
+      "keywords": [
+        "浮肿持续不缓解",
+        "肿胀持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "水肿持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF056",
+      "symptom": "水肿突发剧烈",
+      "keywords": [
+        "浮肿突发剧烈",
+        "肿胀突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "水肿突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF057",
+      "symptom": "水肿伴血压下降",
+      "keywords": [
+        "浮肿伴血压下降",
+        "肿胀伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "水肿伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF058",
+      "symptom": "水肿伴呼吸困难",
+      "keywords": [
+        "浮肿伴呼吸困难",
+        "肿胀伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "水肿伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF059",
+      "symptom": "水肿反复发作",
+      "keywords": [
+        "浮肿反复发作",
+        "肿胀反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "水肿反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF060",
+      "symptom": "水肿难以忍受",
+      "keywords": [
+        "浮肿难以忍受",
+        "肿胀难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "水肿难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF061",
+      "symptom": "寒战伴意识障碍",
+      "keywords": [
+        "发冷伴意识障碍",
+        "打寒战伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒战伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF062",
+      "symptom": "寒战进行性加重",
+      "keywords": [
+        "发冷进行性加重",
+        "打寒战进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒战进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF063",
+      "symptom": "寒战持续不缓解",
+      "keywords": [
+        "发冷持续不缓解",
+        "打寒战持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒战持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF064",
+      "symptom": "寒战突发剧烈",
+      "keywords": [
+        "发冷突发剧烈",
+        "打寒战突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒战突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF065",
+      "symptom": "寒战伴血压下降",
+      "keywords": [
+        "发冷伴血压下降",
+        "打寒战伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒战伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF066",
+      "symptom": "寒战伴呼吸困难",
+      "keywords": [
+        "发冷伴呼吸困难",
+        "打寒战伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒战伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF067",
+      "symptom": "寒战反复发作",
+      "keywords": [
+        "发冷反复发作",
+        "打寒战反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒战反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF068",
+      "symptom": "寒战难以忍受",
+      "keywords": [
+        "发冷难以忍受",
+        "打寒战难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒战难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF069",
+      "symptom": "纳差伴意识障碍",
+      "keywords": [
+        "食欲差伴意识障碍",
+        "不想吃伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "纳差伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF070",
+      "symptom": "纳差进行性加重",
+      "keywords": [
+        "食欲差进行性加重",
+        "不想吃进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "纳差进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF071",
+      "symptom": "纳差持续不缓解",
+      "keywords": [
+        "食欲差持续不缓解",
+        "不想吃持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "纳差持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF072",
+      "symptom": "纳差突发剧烈",
+      "keywords": [
+        "食欲差突发剧烈",
+        "不想吃突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "纳差突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF073",
+      "symptom": "纳差伴血压下降",
+      "keywords": [
+        "食欲差伴血压下降",
+        "不想吃伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "纳差伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF074",
+      "symptom": "纳差伴呼吸困难",
+      "keywords": [
+        "食欲差伴呼吸困难",
+        "不想吃伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "纳差伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF075",
+      "symptom": "纳差反复发作",
+      "keywords": [
+        "食欲差反复发作",
+        "不想吃反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "纳差反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF076",
+      "symptom": "纳差难以忍受",
+      "keywords": [
+        "食欲差难以忍受",
+        "不想吃难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "纳差难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF077",
+      "symptom": "体重增加伴意识障碍",
+      "keywords": [
+        "长胖伴意识障碍",
+        "增重伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "体重增加伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF078",
+      "symptom": "体重增加进行性加重",
+      "keywords": [
+        "长胖进行性加重",
+        "增重进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "体重增加进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF079",
+      "symptom": "体重增加持续不缓解",
+      "keywords": [
+        "长胖持续不缓解",
+        "增重持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "体重增加持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF080",
+      "symptom": "体重增加突发剧烈",
+      "keywords": [
+        "长胖突发剧烈",
+        "增重突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "体重增加突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF081",
+      "symptom": "体重增加伴血压下降",
+      "keywords": [
+        "长胖伴血压下降",
+        "增重伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "体重增加伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF082",
+      "symptom": "体重增加伴呼吸困难",
+      "keywords": [
+        "长胖伴呼吸困难",
+        "增重伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "体重增加伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF083",
+      "symptom": "体重增加反复发作",
+      "keywords": [
+        "长胖反复发作",
+        "增重反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "体重增加反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF084",
+      "symptom": "体重增加难以忍受",
+      "keywords": [
+        "长胖难以忍受",
+        "增重难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "体重增加难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF085",
+      "symptom": "生长迟缓伴意识障碍",
+      "keywords": [
+        "个子矮伴意识障碍",
+        "发育慢伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "生长迟缓伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF086",
+      "symptom": "生长迟缓进行性加重",
+      "keywords": [
+        "个子矮进行性加重",
+        "发育慢进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "生长迟缓进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF087",
+      "symptom": "生长迟缓持续不缓解",
+      "keywords": [
+        "个子矮持续不缓解",
+        "发育慢持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "生长迟缓持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF088",
+      "symptom": "生长迟缓突发剧烈",
+      "keywords": [
+        "个子矮突发剧烈",
+        "发育慢突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "生长迟缓突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF089",
+      "symptom": "生长迟缓伴血压下降",
+      "keywords": [
+        "个子矮伴血压下降",
+        "发育慢伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "生长迟缓伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF090",
+      "symptom": "生长迟缓伴呼吸困难",
+      "keywords": [
+        "个子矮伴呼吸困难",
+        "发育慢伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "生长迟缓伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF091",
+      "symptom": "生长迟缓反复发作",
+      "keywords": [
+        "个子矮反复发作",
+        "发育慢反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "生长迟缓反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF092",
+      "symptom": "生长迟缓难以忍受",
+      "keywords": [
+        "个子矮难以忍受",
+        "发育慢难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "生长迟缓难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF093",
+      "symptom": "多汗伴意识障碍",
+      "keywords": [
+        "出汗多伴意识障碍",
+        "易出汗伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "多汗伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF094",
+      "symptom": "多汗进行性加重",
+      "keywords": [
+        "出汗多进行性加重",
+        "易出汗进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "多汗进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF095",
+      "symptom": "多汗持续不缓解",
+      "keywords": [
+        "出汗多持续不缓解",
+        "易出汗持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "多汗持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF096",
+      "symptom": "多汗突发剧烈",
+      "keywords": [
+        "出汗多突发剧烈",
+        "易出汗突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "多汗突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF097",
+      "symptom": "多汗伴血压下降",
+      "keywords": [
+        "出汗多伴血压下降",
+        "易出汗伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "多汗伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF098",
+      "symptom": "多汗伴呼吸困难",
+      "keywords": [
+        "出汗多伴呼吸困难",
+        "易出汗伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "多汗伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF099",
+      "symptom": "多汗反复发作",
+      "keywords": [
+        "出汗多反复发作",
+        "易出汗反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "多汗反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF100",
+      "symptom": "多汗难以忍受",
+      "keywords": [
+        "出汗多难以忍受",
+        "易出汗难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "多汗难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF101",
+      "symptom": "口渴伴意识障碍",
+      "keywords": [
+        "口干伴意识障碍",
+        "想喝水伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "口渴伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF102",
+      "symptom": "口渴进行性加重",
+      "keywords": [
+        "口干进行性加重",
+        "想喝水进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "口渴进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF103",
+      "symptom": "口渴持续不缓解",
+      "keywords": [
+        "口干持续不缓解",
+        "想喝水持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "口渴持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF104",
+      "symptom": "口渴突发剧烈",
+      "keywords": [
+        "口干突发剧烈",
+        "想喝水突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "口渴突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF105",
+      "symptom": "口渴伴血压下降",
+      "keywords": [
+        "口干伴血压下降",
+        "想喝水伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "口渴伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF106",
+      "symptom": "口渴伴呼吸困难",
+      "keywords": [
+        "口干伴呼吸困难",
+        "想喝水伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "口渴伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF107",
+      "symptom": "口渴反复发作",
+      "keywords": [
+        "口干反复发作",
+        "想喝水反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "口渴反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF108",
+      "symptom": "口渴难以忍受",
+      "keywords": [
+        "口干难以忍受",
+        "想喝水难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "口渴难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF109",
+      "symptom": "脱水伴意识障碍",
+      "keywords": [
+        "尿少伴意识障碍",
+        "皮肤干伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "脱水伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF110",
+      "symptom": "脱水进行性加重",
+      "keywords": [
+        "尿少进行性加重",
+        "皮肤干进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "脱水进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF111",
+      "symptom": "脱水持续不缓解",
+      "keywords": [
+        "尿少持续不缓解",
+        "皮肤干持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "脱水持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF112",
+      "symptom": "脱水突发剧烈",
+      "keywords": [
+        "尿少突发剧烈",
+        "皮肤干突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "脱水突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF113",
+      "symptom": "脱水伴血压下降",
+      "keywords": [
+        "尿少伴血压下降",
+        "皮肤干伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "脱水伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF114",
+      "symptom": "脱水伴呼吸困难",
+      "keywords": [
+        "尿少伴呼吸困难",
+        "皮肤干伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "脱水伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF115",
+      "symptom": "脱水反复发作",
+      "keywords": [
+        "尿少反复发作",
+        "皮肤干反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "脱水反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF116",
+      "symptom": "脱水难以忍受",
+      "keywords": [
+        "尿少难以忍受",
+        "皮肤干难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "脱水难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF117",
+      "symptom": "疲劳伴意识障碍",
+      "keywords": [
+        "累伴意识障碍",
+        "精力差伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疲劳伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF118",
+      "symptom": "疲劳进行性加重",
+      "keywords": [
+        "累进行性加重",
+        "精力差进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疲劳进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF119",
+      "symptom": "疲劳持续不缓解",
+      "keywords": [
+        "累持续不缓解",
+        "精力差持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疲劳持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF120",
+      "symptom": "疲劳突发剧烈",
+      "keywords": [
+        "累突发剧烈",
+        "精力差突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疲劳突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF121",
+      "symptom": "疲劳伴血压下降",
+      "keywords": [
+        "累伴血压下降",
+        "精力差伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疲劳伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF122",
+      "symptom": "疲劳伴呼吸困难",
+      "keywords": [
+        "累伴呼吸困难",
+        "精力差伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疲劳伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF123",
+      "symptom": "疲劳反复发作",
+      "keywords": [
+        "累反复发作",
+        "精力差反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疲劳反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF124",
+      "symptom": "疲劳难以忍受",
+      "keywords": [
+        "累难以忍受",
+        "精力差难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "疲劳难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF125",
+      "symptom": "晕厥伴意识障碍",
+      "keywords": [
+        "晕倒伴意识障碍",
+        "昏倒伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "晕厥伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF126",
+      "symptom": "晕厥进行性加重",
+      "keywords": [
+        "晕倒进行性加重",
+        "昏倒进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "晕厥进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF127",
+      "symptom": "晕厥持续不缓解",
+      "keywords": [
+        "晕倒持续不缓解",
+        "昏倒持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "晕厥持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF128",
+      "symptom": "晕厥突发剧烈",
+      "keywords": [
+        "晕倒突发剧烈",
+        "昏倒突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "晕厥突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF129",
+      "symptom": "晕厥伴血压下降",
+      "keywords": [
+        "晕倒伴血压下降",
+        "昏倒伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "晕厥伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF130",
+      "symptom": "晕厥伴呼吸困难",
+      "keywords": [
+        "晕倒伴呼吸困难",
+        "昏倒伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "晕厥伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF131",
+      "symptom": "晕厥反复发作",
+      "keywords": [
+        "晕倒反复发作",
+        "昏倒反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "晕厥反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF132",
+      "symptom": "晕厥难以忍受",
+      "keywords": [
+        "晕倒难以忍受",
+        "昏倒难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "晕厥难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF133",
+      "symptom": "抽搐伴意识障碍",
+      "keywords": [
+        "抽筋伴意识障碍",
+        "惊厥伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "抽搐伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF134",
+      "symptom": "抽搐进行性加重",
+      "keywords": [
+        "抽筋进行性加重",
+        "惊厥进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "抽搐进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF135",
+      "symptom": "抽搐持续不缓解",
+      "keywords": [
+        "抽筋持续不缓解",
+        "惊厥持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "抽搐持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF136",
+      "symptom": "抽搐突发剧烈",
+      "keywords": [
+        "抽筋突发剧烈",
+        "惊厥突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "抽搐突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF137",
+      "symptom": "抽搐伴血压下降",
+      "keywords": [
+        "抽筋伴血压下降",
+        "惊厥伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "抽搐伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF138",
+      "symptom": "抽搐伴呼吸困难",
+      "keywords": [
+        "抽筋伴呼吸困难",
+        "惊厥伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "抽搐伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF139",
+      "symptom": "抽搐反复发作",
+      "keywords": [
+        "抽筋反复发作",
+        "惊厥反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "抽搐反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF140",
+      "symptom": "抽搐难以忍受",
+      "keywords": [
+        "抽筋难以忍受",
+        "惊厥难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "抽搐难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF141",
+      "symptom": "寒热往来伴意识障碍",
+      "keywords": [
+        "忽冷忽热伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒热往来伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF142",
+      "symptom": "寒热往来进行性加重",
+      "keywords": [
+        "忽冷忽热进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒热往来进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF143",
+      "symptom": "寒热往来持续不缓解",
+      "keywords": [
+        "忽冷忽热持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒热往来持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF144",
+      "symptom": "寒热往来突发剧烈",
+      "keywords": [
+        "忽冷忽热突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒热往来突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF145",
+      "symptom": "寒热往来伴血压下降",
+      "keywords": [
+        "忽冷忽热伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒热往来伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF146",
+      "symptom": "寒热往来伴呼吸困难",
+      "keywords": [
+        "忽冷忽热伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒热往来伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF147",
+      "symptom": "寒热往来反复发作",
+      "keywords": [
+        "忽冷忽热反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒热往来反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF148",
+      "symptom": "寒热往来难以忍受",
+      "keywords": [
+        "忽冷忽热难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "寒热往来难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF149",
+      "symptom": "淋巴结肿大伴意识障碍",
+      "keywords": [
+        "淋巴结大伴意识障碍",
+        "疙瘩伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "淋巴结肿大伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF150",
+      "symptom": "淋巴结肿大进行性加重",
+      "keywords": [
+        "淋巴结大进行性加重",
+        "疙瘩进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "淋巴结肿大进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF151",
+      "symptom": "淋巴结肿大持续不缓解",
+      "keywords": [
+        "淋巴结大持续不缓解",
+        "疙瘩持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "淋巴结肿大持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF152",
+      "symptom": "淋巴结肿大突发剧烈",
+      "keywords": [
+        "淋巴结大突发剧烈",
+        "疙瘩突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "淋巴结肿大突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF153",
+      "symptom": "淋巴结肿大伴血压下降",
+      "keywords": [
+        "淋巴结大伴血压下降",
+        "疙瘩伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "淋巴结肿大伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF154",
+      "symptom": "淋巴结肿大伴呼吸困难",
+      "keywords": [
+        "淋巴结大伴呼吸困难",
+        "疙瘩伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "淋巴结肿大伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF155",
+      "symptom": "淋巴结肿大反复发作",
+      "keywords": [
+        "淋巴结大反复发作",
+        "疙瘩反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "淋巴结肿大反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF156",
+      "symptom": "淋巴结肿大难以忍受",
+      "keywords": [
+        "淋巴结大难以忍受",
+        "疙瘩难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "淋巴结肿大难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF157",
+      "symptom": "皮疹伴意识障碍",
+      "keywords": [
+        "起疹子伴意识障碍",
+        "皮肤红点伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮疹伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF158",
+      "symptom": "皮疹进行性加重",
+      "keywords": [
+        "起疹子进行性加重",
+        "皮肤红点进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮疹进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF159",
+      "symptom": "皮疹持续不缓解",
+      "keywords": [
+        "起疹子持续不缓解",
+        "皮肤红点持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮疹持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF160",
+      "symptom": "皮疹突发剧烈",
+      "keywords": [
+        "起疹子突发剧烈",
+        "皮肤红点突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮疹突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF161",
+      "symptom": "皮疹伴血压下降",
+      "keywords": [
+        "起疹子伴血压下降",
+        "皮肤红点伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮疹伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF162",
+      "symptom": "皮疹伴呼吸困难",
+      "keywords": [
+        "起疹子伴呼吸困难",
+        "皮肤红点伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮疹伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF163",
+      "symptom": "皮疹反复发作",
+      "keywords": [
+        "起疹子反复发作",
+        "皮肤红点反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮疹反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF164",
+      "symptom": "皮疹难以忍受",
+      "keywords": [
+        "起疹子难以忍受",
+        "皮肤红点难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮疹难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF165",
+      "symptom": "瘙痒伴意识障碍",
+      "keywords": [
+        "发痒伴意识障碍",
+        "痒伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "瘙痒伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF166",
+      "symptom": "瘙痒进行性加重",
+      "keywords": [
+        "发痒进行性加重",
+        "痒进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "瘙痒进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF167",
+      "symptom": "瘙痒持续不缓解",
+      "keywords": [
+        "发痒持续不缓解",
+        "痒持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "瘙痒持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF168",
+      "symptom": "瘙痒突发剧烈",
+      "keywords": [
+        "发痒突发剧烈",
+        "痒突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "瘙痒突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF169",
+      "symptom": "瘙痒伴血压下降",
+      "keywords": [
+        "发痒伴血压下降",
+        "痒伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "瘙痒伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF170",
+      "symptom": "瘙痒伴呼吸困难",
+      "keywords": [
+        "发痒伴呼吸困难",
+        "痒伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "瘙痒伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF171",
+      "symptom": "瘙痒反复发作",
+      "keywords": [
+        "发痒反复发作",
+        "痒反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "瘙痒反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF172",
+      "symptom": "瘙痒难以忍受",
+      "keywords": [
+        "发痒难以忍受",
+        "痒难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "瘙痒难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF173",
+      "symptom": "皮肤黄染伴意识障碍",
+      "keywords": [
+        "黄疸伴意识障碍",
+        "眼睛发黄伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮肤黄染伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF174",
+      "symptom": "皮肤黄染进行性加重",
+      "keywords": [
+        "黄疸进行性加重",
+        "眼睛发黄进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮肤黄染进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF175",
+      "symptom": "皮肤黄染持续不缓解",
+      "keywords": [
+        "黄疸持续不缓解",
+        "眼睛发黄持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮肤黄染持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF176",
+      "symptom": "皮肤黄染突发剧烈",
+      "keywords": [
+        "黄疸突发剧烈",
+        "眼睛发黄突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮肤黄染突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF177",
+      "symptom": "皮肤黄染伴血压下降",
+      "keywords": [
+        "黄疸伴血压下降",
+        "眼睛发黄伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮肤黄染伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF178",
+      "symptom": "皮肤黄染伴呼吸困难",
+      "keywords": [
+        "黄疸伴呼吸困难",
+        "眼睛发黄伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮肤黄染伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF179",
+      "symptom": "皮肤黄染反复发作",
+      "keywords": [
+        "黄疸反复发作",
+        "眼睛发黄反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮肤黄染反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF180",
+      "symptom": "皮肤黄染难以忍受",
+      "keywords": [
+        "黄疸难以忍受",
+        "眼睛发黄难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "皮肤黄染难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF181",
+      "symptom": "面色苍白伴意识障碍",
+      "keywords": [
+        "脸白伴意识障碍",
+        "没有血色伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "面色苍白伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF182",
+      "symptom": "面色苍白进行性加重",
+      "keywords": [
+        "脸白进行性加重",
+        "没有血色进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "面色苍白进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF183",
+      "symptom": "面色苍白持续不缓解",
+      "keywords": [
+        "脸白持续不缓解",
+        "没有血色持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "面色苍白持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF184",
+      "symptom": "面色苍白突发剧烈",
+      "keywords": [
+        "脸白突发剧烈",
+        "没有血色突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "面色苍白突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF185",
+      "symptom": "面色苍白伴血压下降",
+      "keywords": [
+        "脸白伴血压下降",
+        "没有血色伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "面色苍白伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF186",
+      "symptom": "面色苍白伴呼吸困难",
+      "keywords": [
+        "脸白伴呼吸困难",
+        "没有血色伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "面色苍白伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF187",
+      "symptom": "面色苍白反复发作",
+      "keywords": [
+        "脸白反复发作",
+        "没有血色反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "面色苍白反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF188",
+      "symptom": "面色苍白难以忍受",
+      "keywords": [
+        "脸白难以忍受",
+        "没有血色难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "面色苍白难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF189",
+      "symptom": "发绀伴意识障碍",
+      "keywords": [
+        "嘴唇发紫伴意识障碍",
+        "青紫伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发绀伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF190",
+      "symptom": "发绀进行性加重",
+      "keywords": [
+        "嘴唇发紫进行性加重",
+        "青紫进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发绀进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF191",
+      "symptom": "发绀持续不缓解",
+      "keywords": [
+        "嘴唇发紫持续不缓解",
+        "青紫持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发绀持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF192",
+      "symptom": "发绀突发剧烈",
+      "keywords": [
+        "嘴唇发紫突发剧烈",
+        "青紫突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发绀突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF193",
+      "symptom": "发绀伴血压下降",
+      "keywords": [
+        "嘴唇发紫伴血压下降",
+        "青紫伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发绀伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF194",
+      "symptom": "发绀伴呼吸困难",
+      "keywords": [
+        "嘴唇发紫伴呼吸困难",
+        "青紫伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发绀伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF195",
+      "symptom": "发绀反复发作",
+      "keywords": [
+        "嘴唇发紫反复发作",
+        "青紫反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发绀反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF196",
+      "symptom": "发绀难以忍受",
+      "keywords": [
+        "嘴唇发紫难以忍受",
+        "青紫难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "发绀难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF197",
+      "symptom": "杵状指伴意识障碍",
+      "keywords": [
+        "手指末端肥大伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状指伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF198",
+      "symptom": "杵状指进行性加重",
+      "keywords": [
+        "手指末端肥大进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状指进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF199",
+      "symptom": "杵状指持续不缓解",
+      "keywords": [
+        "手指末端肥大持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状指持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF200",
+      "symptom": "杵状指突发剧烈",
+      "keywords": [
+        "手指末端肥大突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状指突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF201",
+      "symptom": "杵状指伴血压下降",
+      "keywords": [
+        "手指末端肥大伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状指伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF202",
+      "symptom": "杵状指伴呼吸困难",
+      "keywords": [
+        "手指末端肥大伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状指伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF203",
+      "symptom": "杵状指反复发作",
+      "keywords": [
+        "手指末端肥大反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状指反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF204",
+      "symptom": "杵状指难以忍受",
+      "keywords": [
+        "手指末端肥大难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状指难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF205",
+      "symptom": "贫血貌伴意识障碍",
+      "keywords": [
+        "面色萎黄伴意识障碍",
+        "眼睑苍白伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "贫血貌伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF206",
+      "symptom": "贫血貌进行性加重",
+      "keywords": [
+        "面色萎黄进行性加重",
+        "眼睑苍白进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "贫血貌进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF207",
+      "symptom": "贫血貌持续不缓解",
+      "keywords": [
+        "面色萎黄持续不缓解",
+        "眼睑苍白持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "贫血貌持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF208",
+      "symptom": "贫血貌突发剧烈",
+      "keywords": [
+        "面色萎黄突发剧烈",
+        "眼睑苍白突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "贫血貌突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF209",
+      "symptom": "贫血貌伴血压下降",
+      "keywords": [
+        "面色萎黄伴血压下降",
+        "眼睑苍白伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "贫血貌伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF210",
+      "symptom": "贫血貌伴呼吸困难",
+      "keywords": [
+        "面色萎黄伴呼吸困难",
+        "眼睑苍白伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "贫血貌伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF211",
+      "symptom": "贫血貌反复发作",
+      "keywords": [
+        "面色萎黄反复发作",
+        "眼睑苍白反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "贫血貌反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF212",
+      "symptom": "贫血貌难以忍受",
+      "keywords": [
+        "面色萎黄难以忍受",
+        "眼睑苍白难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "贫血貌难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF213",
+      "symptom": "杵状趾伴意识障碍",
+      "keywords": [
+        "脚趾末端肥大伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状趾伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF214",
+      "symptom": "杵状趾进行性加重",
+      "keywords": [
+        "脚趾末端肥大进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状趾进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF215",
+      "symptom": "杵状趾持续不缓解",
+      "keywords": [
+        "脚趾末端肥大持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状趾持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF216",
+      "symptom": "杵状趾突发剧烈",
+      "keywords": [
+        "脚趾末端肥大突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状趾突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF217",
+      "symptom": "杵状趾伴血压下降",
+      "keywords": [
+        "脚趾末端肥大伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状趾伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF218",
+      "symptom": "杵状趾伴呼吸困难",
+      "keywords": [
+        "脚趾末端肥大伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状趾伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF219",
+      "symptom": "杵状趾反复发作",
+      "keywords": [
+        "脚趾末端肥大反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状趾反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF220",
+      "symptom": "杵状趾难以忍受",
+      "keywords": [
+        "脚趾末端肥大难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "杵状趾难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF221",
+      "symptom": "恶病质伴意识障碍",
+      "keywords": [
+        "极度消瘦伴意识障碍",
+        "衰竭伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "恶病质伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF222",
+      "symptom": "恶病质进行性加重",
+      "keywords": [
+        "极度消瘦进行性加重",
+        "衰竭进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "恶病质进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF223",
+      "symptom": "恶病质持续不缓解",
+      "keywords": [
+        "极度消瘦持续不缓解",
+        "衰竭持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "恶病质持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF224",
+      "symptom": "恶病质突发剧烈",
+      "keywords": [
+        "极度消瘦突发剧烈",
+        "衰竭突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "恶病质突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF225",
+      "symptom": "恶病质伴血压下降",
+      "keywords": [
+        "极度消瘦伴血压下降",
+        "衰竭伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "恶病质伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF226",
+      "symptom": "恶病质伴呼吸困难",
+      "keywords": [
+        "极度消瘦伴呼吸困难",
+        "衰竭伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "恶病质伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF227",
+      "symptom": "恶病质反复发作",
+      "keywords": [
+        "极度消瘦反复发作",
+        "衰竭反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "恶病质反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF228",
+      "symptom": "恶病质难以忍受",
+      "keywords": [
+        "极度消瘦难以忍受",
+        "衰竭难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "恶病质难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF229",
+      "symptom": "乏力嗜睡伴意识障碍",
+      "keywords": [
+        "没精神伴意识障碍",
+        "总想睡伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力嗜睡伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF230",
+      "symptom": "乏力嗜睡进行性加重",
+      "keywords": [
+        "没精神进行性加重",
+        "总想睡进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力嗜睡进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF231",
+      "symptom": "乏力嗜睡持续不缓解",
+      "keywords": [
+        "没精神持续不缓解",
+        "总想睡持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力嗜睡持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF232",
+      "symptom": "乏力嗜睡突发剧烈",
+      "keywords": [
+        "没精神突发剧烈",
+        "总想睡突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力嗜睡突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF233",
+      "symptom": "乏力嗜睡伴血压下降",
+      "keywords": [
+        "没精神伴血压下降",
+        "总想睡伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力嗜睡伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF234",
+      "symptom": "乏力嗜睡伴呼吸困难",
+      "keywords": [
+        "没精神伴呼吸困难",
+        "总想睡伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力嗜睡伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF235",
+      "symptom": "乏力嗜睡反复发作",
+      "keywords": [
+        "没精神反复发作",
+        "总想睡反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力嗜睡反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF236",
+      "symptom": "乏力嗜睡难以忍受",
+      "keywords": [
+        "没精神难以忍受",
+        "总想睡难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "乏力嗜睡难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF237",
+      "symptom": "易激惹伴意识障碍",
+      "keywords": [
+        "烦躁伴意识障碍",
+        "爱发脾气伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "易激惹伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF238",
+      "symptom": "易激惹进行性加重",
+      "keywords": [
+        "烦躁进行性加重",
+        "爱发脾气进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "易激惹进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF239",
+      "symptom": "易激惹持续不缓解",
+      "keywords": [
+        "烦躁持续不缓解",
+        "爱发脾气持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "易激惹持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF240",
+      "symptom": "易激惹突发剧烈",
+      "keywords": [
+        "烦躁突发剧烈",
+        "爱发脾气突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "易激惹突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF241",
+      "symptom": "易激惹伴血压下降",
+      "keywords": [
+        "烦躁伴血压下降",
+        "爱发脾气伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "易激惹伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF242",
+      "symptom": "易激惹伴呼吸困难",
+      "keywords": [
+        "烦躁伴呼吸困难",
+        "爱发脾气伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "易激惹伴呼吸困难，请立即就医评估"
+    },
+    {
+      "rule_id": "RF243",
+      "symptom": "易激惹反复发作",
+      "keywords": [
+        "烦躁反复发作",
+        "爱发脾气反复发作"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "易激惹反复发作，请立即就医评估"
+    },
+    {
+      "rule_id": "RF244",
+      "symptom": "易激惹难以忍受",
+      "keywords": [
+        "烦躁难以忍受",
+        "爱发脾气难以忍受"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "易激惹难以忍受，请立即就医评估"
+    },
+    {
+      "rule_id": "RF245",
+      "symptom": "食欲亢进伴意识障碍",
+      "keywords": [
+        "吃得多伴意识障碍",
+        "容易饿伴意识障碍"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "食欲亢进伴意识障碍，请立即就医评估"
+    },
+    {
+      "rule_id": "RF246",
+      "symptom": "食欲亢进进行性加重",
+      "keywords": [
+        "吃得多进行性加重",
+        "容易饿进行性加重"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "食欲亢进进行性加重，请立即就医评估"
+    },
+    {
+      "rule_id": "RF247",
+      "symptom": "食欲亢进持续不缓解",
+      "keywords": [
+        "吃得多持续不缓解",
+        "容易饿持续不缓解"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "食欲亢进持续不缓解，请立即就医评估"
+    },
+    {
+      "rule_id": "RF248",
+      "symptom": "食欲亢进突发剧烈",
+      "keywords": [
+        "吃得多突发剧烈",
+        "容易饿突发剧烈"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "食欲亢进突发剧烈，请立即就医评估"
+    },
+    {
+      "rule_id": "RF249",
+      "symptom": "食欲亢进伴血压下降",
+      "keywords": [
+        "吃得多伴血压下降",
+        "容易饿伴血压下降"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "食欲亢进伴血压下降，请立即就医评估"
+    },
+    {
+      "rule_id": "RF250",
+      "symptom": "食欲亢进伴呼吸困难",
+      "keywords": [
+        "吃得多伴呼吸困难",
+        "容易饿伴呼吸困难"
+      ],
+      "layer": 1,
+      "action": "GUIDE_TO_EMERGENCY",
+      "message": "食欲亢进伴呼吸困难，请立即就医评估"
     }
   ],
   "triage_rules": [
@@ -196,7 +2762,7 @@
       "age_filter": "",
       "gender_filter": "",
       "priority": 10,
-      "note": "消化系统症状首选消化内科",
+      "note": "消化内科主症状",
       "symptoms": [
         "腹痛",
         "腹泻",
@@ -205,7 +2771,6 @@
         "反酸",
         "烧心",
         "便血",
-        "黑便",
         "腹胀"
       ]
     },
@@ -215,15 +2780,14 @@
       "age_filter": "",
       "gender_filter": "",
       "priority": 10,
-      "note": "心血管症状首选心内科（先排除红旗）",
+      "note": "心血管内科主症状",
       "symptoms": [
         "胸痛",
         "胸闷",
         "心悸",
         "心慌",
         "气短",
-        "高血压",
-        "心前区痛"
+        "高血压"
       ]
     },
     {
@@ -232,7 +2796,7 @@
       "age_filter": "",
       "gender_filter": "",
       "priority": 10,
-      "note": "呼吸道症状首选呼吸内科（先排除红旗）",
+      "note": "呼吸内科主症状",
       "symptoms": [
         "咳嗽",
         "咳痰",
@@ -248,7 +2812,7 @@
       "age_filter": "",
       "gender_filter": "",
       "priority": 10,
-      "note": "神经系统症状首选神经内科（先排除红旗）",
+      "note": "神经内科主症状",
       "symptoms": [
         "头痛",
         "头晕",
@@ -256,8 +2820,7 @@
         "肢体无力",
         "麻木",
         "抽搐",
-        "面瘫",
-        "言语不清"
+        "面瘫"
       ]
     },
     {
@@ -265,16 +2828,148 @@
       "dept_name": "内分泌科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 8,
-      "note": "内分泌代谢症状",
+      "priority": 10,
+      "note": "内分泌科主症状",
       "symptoms": [
         "多饮",
         "多尿",
-        "体重下降",
-        "怕冷",
-        "多汗",
+        "口渴",
         "消瘦",
-        "关节红肿"
+        "畏寒",
+        "多汗"
+      ]
+    },
+    {
+      "dept_code": "NEP",
+      "dept_name": "肾内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "肾内科主症状",
+      "symptoms": [
+        "水肿",
+        "少尿",
+        "多尿",
+        "血尿",
+        "腰痛"
+      ]
+    },
+    {
+      "dept_code": "HEM",
+      "dept_name": "血液科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "血液科主症状",
+      "symptoms": [
+        "贫血",
+        "乏力",
+        "出血",
+        "瘀斑",
+        "淋巴结肿大"
+      ]
+    },
+    {
+      "dept_code": "RHE",
+      "dept_name": "风湿免疫科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "风湿免疫科主症状",
+      "symptoms": [
+        "关节痛",
+        "关节肿",
+        "晨僵",
+        "皮疹",
+        "光过敏"
+      ]
+    },
+    {
+      "dept_code": "INF",
+      "dept_name": "感染科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "感染科主症状",
+      "symptoms": [
+        "发热",
+        "皮疹",
+        "腹泻",
+        "黄疸",
+        "盗汗"
+      ]
+    },
+    {
+      "dept_code": "ONC",
+      "dept_name": "肿瘤内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "肿瘤内科主症状",
+      "symptoms": [
+        "消瘦",
+        "肿块",
+        "咯血",
+        "便血",
+        "吞咽困难"
+      ]
+    },
+    {
+      "dept_code": "GER",
+      "dept_name": "老年病科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "老年病科主症状",
+      "symptoms": [
+        "记忆减退",
+        "跌倒",
+        "乏力",
+        "纳差"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "全科医学科主症状",
+      "symptoms": [
+        "发热",
+        "咳嗽",
+        "腹痛",
+        "头晕",
+        "失眠"
+      ]
+    },
+    {
+      "dept_code": "GS",
+      "dept_name": "普通外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "普通外科主症状",
+      "symptoms": [
+        "腹痛",
+        "腹部包块",
+        "腹股沟包块",
+        "甲状腺结节"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "骨科主症状",
+      "symptoms": [
+        "关节痛",
+        "腰背痛",
+        "颈痛",
+        "骨折",
+        "扭伤"
       ]
     },
     {
@@ -282,62 +2977,155 @@
       "dept_name": "泌尿外科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 8,
-      "note": "泌尿系统症状",
+      "priority": 10,
+      "note": "泌尿外科主症状",
       "symptoms": [
         "尿频",
         "尿急",
         "尿痛",
         "血尿",
-        "排尿困难",
-        "肾绞痛"
+        "排尿困难"
       ]
     },
     {
-      "dept_code": "GYN",
-      "dept_name": "妇科",
+      "dept_code": "NS",
+      "dept_name": "神经外科",
       "age_filter": "",
-      "gender_filter": "女",
-      "priority": 8,
-      "note": "妇科症状（仅女性）",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "神经外科主症状",
       "symptoms": [
-        "白带异常",
-        "月经不调",
-        "痛经",
-        "下腹痛",
-        "阴道出血"
+        "头痛",
+        "意识障碍",
+        "抽搐",
+        "视物模糊"
+      ]
+    },
+    {
+      "dept_code": "CS",
+      "dept_name": "心胸外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "心胸外科主症状",
+      "symptoms": [
+        "胸痛",
+        "气短",
+        "咳嗽",
+        "咯血",
+        "吞咽困难"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "血管外科主症状",
+      "symptoms": [
+        "下肢肿胀",
+        "下肢发凉",
+        "间歇性跛行",
+        "血管包块"
+      ]
+    },
+    {
+      "dept_code": "BS",
+      "dept_name": "乳腺外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "乳腺外科主症状",
+      "symptoms": [
+        "乳房肿块",
+        "乳房胀痛",
+        "乳头溢液"
+      ]
+    },
+    {
+      "dept_code": "CRS",
+      "dept_name": "肛肠科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "肛肠科主症状",
+      "symptoms": [
+        "便血",
+        "肛门疼痛",
+        "便秘",
+        "脱出"
+      ]
+    },
+    {
+      "dept_code": "HBS",
+      "dept_name": "肝胆外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "肝胆外科主症状",
+      "symptoms": [
+        "右上腹痛",
+        "黄疸",
+        "腹痛",
+        "发热"
+      ]
+    },
+    {
+      "dept_code": "BURN",
+      "dept_name": "烧伤整形科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "烧伤整形科主症状",
+      "symptoms": [
+        "烧伤",
+        "烫伤",
+        "皮肤溃疡",
+        "瘢痕"
       ]
     },
     {
       "dept_code": "OB",
       "dept_name": "产科",
       "age_filter": "",
-      "gender_filter": "女",
-      "priority": 8,
-      "note": "产科症状（仅女性）",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "产科主症状",
       "symptoms": [
         "停经",
-        "早孕",
         "孕期腹痛",
-        "胎动异常",
-        "孕期出血"
+        "阴道出血",
+        "胎动异常"
       ]
     },
     {
-      "dept_code": "ORTH",
-      "dept_name": "骨科",
+      "dept_code": "PED",
+      "dept_name": "儿科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 8,
-      "note": "骨关节与运动系统症状",
+      "priority": 10,
+      "note": "儿科主症状",
       "symptoms": [
-        "腰痛",
-        "腰背痛",
-        "关节痛",
-        "颈痛",
-        "骨折",
-        "扭伤",
-        "活动受限"
+        "发热",
+        "咳嗽",
+        "腹泻",
+        "抽搐",
+        "纳差"
+      ]
+    },
+    {
+      "dept_code": "NEO",
+      "dept_name": "新生儿科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "新生儿科主症状",
+      "symptoms": [
+        "黄疸",
+        "喂养困难",
+        "气促",
+        "体温不稳"
       ]
     },
     {
@@ -345,32 +3133,14 @@
       "dept_name": "皮肤科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 8,
-      "note": "皮肤症状",
+      "priority": 10,
+      "note": "皮肤科主症状",
       "symptoms": [
         "皮疹",
         "瘙痒",
         "风团",
         "水疱",
-        "脱发",
-        "红斑"
-      ]
-    },
-    {
-      "dept_code": "ENT",
-      "dept_name": "耳鼻喉科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 8,
-      "note": "耳鼻喉症状",
-      "symptoms": [
-        "咽痛",
-        "鼻塞",
-        "流涕",
-        "耳鸣",
-        "耳痛",
-        "听力下降",
-        "声音嘶哑"
+        "脱发"
       ]
     },
     {
@@ -378,15 +3148,44 @@
       "dept_name": "眼科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 8,
-      "note": "眼部症状",
+      "priority": 10,
+      "note": "眼科主症状",
       "symptoms": [
         "眼红",
         "眼痛",
         "视力下降",
         "视物模糊",
-        "眼干",
-        "流泪"
+        "眼干"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "耳鼻喉科主症状",
+      "symptoms": [
+        "咽痛",
+        "鼻塞",
+        "流涕",
+        "耳鸣",
+        "耳痛",
+        "声音嘶哑"
+      ]
+    },
+    {
+      "dept_code": "STO",
+      "dept_name": "口腔科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "口腔科主症状",
+      "symptoms": [
+        "牙痛",
+        "牙龈出血",
+        "口腔溃疡",
+        "张口受限"
       ]
     },
     {
@@ -394,15 +3193,57 @@
       "dept_name": "精神心理科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 8,
-      "note": "精神心理症状",
+      "priority": 10,
+      "note": "精神心理科主症状",
       "symptoms": [
         "失眠",
         "焦虑",
         "抑郁",
         "情绪低落",
-        "恐慌",
-        "坐立不安"
+        "恐慌"
+      ]
+    },
+    {
+      "dept_code": "REH",
+      "dept_name": "康复医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "康复医学科主症状",
+      "symptoms": [
+        "偏瘫",
+        "活动受限",
+        "言语障碍",
+        "吞咽困难"
+      ]
+    },
+    {
+      "dept_code": "TCM",
+      "dept_name": "中医科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "中医科主症状",
+      "symptoms": [
+        "乏力",
+        "纳差",
+        "失眠",
+        "咳嗽",
+        "腰痛"
+      ]
+    },
+    {
+      "dept_code": "ACU",
+      "dept_name": "针灸科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "针灸科主症状",
+      "symptoms": [
+        "颈肩腰腿痛",
+        "面瘫",
+        "失眠",
+        "偏头痛"
       ]
     },
     {
@@ -411,15 +3252,438 @@
       "age_filter": "",
       "gender_filter": "",
       "priority": 20,
-      "note": "红旗症状直接急诊（最高优先级）",
+      "note": "急诊科主症状",
       "symptoms": [
         "剧烈胸痛",
         "昏迷",
         "休克",
         "抽搐",
         "大出血",
-        "严重外伤",
-        "意识障碍"
+        "严重外伤"
+      ]
+    },
+    {
+      "dept_code": "ICU",
+      "dept_name": "重症医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "重症医学科主症状",
+      "symptoms": [
+        "休克",
+        "呼吸衰竭",
+        "意识障碍",
+        "多器官衰竭"
+      ]
+    },
+    {
+      "dept_code": "ANE",
+      "dept_name": "麻醉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "麻醉科主症状",
+      "symptoms": [
+        "术前评估",
+        "术后疼痛",
+        "慢性疼痛"
+      ]
+    },
+    {
+      "dept_code": "PAIN",
+      "dept_name": "疼痛科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "疼痛科主症状",
+      "symptoms": [
+        "慢性疼痛",
+        "神经痛",
+        "癌痛",
+        "关节疼痛"
+      ]
+    },
+    {
+      "dept_code": "NUT",
+      "dept_name": "营养科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "营养科主症状",
+      "symptoms": [
+        "消瘦",
+        "营养不良",
+        "肥胖",
+        "饮食指导"
+      ]
+    },
+    {
+      "dept_code": "MIN",
+      "dept_name": "体检中心",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "体检中心主症状",
+      "symptoms": [
+        "健康体检",
+        "慢病筛查",
+        "职业病筛查"
+      ]
+    },
+    {
+      "dept_code": "FAM",
+      "dept_name": "家庭医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "家庭医学科主症状",
+      "symptoms": [
+        "慢病随访",
+        "健康管理",
+        "家庭病床"
+      ]
+    },
+    {
+      "dept_code": "GCP",
+      "dept_name": "临床研究中心",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 10,
+      "note": "临床研究中心主症状",
+      "symptoms": [
+        "临床试验",
+        "入组评估",
+        "随访"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "发热（全身）",
+      "symptoms": [
+        "发热"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "乏力（全身）",
+      "symptoms": [
+        "乏力"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "消瘦（全身）",
+      "symptoms": [
+        "消瘦"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "盗汗（全身）",
+      "symptoms": [
+        "盗汗"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "水肿（全身/下肢）",
+      "symptoms": [
+        "水肿"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "寒战（全身）",
+      "symptoms": [
+        "寒战"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "纳差（全身）",
+      "symptoms": [
+        "纳差"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "体重增加（全身）",
+      "symptoms": [
+        "体重增加"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "生长迟缓（全身）",
+      "symptoms": [
+        "生长迟缓"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "多汗（全身）",
+      "symptoms": [
+        "多汗"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "口渴（全身）",
+      "symptoms": [
+        "口渴"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "脱水（全身）",
+      "symptoms": [
+        "脱水"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "疲劳（全身）",
+      "symptoms": [
+        "疲劳"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "晕厥（全身）",
+      "symptoms": [
+        "晕厥"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "抽搐（全身）",
+      "symptoms": [
+        "抽搐"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "寒热往来（全身）",
+      "symptoms": [
+        "寒热往来"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "淋巴结肿大（全身）",
+      "symptoms": [
+        "淋巴结肿大"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "皮疹（全身）",
+      "symptoms": [
+        "皮疹"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "瘙痒（全身）",
+      "symptoms": [
+        "瘙痒"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "皮肤黄染（全身）",
+      "symptoms": [
+        "皮肤黄染"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "面色苍白（全身）",
+      "symptoms": [
+        "面色苍白"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "发绀（全身）",
+      "symptoms": [
+        "发绀"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "杵状指（全身）",
+      "symptoms": [
+        "杵状指"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "贫血貌（全身）",
+      "symptoms": [
+        "贫血貌"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "杵状趾（全身）",
+      "symptoms": [
+        "杵状趾"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "恶病质（全身）",
+      "symptoms": [
+        "恶病质"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "乏力嗜睡（全身）",
+      "symptoms": [
+        "乏力嗜睡"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "易激惹（全身）",
+      "symptoms": [
+        "易激惹"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "食欲亢进（全身）",
+      "symptoms": [
+        "食欲亢进"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "畏寒（全身）",
+      "symptoms": [
+        "畏寒"
       ]
     },
     {
@@ -427,112 +3691,10 @@
       "dept_name": "消化内科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 9,
-      "note": "消化系统感染表现",
+      "priority": 8,
+      "note": "腹痛（腹部）",
       "symptoms": [
-        "呕吐伴腹泻",
-        "腹痛伴发热"
-      ]
-    },
-    {
-      "dept_code": "RES",
-      "dept_name": "呼吸内科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 9,
-      "note": "下呼吸道症状",
-      "symptoms": [
-        "咳嗽伴气短",
-        "喘息发作"
-      ]
-    },
-    {
-      "dept_code": "NEU",
-      "dept_name": "神经内科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 9,
-      "note": "神经系统复合症状",
-      "symptoms": [
-        "头痛伴头晕",
-        "肢体麻木"
-      ]
-    },
-    {
-      "dept_code": "URO",
-      "dept_name": "泌尿外科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 9,
-      "note": "泌尿系感染可能",
-      "symptoms": [
-        "尿痛伴发热"
-      ]
-    },
-    {
-      "dept_code": "GYN",
-      "dept_name": "妇科",
-      "age_filter": "",
-      "gender_filter": "女",
-      "priority": 9,
-      "note": "妇科炎症可能",
-      "symptoms": [
-        "下腹痛伴白带异常"
-      ]
-    },
-    {
-      "dept_code": "ORTH",
-      "dept_name": "骨科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 9,
-      "note": "关节炎症可能",
-      "symptoms": [
-        "关节痛伴红肿"
-      ]
-    },
-    {
-      "dept_code": "DERM",
-      "dept_name": "皮肤科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 9,
-      "note": "皮肤过敏可能",
-      "symptoms": [
-        "皮疹伴瘙痒"
-      ]
-    },
-    {
-      "dept_code": "ENT",
-      "dept_name": "耳鼻喉科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 9,
-      "note": "上呼吸道感染可能",
-      "symptoms": [
-        "咽痛伴发热"
-      ]
-    },
-    {
-      "dept_code": "OPH",
-      "dept_name": "眼科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 9,
-      "note": "眼部急症可能",
-      "symptoms": [
-        "视物模糊伴眼痛"
-      ]
-    },
-    {
-      "dept_code": "END",
-      "dept_name": "内分泌科",
-      "age_filter": "",
-      "gender_filter": "",
-      "priority": 9,
-      "note": "甲状腺功能异常可能",
-      "symptoms": [
-        "心悸伴多汗消瘦"
+        "腹痛"
       ]
     },
     {
@@ -540,11 +3702,373 @@
       "dept_name": "消化内科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 7,
-      "note": "胃食管反流可能",
+      "priority": 8,
+      "note": "腹泻（腹部）",
       "symptoms": [
-        "夜间胸痛",
-        "餐后反酸"
+        "腹泻"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "恶心（上腹部）",
+      "symptoms": [
+        "恶心"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "呕吐（上腹部）",
+      "symptoms": [
+        "呕吐"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "烧心（胸骨后）",
+      "symptoms": [
+        "烧心"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "反酸（上腹部）",
+      "symptoms": [
+        "反酸"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "嗳气（上腹部）",
+      "symptoms": [
+        "嗳气"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "腹胀（腹部）",
+      "symptoms": [
+        "腹胀"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "便秘（腹部）",
+      "symptoms": [
+        "便秘"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "便血（腹部）",
+      "symptoms": [
+        "便血"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "黑便（腹部）",
+      "symptoms": [
+        "黑便"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "呕血（上腹部）",
+      "symptoms": [
+        "呕血"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "食欲减退（全身）",
+      "symptoms": [
+        "食欲减退"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "吞咽困难（咽喉/食管）",
+      "symptoms": [
+        "吞咽困难"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "黄疸（全身）",
+      "symptoms": [
+        "黄疸"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "腹水（腹部）",
+      "symptoms": [
+        "腹水"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "里急后重（直肠）",
+      "symptoms": [
+        "里急后重"
+      ]
+    },
+    {
+      "dept_code": "STO",
+      "dept_name": "口腔科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "口臭（口腔）",
+      "symptoms": [
+        "口臭"
+      ]
+    },
+    {
+      "dept_code": "STO",
+      "dept_name": "口腔科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "口腔溃疡（口腔）",
+      "symptoms": [
+        "口腔溃疡"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "消化不良（上腹部）",
+      "symptoms": [
+        "消化不良"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "上腹痛（上腹部）",
+      "symptoms": [
+        "上腹痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "下腹痛（下腹部）",
+      "symptoms": [
+        "下腹痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "右上腹痛（右上腹）",
+      "symptoms": [
+        "右上腹痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "左下腹痛（左下腹）",
+      "symptoms": [
+        "左下腹痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "脐周痛（脐周）",
+      "symptoms": [
+        "脐周痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "餐后饱胀（上腹部）",
+      "symptoms": [
+        "餐后饱胀"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "早饱（上腹部）",
+      "symptoms": [
+        "早饱"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "大便习惯改变（腹部）",
+      "symptoms": [
+        "大便习惯改变"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "黏液便（腹部）",
+      "symptoms": [
+        "黏液便"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肛门疼痛（肛门）",
+      "symptoms": [
+        "肛门疼痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "排便疼痛（肛门）",
+      "symptoms": [
+        "排便疼痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "呃逆（上腹部）",
+      "symptoms": [
+        "呃逆"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "胃部不适（上腹部）",
+      "symptoms": [
+        "胃部不适"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肠鸣音亢进（腹部）",
+      "symptoms": [
+        "肠鸣音亢进"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "腹部包块（腹部）",
+      "symptoms": [
+        "腹部包块"
       ]
     },
     {
@@ -552,45 +4076,1583 @@
       "dept_name": "心血管内科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 7,
-      "note": "心功能评估",
+      "priority": 8,
+      "note": "胸痛（胸部）",
       "symptoms": [
-        "活动后气短"
+        "胸痛"
       ]
     },
     {
-      "dept_code": "DERM",
-      "dept_name": "皮肤科",
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
       "age_filter": "",
       "gender_filter": "",
-      "priority": 7,
-      "note": "感染性皮疹可能",
+      "priority": 8,
+      "note": "胸闷（胸部）",
       "symptoms": [
-        "发热伴皮疹"
+        "胸闷"
       ]
     },
     {
-      "dept_code": "RES",
-      "dept_name": "呼吸内科",
-      "age_filter": "child",
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
       "gender_filter": "",
       "priority": 8,
-      "note": "儿童常见感染",
+      "note": "心悸（胸部）",
       "symptoms": [
-        "儿童发热",
-        "儿童腹泻"
+        "心悸"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "心前区痛（胸部）",
+      "symptoms": [
+        "心前区痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "胸骨后痛（胸骨后）",
+      "symptoms": [
+        "胸骨后痛"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "气短（胸部）",
+      "symptoms": [
+        "气短"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "晕厥前兆（全身）",
+      "symptoms": [
+        "晕厥前兆"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "间歇性跛行（下肢）",
+      "symptoms": [
+        "间歇性跛行"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "血压升高（全身）",
+      "symptoms": [
+        "血压升高"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "血压下降（全身）",
+      "symptoms": [
+        "血压下降"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "脉搏异常（全身）",
+      "symptoms": [
+        "脉搏异常"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "下肢肿胀（下肢）",
+      "symptoms": [
+        "下肢肿胀"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "颈静脉怒张（颈部）",
+      "symptoms": [
+        "颈静脉怒张"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "活动后气促（胸部）",
+      "symptoms": [
+        "活动后气促"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "夜间阵发性呼吸困难（胸部）",
+      "symptoms": [
+        "夜间阵发性呼吸困难"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "端坐呼吸（胸部）",
+      "symptoms": [
+        "端坐呼吸"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "心前区不适（胸部）",
+      "symptoms": [
+        "心前区不适"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "心脏杂音（胸部）",
+      "symptoms": [
+        "心脏杂音"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "下肢发凉（下肢）",
+      "symptoms": [
+        "下肢发凉"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "静息痛（下肢）",
+      "symptoms": [
+        "静息痛"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "下肢溃疡（下肢）",
+      "symptoms": [
+        "下肢溃疡"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "血管搏动性包块（腹部）",
+      "symptoms": [
+        "血管搏动性包块"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "水肿加重（下肢）",
+      "symptoms": [
+        "水肿加重"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "面色潮红（面部）",
+      "symptoms": [
+        "面色潮红"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "心慌气短（胸部）",
+      "symptoms": [
+        "心慌气短"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "呼吸困难（胸部）",
+      "symptoms": [
+        "呼吸困难"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "咳嗽（胸部）",
+      "symptoms": [
+        "咳嗽"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "咳痰（胸部）",
+      "symptoms": [
+        "咳痰"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "咯血（胸部）",
+      "symptoms": [
+        "咯血"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "喘息（胸部）",
+      "symptoms": [
+        "喘息"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "咳黄痰（胸部）",
+      "symptoms": [
+        "咳黄痰"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "咳白痰（胸部）",
+      "symptoms": [
+        "咳白痰"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "干咳（胸部）",
+      "symptoms": [
+        "干咳"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "夜间咳嗽（胸部）",
+      "symptoms": [
+        "夜间咳嗽"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "咽痒（咽喉）",
+      "symptoms": [
+        "咽痒"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "咽痛（咽喉）",
+      "symptoms": [
+        "咽痛"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "声音嘶哑（咽喉）",
+      "symptoms": [
+        "声音嘶哑"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "鼻塞（鼻部）",
+      "symptoms": [
+        "鼻塞"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "流涕（鼻部）",
+      "symptoms": [
+        "流涕"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "鼻痒（鼻部）",
+      "symptoms": [
+        "鼻痒"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "喷嚏（鼻部）",
+      "symptoms": [
+        "喷嚏"
+      ]
+    },
+    {
+      "dept_code": "ENT",
+      "dept_name": "耳鼻喉科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "嗅觉减退（鼻部）",
+      "symptoms": [
+        "嗅觉减退"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "胸痛伴呼吸（胸部）",
+      "symptoms": [
+        "胸痛伴呼吸"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "呼吸音减弱（胸部）",
+      "symptoms": [
+        "呼吸音减弱"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "哮鸣音（胸部）",
+      "symptoms": [
+        "哮鸣音"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "湿啰音（胸部）",
+      "symptoms": [
+        "湿啰音"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "咳粉红泡沫痰（胸部）",
+      "symptoms": [
+        "咳粉红泡沫痰"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "端坐喘息（胸部）",
+      "symptoms": [
+        "端坐喘息"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "发绀气促（胸部）",
+      "symptoms": [
+        "发绀气促"
+      ]
+    },
+    {
+      "dept_code": "CAR",
+      "dept_name": "心血管内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "长期咳痰（胸部）",
+      "symptoms": [
+        "长期咳痰"
       ]
     },
     {
       "dept_code": "NEU",
       "dept_name": "神经内科",
-      "age_filter": "elderly",
+      "age_filter": "",
       "gender_filter": "",
       "priority": 8,
-      "note": "老年神经系统评估",
+      "note": "头痛（头部）",
       "symptoms": [
-        "老年人头晕",
-        "老年人乏力"
+        "头痛"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "头晕（头部）",
+      "symptoms": [
+        "头晕"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "眩晕（头部）",
+      "symptoms": [
+        "眩晕"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "偏侧头痛（头部）",
+      "symptoms": [
+        "偏侧头痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肢体无力（四肢）",
+      "symptoms": [
+        "肢体无力"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "麻木（四肢）",
+      "symptoms": [
+        "麻木"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "面瘫（面部）",
+      "symptoms": [
+        "面瘫"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "言语不清（口咽）",
+      "symptoms": [
+        "言语不清"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "意识障碍（头部）",
+      "symptoms": [
+        "意识障碍"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "记忆减退（头部）",
+      "symptoms": [
+        "记忆减退"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "认知障碍（头部）",
+      "symptoms": [
+        "认知障碍"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "步态不稳（下肢）",
+      "symptoms": [
+        "步态不稳"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "震颤（四肢）",
+      "symptoms": [
+        "震颤"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肌强直（四肢）",
+      "symptoms": [
+        "肌强直"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "运动迟缓（四肢）",
+      "symptoms": [
+        "运动迟缓"
+      ]
+    },
+    {
+      "dept_code": "OPH",
+      "dept_name": "眼科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "视野缺损（眼部）",
+      "symptoms": [
+        "视野缺损"
+      ]
+    },
+    {
+      "dept_code": "OPH",
+      "dept_name": "眼科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "复视（眼部）",
+      "symptoms": [
+        "复视"
+      ]
+    },
+    {
+      "dept_code": "NEU",
+      "dept_name": "神经内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "失语（头部）",
+      "symptoms": [
+        "失语"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "感觉异常（四肢）",
+      "symptoms": [
+        "感觉异常"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "共济失调（四肢）",
+      "symptoms": [
+        "共济失调"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "癫痫发作（全身）",
+      "symptoms": [
+        "癫痫发作"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "单侧无力（四肢）",
+      "symptoms": [
+        "单侧无力"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "下肢无力（下肢）",
+      "symptoms": [
+        "下肢无力"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "行走困难（下肢）",
+      "symptoms": [
+        "行走困难"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "颈部僵硬（颈部）",
+      "symptoms": [
+        "颈部僵硬"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿频（泌尿）",
+      "symptoms": [
+        "尿频"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿急（泌尿）",
+      "symptoms": [
+        "尿急"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿痛（泌尿）",
+      "symptoms": [
+        "尿痛"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "血尿（泌尿）",
+      "symptoms": [
+        "血尿"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "排尿困难（泌尿）",
+      "symptoms": [
+        "排尿困难"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿潴留（泌尿）",
+      "symptoms": [
+        "尿潴留"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿失禁（泌尿）",
+      "symptoms": [
+        "尿失禁"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "夜尿增多（泌尿）",
+      "symptoms": [
+        "夜尿增多"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿线细（泌尿）",
+      "symptoms": [
+        "尿线细"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿分叉（泌尿）",
+      "symptoms": [
+        "尿分叉"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "腰痛（腰部）",
+      "symptoms": [
+        "腰痛"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肾绞痛（腰部）",
+      "symptoms": [
+        "肾绞痛"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "少尿（泌尿）",
+      "symptoms": [
+        "少尿"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "多尿（泌尿）",
+      "symptoms": [
+        "多尿"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿混浊（泌尿）",
+      "symptoms": [
+        "尿混浊"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿异味（泌尿）",
+      "symptoms": [
+        "尿异味"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "下腹坠胀（下腹部）",
+      "symptoms": [
+        "下腹坠胀"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿滴沥（泌尿）",
+      "symptoms": [
+        "尿滴沥"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿等待（泌尿）",
+      "symptoms": [
+        "尿等待"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿道分泌物（泌尿）",
+      "symptoms": [
+        "尿道分泌物"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "睾丸痛（会阴）",
+      "symptoms": [
+        "睾丸痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "阴囊肿胀（会阴）",
+      "symptoms": [
+        "阴囊肿胀"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "会阴部不适（会阴）",
+      "symptoms": [
+        "会阴部不适"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "排尿烧灼感（泌尿）",
+      "symptoms": [
+        "排尿烧灼感"
+      ]
+    },
+    {
+      "dept_code": "URO",
+      "dept_name": "泌尿外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "尿失禁漏尿（泌尿）",
+      "symptoms": [
+        "尿失禁漏尿"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "月经不调（生殖）",
+      "symptoms": [
+        "月经不调"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "痛经（下腹部）",
+      "symptoms": [
+        "痛经"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "白带异常（生殖）",
+      "symptoms": [
+        "白带异常"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "阴道出血（生殖）",
+      "symptoms": [
+        "阴道出血"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "停经（生殖）",
+      "symptoms": [
+        "停经"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "经量过多（生殖）",
+      "symptoms": [
+        "经量过多"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "经期延长（生殖）",
+      "symptoms": [
+        "经期延长"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "闭经（生殖）",
+      "symptoms": [
+        "闭经"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "性交痛（生殖）",
+      "symptoms": [
+        "性交痛"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "外阴瘙痒（生殖）",
+      "symptoms": [
+        "外阴瘙痒"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "下腹包块（下腹部）",
+      "symptoms": [
+        "下腹包块"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "乳房胀痛（乳房）",
+      "symptoms": [
+        "乳房胀痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "乳房肿块（乳房）",
+      "symptoms": [
+        "乳房肿块"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "乳头溢液（乳房）",
+      "symptoms": [
+        "乳头溢液"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "孕期腹痛（下腹部）",
+      "symptoms": [
+        "孕期腹痛"
+      ]
+    },
+    {
+      "dept_code": "DIG",
+      "dept_name": "消化内科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "胎动异常（腹部）",
+      "symptoms": [
+        "胎动异常"
+      ]
+    },
+    {
+      "dept_code": "VS",
+      "dept_name": "血管外科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "孕期水肿（下肢）",
+      "symptoms": [
+        "孕期水肿"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "孕期呕吐（上腹部）",
+      "symptoms": [
+        "孕期呕吐"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "恶露异常（生殖）",
+      "symptoms": [
+        "恶露异常"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "产后发热（全身）",
+      "symptoms": [
+        "产后发热"
+      ]
+    },
+    {
+      "dept_code": "PSY",
+      "dept_name": "精神心理科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "产后抑郁（心理）",
+      "symptoms": [
+        "产后抑郁"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "男性性功能减退（生殖）",
+      "symptoms": [
+        "男性性功能减退"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "射精痛（生殖）",
+      "symptoms": [
+        "射精痛"
+      ]
+    },
+    {
+      "dept_code": "GYN",
+      "dept_name": "妇科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "包皮红肿（生殖）",
+      "symptoms": [
+        "包皮红肿"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "盆腔痛（下腹部）",
+      "symptoms": [
+        "盆腔痛"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "关节痛（关节）",
+      "symptoms": [
+        "关节痛"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "关节肿胀（关节）",
+      "symptoms": [
+        "关节肿胀"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "关节红肿（关节）",
+      "symptoms": [
+        "关节红肿"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "关节僵硬（关节）",
+      "symptoms": [
+        "关节僵硬"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "晨僵（关节）",
+      "symptoms": [
+        "晨僵"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "腰背痛（腰背）",
+      "symptoms": [
+        "腰背痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "颈痛（颈部）",
+      "symptoms": [
+        "颈痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肩痛（肩部）",
+      "symptoms": [
+        "肩痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "膝关节痛（膝部）",
+      "symptoms": [
+        "膝关节痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "髋关节痛（髋部）",
+      "symptoms": [
+        "髋关节痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "骨折（骨骼）",
+      "symptoms": [
+        "骨折"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "扭伤（关节）",
+      "symptoms": [
+        "扭伤"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肌肉疼痛（肌肉）",
+      "symptoms": [
+        "肌肉疼痛"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肌肉萎缩（肌肉）",
+      "symptoms": [
+        "肌肉萎缩"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "肢体畸形（骨骼）",
+      "symptoms": [
+        "肢体畸形"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "活动受限（关节）",
+      "symptoms": [
+        "活动受限"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "关节弹响（关节）",
+      "symptoms": [
+        "关节弹响"
+      ]
+    },
+    {
+      "dept_code": "ORT",
+      "dept_name": "骨科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "骨摩擦感（关节）",
+      "symptoms": [
+        "骨摩擦感"
+      ]
+    },
+    {
+      "dept_code": "GEN",
+      "dept_name": "全科医学科",
+      "age_filter": "",
+      "gender_filter": "",
+      "priority": 8,
+      "note": "下蹲困难（膝部）",
+      "symptoms": [
+        "下蹲困难"
       ]
     }
   ],
@@ -598,182 +5660,1502 @@
     {
       "complaint_type": "腹痛",
       "target_slot": "location",
-      "question": "疼痛具体在哪个部位（上腹、下腹、左右侧）？",
+      "question": "具体在哪个部位？",
       "order": "1"
     },
     {
       "complaint_type": "腹痛",
       "target_slot": "duration",
-      "question": "疼了多久了？是持续还是阵发？",
+      "question": "出现多久了？",
       "order": "2"
     },
     {
       "complaint_type": "腹痛",
       "target_slot": "nature",
-      "question": "疼痛是什么样的（绞痛、胀痛、隐痛、烧灼痛）？",
+      "question": "是什么样的感觉（性质）？",
       "order": "3"
     },
     {
       "complaint_type": "腹痛",
-      "target_slot": "accompanying",
-      "question": "有没有腹泻、恶心、呕吐、发热这些伴随症状？",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
       "order": "4"
     },
     {
+      "complaint_type": "腹痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "5"
+    },
+    {
+      "complaint_type": "腹痛",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "6"
+    },
+    {
+      "complaint_type": "腹痛",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "7"
+    },
+    {
+      "complaint_type": "腹痛",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "8"
+    },
+    {
+      "complaint_type": "腹痛",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "9"
+    },
+    {
+      "complaint_type": "腹痛",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "10"
+    },
+    {
       "complaint_type": "腹泻",
-      "target_slot": "frequency",
-      "question": "一天腹泻几次？大便是什么样子（水样、糊状、带血）？",
-      "order": "1"
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "11"
     },
     {
       "complaint_type": "腹泻",
       "target_slot": "duration",
-      "question": "腹泻多久了？",
-      "order": "2"
+      "question": "出现多久了？",
+      "order": "12"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "13"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "14"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "15"
     },
     {
       "complaint_type": "腹泻",
       "target_slot": "accompanying",
-      "question": "有没有腹痛、发热、呕吐、脱水表现？",
-      "order": "3"
+      "question": "有没有其它伴随症状？",
+      "order": "16"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "17"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "18"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "19"
+    },
+    {
+      "complaint_type": "腹泻",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "20"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "21"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "22"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "23"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "24"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "25"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "26"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "27"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "28"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "29"
+    },
+    {
+      "complaint_type": "恶心",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "30"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "31"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "32"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "33"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "34"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "35"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "36"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "37"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "38"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "39"
+    },
+    {
+      "complaint_type": "呕吐",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "40"
+    },
+    {
+      "complaint_type": "胸痛",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "41"
+    },
+    {
+      "complaint_type": "胸痛",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "42"
     },
     {
       "complaint_type": "胸痛",
       "target_slot": "nature",
-      "question": "胸痛是什么样的（压榨、针刺、烧灼）？",
-      "order": "1"
+      "question": "是什么样的感觉（性质）？",
+      "order": "43"
+    },
+    {
+      "complaint_type": "胸痛",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "44"
+    },
+    {
+      "complaint_type": "胸痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "45"
+    },
+    {
+      "complaint_type": "胸痛",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "46"
+    },
+    {
+      "complaint_type": "胸痛",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "47"
+    },
+    {
+      "complaint_type": "胸痛",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "48"
+    },
+    {
+      "complaint_type": "胸痛",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "49"
     },
     {
       "complaint_type": "胸痛",
       "target_slot": "radiation",
-      "question": "疼痛有没有放射到左臂、下颌或后背？",
-      "order": "2"
-    },
-    {
-      "complaint_type": "胸痛",
-      "target_slot": "trigger",
-      "question": "什么情况下会加重（活动、劳累、深呼吸）？",
-      "order": "3"
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "50"
     },
     {
       "complaint_type": "胸闷",
-      "target_slot": "trigger",
-      "question": "胸闷在什么情况下出现（活动、休息、夜间）？",
-      "order": "1"
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "51"
     },
     {
       "complaint_type": "胸闷",
       "target_slot": "duration",
-      "question": "每次持续多久？能否自行缓解？",
-      "order": "2"
+      "question": "出现多久了？",
+      "order": "52"
+    },
+    {
+      "complaint_type": "胸闷",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "53"
+    },
+    {
+      "complaint_type": "胸闷",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "54"
+    },
+    {
+      "complaint_type": "胸闷",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "55"
+    },
+    {
+      "complaint_type": "胸闷",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "56"
+    },
+    {
+      "complaint_type": "胸闷",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "57"
+    },
+    {
+      "complaint_type": "胸闷",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "58"
+    },
+    {
+      "complaint_type": "胸闷",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "59"
+    },
+    {
+      "complaint_type": "胸闷",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "60"
+    },
+    {
+      "complaint_type": "心悸",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "61"
+    },
+    {
+      "complaint_type": "心悸",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "62"
+    },
+    {
+      "complaint_type": "心悸",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "63"
+    },
+    {
+      "complaint_type": "心悸",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "64"
     },
     {
       "complaint_type": "心悸",
       "target_slot": "trigger",
-      "question": "心慌在什么情况下出现？持续多久？",
-      "order": "1"
+      "question": "什么情况下加重或缓解？",
+      "order": "65"
     },
     {
       "complaint_type": "心悸",
       "target_slot": "accompanying",
-      "question": "有没有胸痛、气短、头晕、多汗？",
-      "order": "2"
+      "question": "有没有其它伴随症状？",
+      "order": "66"
+    },
+    {
+      "complaint_type": "心悸",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "67"
+    },
+    {
+      "complaint_type": "心悸",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "68"
+    },
+    {
+      "complaint_type": "心悸",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "69"
+    },
+    {
+      "complaint_type": "心悸",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "70"
+    },
+    {
+      "complaint_type": "咳嗽",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "71"
     },
     {
       "complaint_type": "咳嗽",
       "target_slot": "duration",
-      "question": "咳嗽多久了？",
-      "order": "1"
+      "question": "出现多久了？",
+      "order": "72"
     },
     {
       "complaint_type": "咳嗽",
-      "target_slot": "sputum",
-      "question": "有没有痰？痰是什么颜色？",
-      "order": "2"
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "73"
+    },
+    {
+      "complaint_type": "咳嗽",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "74"
+    },
+    {
+      "complaint_type": "咳嗽",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "75"
+    },
+    {
+      "complaint_type": "咳嗽",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "76"
+    },
+    {
+      "complaint_type": "咳嗽",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "77"
+    },
+    {
+      "complaint_type": "咳嗽",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "78"
     },
     {
       "complaint_type": "咳嗽",
       "target_slot": "fever",
       "question": "有没有发热？体温多少？",
-      "order": "3"
+      "order": "79"
+    },
+    {
+      "complaint_type": "咳嗽",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "80"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "81"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "82"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "83"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "84"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "85"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "86"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "87"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "88"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "89"
+    },
+    {
+      "complaint_type": "咳痰",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "90"
+    },
+    {
+      "complaint_type": "发热",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "91"
     },
     {
       "complaint_type": "发热",
       "target_slot": "duration",
-      "question": "发热多久了？最高体温多少？",
-      "order": "1"
+      "question": "出现多久了？",
+      "order": "92"
+    },
+    {
+      "complaint_type": "发热",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "93"
+    },
+    {
+      "complaint_type": "发热",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "94"
+    },
+    {
+      "complaint_type": "发热",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "95"
     },
     {
       "complaint_type": "发热",
       "target_slot": "accompanying",
-      "question": "有没有咳嗽、咽痛、腹泻、皮疹？",
-      "order": "2"
+      "question": "有没有其它伴随症状？",
+      "order": "96"
+    },
+    {
+      "complaint_type": "发热",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "97"
+    },
+    {
+      "complaint_type": "发热",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "98"
+    },
+    {
+      "complaint_type": "发热",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "99"
+    },
+    {
+      "complaint_type": "发热",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "100"
     },
     {
       "complaint_type": "头痛",
       "target_slot": "location",
-      "question": "头痛在哪个部位（太阳穴、后脑勺、全头）？",
-      "order": "1"
+      "question": "具体在哪个部位？",
+      "order": "101"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "102"
     },
     {
       "complaint_type": "头痛",
       "target_slot": "nature",
-      "question": "是胀痛、跳痛还是刺痛？",
-      "order": "2"
+      "question": "是什么样的感觉（性质）？",
+      "order": "103"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "104"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "105"
     },
     {
       "complaint_type": "头痛",
       "target_slot": "accompanying",
-      "question": "有没有恶心、呕吐、畏光、发热？",
-      "order": "3"
+      "question": "有没有其它伴随症状？",
+      "order": "106"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "107"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "108"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "109"
+    },
+    {
+      "complaint_type": "头痛",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "110"
+    },
+    {
+      "complaint_type": "头晕",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "111"
+    },
+    {
+      "complaint_type": "头晕",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "112"
     },
     {
       "complaint_type": "头晕",
       "target_slot": "nature",
-      "question": "是旋转感（天旋地转）还是头重脚轻？",
-      "order": "1"
+      "question": "是什么样的感觉（性质）？",
+      "order": "113"
     },
     {
       "complaint_type": "头晕",
-      "target_slot": "duration",
-      "question": "持续多久？是阵发还是持续？",
-      "order": "2"
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "114"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "onset",
-      "question": "无力是突然发生还是慢慢出现的？",
-      "order": "1"
+      "complaint_type": "头晕",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "115"
+    },
+    {
+      "complaint_type": "头晕",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "116"
+    },
+    {
+      "complaint_type": "头晕",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "117"
+    },
+    {
+      "complaint_type": "头晕",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "118"
+    },
+    {
+      "complaint_type": "头晕",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "119"
+    },
+    {
+      "complaint_type": "头晕",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "120"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "121"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "122"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "123"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "124"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "125"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "126"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "127"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "128"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "129"
+    },
+    {
+      "complaint_type": "眩晕",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "130"
     },
     {
       "complaint_type": "肢体无力",
       "target_slot": "location",
-      "question": "是单侧还是双侧？具体哪边？",
-      "order": "2"
+      "question": "具体在哪个部位？",
+      "order": "131"
     },
     {
-      "complaint_type": "尿频尿痛",
+      "complaint_type": "肢体无力",
       "target_slot": "duration",
-      "question": "尿频尿痛多久了？有没有血尿、发热？",
-      "order": "1"
+      "question": "出现多久了？",
+      "order": "132"
+    },
+    {
+      "complaint_type": "肢体无力",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "133"
+    },
+    {
+      "complaint_type": "肢体无力",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "134"
+    },
+    {
+      "complaint_type": "肢体无力",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "135"
+    },
+    {
+      "complaint_type": "肢体无力",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "136"
+    },
+    {
+      "complaint_type": "肢体无力",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "137"
+    },
+    {
+      "complaint_type": "肢体无力",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "138"
+    },
+    {
+      "complaint_type": "肢体无力",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "139"
+    },
+    {
+      "complaint_type": "肢体无力",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "140"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "141"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "142"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "143"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "144"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "145"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "146"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "147"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "148"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "149"
+    },
+    {
+      "complaint_type": "麻木",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "150"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "151"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "152"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "153"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "154"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "155"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "156"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "157"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "158"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "159"
+    },
+    {
+      "complaint_type": "尿频",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "160"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "161"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "162"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "163"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "164"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "165"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "166"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "167"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "168"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "169"
+    },
+    {
+      "complaint_type": "尿痛",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "170"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "171"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "172"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "173"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "174"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "175"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "176"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "177"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "178"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "179"
+    },
+    {
+      "complaint_type": "血尿",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "180"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "181"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "182"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "183"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "184"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "185"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "186"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "187"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "188"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "189"
+    },
+    {
+      "complaint_type": "腰痛",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "190"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "191"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "192"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "193"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "194"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "195"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "196"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "197"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "198"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "199"
+    },
+    {
+      "complaint_type": "关节痛",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "200"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "201"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "202"
     },
     {
       "complaint_type": "皮疹",
       "target_slot": "nature",
-      "question": "皮疹是什么样（红斑、丘疹、水疱）？分布在哪些部位？",
-      "order": "1"
+      "question": "是什么样的感觉（性质）？",
+      "order": "203"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "204"
     },
     {
       "complaint_type": "皮疹",
       "target_slot": "trigger",
-      "question": "有没有接触过敏原、用药、进食特殊食物？",
-      "order": "2"
+      "question": "什么情况下加重或缓解？",
+      "order": "205"
     },
     {
-      "complaint_type": "下腹痛",
-      "target_slot": "relation",
-      "question": "腹痛与月经周期有关系吗？有没有阴道出血？",
-      "order": "1"
+      "complaint_type": "皮疹",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "206"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "207"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "208"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "209"
+    },
+    {
+      "complaint_type": "皮疹",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "210"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "211"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "212"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "213"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "214"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "215"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "216"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "217"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "218"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "219"
+    },
+    {
+      "complaint_type": "瘙痒",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "220"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "221"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "222"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "223"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "224"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "225"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "226"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "227"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "228"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "229"
+    },
+    {
+      "complaint_type": "咽痛",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "230"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "231"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "232"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "233"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "234"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "235"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "236"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "237"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "238"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "239"
+    },
+    {
+      "complaint_type": "鼻塞",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "240"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "location",
+      "question": "具体在哪个部位？",
+      "order": "241"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "duration",
+      "question": "出现多久了？",
+      "order": "242"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "nature",
+      "question": "是什么样的感觉（性质）？",
+      "order": "243"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "severity",
+      "question": "严重程度如何（轻/中/重）？",
+      "order": "244"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "trigger",
+      "question": "什么情况下加重或缓解？",
+      "order": "245"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "accompanying",
+      "question": "有没有其它伴随症状？",
+      "order": "246"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "history",
+      "question": "以前有没有类似情况或相关病史？",
+      "order": "247"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "medication",
+      "question": "目前有没有在用药？",
+      "order": "248"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
+      "order": "249"
+    },
+    {
+      "complaint_type": "耳鸣",
+      "target_slot": "radiation",
+      "question": "疼痛有没有向其它部位放射？",
+      "order": "250"
     }
   ]
 }
