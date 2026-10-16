@@ -1,0 +1,50 @@
+/*
+ * 医生工作台 · 延续「诊室暖光」
+ *
+ * 与患者端同一色系，但桌面端信息密度更高、更克制：
+ * 深青绿做主导航，暖白内容区，暖琥珀只留给「确认分诊」这类关键医疗动作。
+ */
+
+:root {
+  --c-bg: #f6f3ee;
+  --c-surface: #ffffff;
+  --c-primary: #17504e;
+  --c-primary-soft: #e8f0ee;
+  --c-accent: #c97b3d;
+  --c-ink: #22302e;
+  --c-muted: #7a8580;
+  --c-line: #e6e0d6;
+
+  --font-display: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+  --font-body: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+
+  /* Element Plus 主题覆盖：主色改为深青绿 */
+  --el-color-primary: #17504e;
+  --el-color-primary-light-3: #4d7d7b;
+  --el-color-primary-light-5: #79a09e;
+  --el-color-primary-light-7: #a6c3c1;
+  --el-color-primary-light-8: #c0d5d4;
+  --el-color-primary-light-9: #e8f0ee;
+  --el-color-primary-dark-2: #12403e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--c-primary);
+  font-weight: 600;
+  margin: 0;
+}

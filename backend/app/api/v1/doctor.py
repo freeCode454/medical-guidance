@@ -200,3 +200,10 @@ async def list_patient_summaries(
         size=size,
     )
     return ApiResponse(data=data)
+
+
+@router.get("/depts", response_model=ApiResponse[list])
+async def list_depts(db: DbSession, doctor: CurrentDoctor) -> ApiResponse[list]:
+    """查询启用中的科室列表（供修正分诊下拉选择）。"""
+    data = await doctor_service.list_depts(db, tenant_id=doctor["tenant_id"])
+    return ApiResponse(data=data)

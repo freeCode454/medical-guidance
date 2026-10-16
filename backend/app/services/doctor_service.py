@@ -695,3 +695,15 @@ async def list_patient_summaries(
         for t in rows
     ]
     return {"total": total, "page": page, "size": size, "items": items}
+
+
+async def list_depts(db: AsyncSession, *, tenant_id: str) -> list[dict]:
+    """查询启用中的科室列表（供修正分诊下拉选择）。"""
+    rows = (
+        await db.scalars(
+            select(Dept)
+            .where(Dept.tenant_id == tenant_id, Dept.status == "1")
+            .order_by(Dept.sort_no.asc())
+        )
+    ).all()
+    return [{"dept_code": d.dept_code, "dept_name": d.dept_name} for d in rows]
