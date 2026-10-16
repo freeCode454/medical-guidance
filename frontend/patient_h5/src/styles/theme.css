@@ -1,0 +1,62 @@
+/*
+ * 诊室暖光 · 设计系统
+ *
+ * 定位：医疗智能导诊，要「可信」而非「冰冷」。
+ * 深青绿传达医疗的专业与信任，暖白底模拟诊室柔和光线，暖琥珀是唯一的高亮——
+ * 只用在「开始问诊」这类需要引导动作的地方，避免满屏都是强调。
+ */
+
+:root {
+  /* 色板 */
+  --c-bg: #fbf7f1;          /* 暖白底（诊室墙面） */
+  --c-surface: #ffffff;     /* 卡片面 */
+  --c-primary: #17504e;     /* 深青绿（主色：信任 / 专业） */
+  --c-primary-soft: #e8f0ee;/* 浅青绿（AI 气泡 / 分区底） */
+  --c-accent: #c97b3d;      /* 暖琥珀（唯一强调：引导动作） */
+  --c-ink: #22302e;         /* 正文深墨绿 */
+  --c-muted: #7a8580;       /* 次要文字 */
+  --c-line: #e6e0d6;        /* 分隔线 */
+
+  /* 字体 */
+  --font-display: 'Noto Serif SC', 'Songti SC', 'STSong', serif; /* 标题：书卷感 */
+  --font-body: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+
+  /* 圆角与阴影 */
+  --radius: 14px;
+  --shadow: 0 2px 12px rgba(34, 48, 46, 0.06);
+
+  /* Vant 主题覆盖 */
+  --van-primary-color: var(--c-primary);
+  --van-text-color: var(--c-ink);
+  --van-background: var(--c-bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+#app {
+  max-width: 520px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--c-primary);
+  margin: 0;
+}
