@@ -13,8 +13,11 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.staticfiles import StaticFiles
 
 from app.common.egress_guard import (
     ABSOLUTE_PII_CAPABILITIES,
@@ -63,7 +66,25 @@ async def lifespan(app: FastAPI):
     milvus_store.close()
 
 
-app = FastAPI(title="MedicalGuidance", version="0.1.0", lifespan=lifespan)
+# docs_url=None 禁用默认 /docs（其模板引用 jsdelivr CDN，国内不可达会白屏），
+# 由下方自定义路由用本地静态资源接管
+app = FastAPI(title="MedicalGuidance", version="0.1.0", lifespan=lifespan, docs_url=None)
+
+# Swagger UI 静态资源本地托管：不依赖公网 CDN（内网/私有化部署同样可用）
+_STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static")
+
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    """用本地静态资源渲染 Swagger UI。"""
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Swagger UI",
+        swagger_js_url="/static/swagger-ui/swagger-ui-bundle.js",
+        swagger_css_url="/static/swagger-ui/swagger-ui.css",
+    )
+
 
 # 全局异常处理器（业务错误 → 统一响应）+ 业务路由 + WebSocket
 register_exception_handlers(app)
