@@ -55,6 +55,12 @@ class TriageState(TypedDict, total=False):
     candidate_depts: list[dict]  # 候选科室召回结果
     triage_result: dict  # 分诊结论
 
+    # ---- MDT 会诊（fan-out / fan-in） ----
+    specialist_dept: str  # 当前专科角色科室编码（Send 分支覆盖）
+    specialist_dept_name: str  # 当前专科角色科室名称
+    mdt_opinions: Annotated[list[dict], operator.add]  # 各专科意见（并行追加）
+    mdt_result: dict  # 会诊汇总结果（共识 + 分歧）
+
     # ---- 输出（覆盖） ----
     emr: dict  # SOAP 病历
     pending_question: str  # 待患者回答的追问（interrupt 输出）
