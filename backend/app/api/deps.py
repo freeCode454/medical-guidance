@@ -65,8 +65,19 @@ async def get_current_doctor(
     return payload
 
 
+async def get_current_kb_admin(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
+) -> dict:
+    """获取知识库管理员或机构管理员，拒绝患者与医生令牌。"""
+    payload = _require_payload(credentials)
+    if payload.get("role") not in {"KB_ADMIN", "ORG_ADMIN"}:
+        raise BizError(FORBIDDEN, "该接口需要知识库管理员或机构管理员身份")
+    return payload
+
+
 # 便捷类型别名
 Principal = Annotated[dict, Depends(get_principal)]
 CurrentStaff = Annotated[dict, Depends(get_current_staff)]
 CurrentPatient = Annotated[dict, Depends(get_current_patient)]
 CurrentDoctor = Annotated[dict, Depends(get_current_doctor)]
+CurrentKbAdmin = Annotated[dict, Depends(get_current_kb_admin)]
