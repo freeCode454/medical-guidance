@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
@@ -283,4 +284,39 @@ async def list_audit_logs(
         db, tenant_id=admin["tenant_id"], page=page, size=size,
         action_type=action_type, actor_id=actor_id, target_type=target_type,
     )
+    return ApiResponse(data=data)
+
+
+# ---------------- 知识图谱 ----------------
+# Neo4j 驱动是同步的，放线程池执行，避免阻塞事件循环
+
+
+@router.get("/kg/stats", response_model=ApiResponse[dict])
+async def kg_stats(admin: CurrentKbAdmin) -> ApiResponse[dict]:
+    """知识图谱规模（各类节点数 / 关系数）。"""
+    from app.services.kg_service import get_kg
+
+    data = await asyncio.to_thread(get_kg().stats)
+    return ApiResponse(data=data)
+
+
+@router.get("/kg/symptoms", response_model=ApiResponse[dict])
+async def kg_symptoms(admin: CurrentKbAdmin) -> ApiResponse[dict]:
+    """图谱中的标准症状名（供前端选择/提示）。"""
+    from app.services.kg_service import get_kg
+
+    items = await asyncio.to_thread(get_kg().symptom_names)
+    return ApiResponse(data={"items": items})
+
+
+@router.get("/kg/network", response_model=ApiResponse[dict])
+async def kg_network(
+    admin: CurrentKbAdmin,
+    symptom: str = Query(..., min_length=1, description="标准症状名"),
+    limit: int = Query(30, ge=5, le=200),
+) -> ApiResponse[dict]:
+    """症状 → 疾病 → 科室 的推理子图（nodes + edges）。"""
+    from app.services.kg_service import get_kg
+
+    data = await asyncio.to_thread(get_kg().network, symptom, limit)
     return ApiResponse(data=data)

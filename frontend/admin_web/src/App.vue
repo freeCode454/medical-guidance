@@ -10,6 +10,7 @@ const menus = [
   { path: '/users', label: '用户管理' },
   { path: '/depts', label: '科室管理' },
   { path: '/kb', label: '知识库' },
+  { path: '/kg', label: '知识图谱' },
   { path: '/audit', label: '审计日志' },
   { path: '/settings', label: '系统设置' },
 ]

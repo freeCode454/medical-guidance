@@ -98,12 +98,58 @@ class KnowledgeGraph:
             return [r["path"] for r in s.run(cql, symptoms=symptoms, dept=dept_code).data()]
 
     def stats(self) -> dict:
+        """图谱规模：各类节点数 + 各类关系数。"""
         with self._driver.session(database="neo4j") as s:
-            nodes = s.run(f"MATCH (n{_MG}) RETURN labels(n) AS labels, count(*) AS c").data()
-            rels = s.run(
-                f"MATCH (:{_MG[1:]} )-[r]->() RETURN type(r) AS type, count(*) AS c"
+            nodes = s.run(
+                "MATCH (n:Mg) RETURN labels(n)[0] AS label, count(*) AS count ORDER BY count DESC"
             ).data()
-        return {"nodes": nodes, "rels": rels}
+            rels = s.run(
+                "MATCH (:Mg)-[r]->(:Mg) RETURN type(r) AS type, count(*) AS count ORDER BY count DESC"
+            ).data()
+        return {"nodes": nodes, "relationships": rels}
+
+    def symptom_names(self, limit: int = 1000) -> list[str]:
+        """标准症状名（排除同义词节点，供前端下拉/提示）。"""
+        with self._driver.session(database="neo4j") as s:
+            rows = s.run(
+                "MATCH (n:Symptom:Mg) WHERE NOT (n)-[:SYNONYM_OF]->() "
+                "RETURN n.name AS name ORDER BY name LIMIT $limit",
+                limit=limit,
+            ).data()
+        return [r["name"] for r in rows]
+
+    def network(self, symptom: str, limit: int = 30) -> dict:
+        """症状 → 疾病 → 科室 的子图（nodes + edges），供前端可视化。"""
+        cql = """
+        MATCH (s:Symptom:Mg {name: $symptom})-[:INDICATES]->(d:Disease:Mg)-[:BELONGS_TO]->(dept:Department:Mg)
+        RETURN s.name AS symptom, d.name AS disease,
+               dept.code AS dept_code, dept.name AS dept_name
+        LIMIT $limit
+        """
+        with self._driver.session(database="neo4j") as s:
+            rows = s.run(cql, symptom=symptom, limit=limit).data()
+
+        nodes: dict[str, dict] = {}
+        edges: list[dict] = []
+        seen: set[tuple[str, str]] = set()
+        for r in rows:
+            sid = f"symptom::{r['symptom']}"
+            did = f"disease::{r['disease']}"
+            deid = f"dept::{r['dept_code']}"
+            nodes[sid] = {"id": sid, "name": r["symptom"], "category": 0}
+            nodes[did] = {"id": did, "name": r["disease"], "category": 1}
+            nodes[deid] = {"id": deid, "name": r["dept_name"], "category": 2}
+            for src, dst, label in ((sid, did, "提示"), (did, deid, "归属")):
+                key = (src, dst)
+                if key not in seen:
+                    seen.add(key)
+                    edges.append({"source": src, "target": dst, "label": label})
+        return {
+            "symptom": symptom,
+            "nodes": list(nodes.values()),
+            "edges": edges,
+            "paths": len(rows),
+        }
 
 
 _kg: KnowledgeGraph | None = None
