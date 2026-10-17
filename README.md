@@ -34,11 +34,54 @@
 - **MDT 会诊 Agent** —— 复杂共病并行唤起多个专科角色，**分歧必须保留，不许在汇总时抹平**
 - **病历生成 Agent** —— 把整段对话整理成符合规范的 SOAP 预问诊病历
 
+### 分诊链路：规则与检索各司其职
+
+纯向量召回对「肚子疼」「胸口疼」这类口语主诉区分度不够（妇科、消化、产科都涉及腹痛），
+所以分诊不是「一次向量检索 + 大模型自由裁决」，而是分层递进：
+
+```
+主诉
+  → ① 红旗拦截（250 条急症规则 + 症状同义词归一化）命中即引导急诊
+  → ② 结构化追问（250 条按主诉定制的追问模板，部位→时长→性质→伴随→程度）
+  → ③ 向量召回（稠密 + 稀疏 + RRF 融合）
+  → ④ rerank 精排（bge-reranker-v2-m3，权重 0.55）
+  → ⑤ 分诊规则加权（症状→科室映射，权重 0.15）+ 人群硬过滤（性别/年龄）
+  → ⑥ LLM 生成结论 + SOAP 病历
+```
+
+关键点：
+
+- **同义词归一化**：规则表用标准症状名（腹痛/腹泻/胸痛），患者说的是口语
+  （肚子疼/拉肚子/胸口疼），不归一化规则一条都命中不了——514 条映射是规则生效的前提。
+- **规则加权 ≠ 规则过滤**：性别不符（如男性→妇科）必须在**候选层硬剔除**，
+  否则 0.15 的加权压不过向量+精排的分差。
+- **追问不靠大模型临场发挥**：按主诉类型走模板，顺序可预期，避免「尿频也问哪个部位」。
+
+## 知识库数据资产
+
+`kb/医学知识库源数据.xlsx` 是知识库的唯一源头（10 个 sheet / 2556 条），改数据 → 跑
+`python backend/scripts/import_kb.py` 即同步到 PostgreSQL 与 Milvus：
+
+| Sheet | 条数 | 用途 |
+|---|---|---|
+| 科室字典 | 252 | 41 个一级科室 + 211 个亚专科 |
+| 医生信息 | 250 | 演示用医生账号 |
+| 疾病特征库 | 251 | 症状 / 鉴别要点 / 高危因素 |
+| 临床指南 | 250 | 指南片段 + 证据等级 |
+| ICD-10 映射 | 250 | 疾病编码 / 章节 / 包含排除 |
+| 症状本体库 | 289 | 标准名 / 同义词 / 部位 / 时长 |
+| 红旗症状库 | 250 | 急症关键词 / 处置动作 / 提示文案 |
+| 禁忌症与用药风险 | 264 | 过敏 / 妊娠 / 儿童 / 脏器禁忌 |
+| 分诊规则 | 250 | 症状→科室映射 + 人群过滤 |
+| 追问模板 | 250 | 按主诉定制的追问维度 |
+
+> 数据为演示用示例，正式使用须经医学专业人士审核。
+
 ## 技术栈
 
 | 层 | 选型 |
 |---|---|
-| 患者端 | Vue 3 + Vite + Vant 4（移动端 H5，含人体部位点选） |
+| 患者端 | Vue 3 + Vite + Vant 4（移动端 H5） |
 | 医生端 / 管理后台 | Vue 3 + Element Plus |
 | 接口 | FastAPI + WebSocket（对话流式） |
 | 编排 | LangGraph（有环状态机、检查点持久化、人工介入挂起） |
@@ -56,19 +99,26 @@ medical-guidance/
 ├── docs/               # 01 需求 / 02 架构 / 03 数据库 / 04 接口 四份设计文档
 ├── backend/            # FastAPI 后端（六层：接口/服务/编排/数据访问/能力/基础设施）
 │   ├── app/
-│   │   ├── api/        # 接口层（patient / doctor / admin / ws）
-│   │   ├── services/   # 服务层（业务用例 + 事务 + 审计）
+│   │   ├── api/        # 接口层（patient / doctor / admin / ws / auth）
+│   │   ├── services/   # 服务层（业务用例 + 规则引擎 + 事务 + 审计）
 │   │   ├── agents/     # 智能体编排层（LangGraph 图 + 节点）
-│   │   ├── retrieval/  # 检索能力（向量化 / 向量库 / 融合精排）
-│   │   ├── nlp/        # 医学术语规范化（medical_ner）
-│   │   ├── clients/    # 外部能力适配（LLM / 精排 / ASR / MCP）
+│   │   ├── retrieval/  # 检索能力（向量化 / 向量库 / 融合）
+│   │   ├── common/     # 基础设施（配置 / 数据库 / 鉴权 / LLM 客户端 / 出域守卫）
 │   │   ├── models/     # 数据访问层（SQLAlchemy 模型）
-│   │   ├── repositories/  # 仓储（强制机构过滤）
+│   │   ├── schemas/    # 请求/响应模型
+│   │   ├── middleware/ # 中间件（租户上下文 / 限流）
+│   │   ├── ws/         # WebSocket 流式通道
 │   │   └── jobs/       # 异步任务（知识库入库/发布/回归）
-│   └── scripts/        # 工具脚本
+│   ├── scripts/        # 工具脚本（种子数据 / 知识库生成与导入）
+│   └── static/         # 本地托管的 Swagger UI 静态资源
 ├── mcp_servers/        # FastMCP 服务（HIS 挂号 / 病历查询 / 用药禁忌）
-├── frontend/           # 三端（patient_h5 / doctor_web / admin_web）
-├── kb/                 # 知识库源文件与黄金查询集（数据资产，独立版本管理）
+├── frontend/           # 三端
+│   ├── patient_h5/     # 患者端 H5（Vant 4，核心问诊链路）
+│   ├── doctor_web/     # 医生端（Element Plus，接诊工作台）
+│   └── admin_web/      # 管理后台（Element Plus，用户/科室/知识库/审计）
+├── kb/                 # 知识库数据资产
+│   ├── 医学知识库源数据.xlsx  # 10 sheet / 2556 条（唯一源头）
+│   └── rules.json      # 导入时生成：红旗/分诊/追问/同义词
 └── deploy/             # docker-compose + init.sql + migrations
 ```
 
@@ -95,7 +145,27 @@ make dev          # uvicorn 热重载，http://localhost:8000
 # 4. 自检
 make check        # 配置 / 云端 API / 出域守卫
 make probe-vector # 向量库能力边界
+
+# 5. 初始化演示数据 + 知识库（Excel → PostgreSQL + Milvus）
+cd backend
+python scripts/seed_dev.py        # 租户/用户/科室/系统配置/模型配置
+python scripts/gen_kb_excel.py    # 生成 kb/医学知识库源数据.xlsx（2556 条）
+python scripts/import_kb.py       # 导入 mg_kb_entry + Milvus + rules.json
+
+# 6. 启动三端前端（另开终端）
+cd frontend/patient_h5 && npm install && npm run dev   # 患者端  http://localhost:5173
+cd frontend/doctor_web && npm install && npm run dev   # 医生端  http://localhost:5174
+cd frontend/admin_web  && npm install && npm run dev   # 管理后台 http://localhost:5175
 ```
+
+演示账号：
+
+| 端 | 账号 | 密码 |
+|---|---|---|
+| 医生端 | doctor01 | admin123 |
+| 管理后台 | admin | admin123 |
+
+后端 API 文档：<http://localhost:8000/docs>（Swagger UI 静态资源本地托管，不依赖公网 CDN）。
 
 > ⚠️ 开发形态需设置 `EGRESS_POLICY=dev_sandbox`，且**只允许使用合成数据**；
 > 交付形态必须是 `strict`（详见 02 文档 §8.2 与 `NFR70`）。

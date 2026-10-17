@@ -127,6 +127,12 @@ def build_inquiry_node(client: ModelClient):
         # 结构化追问模板优先：按主诉类型取模板，顺序固定（部位→时长→性质→程度→诱因→伴随…），
         # 已问过的 slot 跳过；模板未命中（主诉类型未知）时才用 LLM 生成的追问。
         complaint_type = rules_engine.infer_complaint_type(state.get("chief_complaint", ""))
+        logger.debug(
+            "inquiry 模板匹配 chief_complaint=%r type=%r asked=%r",
+            state.get("chief_complaint"),
+            complaint_type,
+            state.get("asked"),
+        )
         if complaint_type:
             asked = set(state.get("asked", []))
             for tpl in rules_engine.inquiry_templates(complaint_type):
