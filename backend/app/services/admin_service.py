@@ -202,15 +202,32 @@ async def toggle_user(
 # ---- 科室 -----------------------------------------------------------------
 
 
-async def list_depts(db: AsyncSession, *, tenant_id: str, status: str | None, keyword: str | None) -> dict:
+async def list_depts(
+    db: AsyncSession,
+    *,
+    tenant_id: str,
+    status: str | None,
+    keyword: str | None,
+    page: int = 1,
+    size: int = 20,
+) -> dict:
     conds = [Dept.tenant_id == tenant_id]
     if status:
         conds.append(Dept.status == status)
     if keyword:
         conds.append(or_(Dept.dept_code.ilike(f"%{keyword}%"), Dept.dept_name.ilike(f"%{keyword}%")))
-    rows = (await db.scalars(select(Dept).where(*conds).order_by(Dept.sort_no.asc()))).all()
+    total = await db.scalar(select(func.count()).select_from(Dept).where(*conds))
+    rows = (
+        await db.scalars(
+            select(Dept)
+            .where(*conds)
+            .order_by(Dept.sort_no.asc())
+            .offset((page - 1) * size)
+            .limit(size)
+        )
+    ).all()
     return {
-        "total": len(rows),
+        "total": total or 0,
         "items": [
             {
                 "dept_id": d.id,

@@ -148,9 +148,11 @@ async def toggle_user(user_id: str, db: DbSession, admin: CurrentOrgAdmin) -> Ap
 async def list_depts(
     db: DbSession, admin: CurrentOrgAdmin,
     status: str | None = None, keyword: str | None = None,
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=500),  # 科室下拉需要一次拉全量
 ) -> ApiResponse[dict]:
     data = await admin_service.list_depts(
-        db, tenant_id=admin["tenant_id"], status=status, keyword=keyword
+        db, tenant_id=admin["tenant_id"], status=status, keyword=keyword, page=page, size=size
     )
     return ApiResponse(data=data)
 

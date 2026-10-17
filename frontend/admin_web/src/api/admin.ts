@@ -20,7 +20,7 @@ export const users = {
 
 // 科室
 export const depts = {
-  list: () => http.get<{ total: number; items: Dept[] }>('/admin/depts'),
+  list: (q: Record<string, any> = {}) => http.get<{ total: number; items: Dept[] }>(`/admin/depts?${new URLSearchParams(Object.entries(q).filter(([, v]) => v != null && v !== '') as any)}`),
   create: (b: any) => http.post('/admin/depts', b),
   update: (id: string, b: any) => http.put(`/admin/depts/${id}`, b),
   toggle: (id: string) => http.post(`/admin/depts/${id}/toggle`),

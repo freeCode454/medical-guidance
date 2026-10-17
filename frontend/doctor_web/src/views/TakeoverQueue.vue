@@ -8,17 +8,32 @@ import { listTakeoverQueue, takeover, type EncounterItem } from '@/api/doctor'
 const router = useRouter()
 const loading = ref(false)
 const items = ref<EncounterItem[]>([])
+const page = ref(1)
+const size = ref(20)
+const total = ref(0)
 
 async function load() {
   loading.value = true
   try {
-    const d = await listTakeoverQueue()
+    const d = await listTakeoverQueue(page.value, size.value)
     items.value = d.items
+    total.value = d.total
   } catch (e) {
     ElMessage.error((e as Error).message || '加载失败')
   } finally {
     loading.value = false
   }
+}
+
+function onPageChange(p: number) {
+  page.value = p
+  load()
+}
+
+function onSizeChange(s: number) {
+  size.value = s
+  page.value = 1
+  load()
 }
 
 async function onTakeover(row: EncounterItem) {
@@ -39,7 +54,7 @@ onMounted(load)
   <main class="page">
     <div class="page-head">
       <h1>待接管队列</h1>
-      <span class="count">共 {{ items.length }} 位患者等待接诊</span>
+      <span class="count">共 {{ total }} 位患者等待接诊</span>
     </div>
 
     <el-table :data="items" v-loading="loading">
@@ -58,6 +73,19 @@ onMounted(load)
         </template>
       </el-table-column>
     </el-table>
+
+    <div class="pager">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="total"
+        :page-sizes="[10, 20, 50]"
+        layout="total, sizes, prev, pager, next"
+        background
+        @current-change="onPageChange"
+        @size-change="onSizeChange"
+      />
+    </div>
 
     <el-empty v-if="!loading && !items.length" description="暂无待接管患者" />
   </main>
@@ -80,4 +108,5 @@ onMounted(load)
 h1 { font-size: 22px; }
 .count { color: var(--c-muted); font-size: 14px; }
 .muted { color: var(--c-muted); }
+.pager { display: flex; justify-content: flex-end; margin-top: 14px; }
 </style>

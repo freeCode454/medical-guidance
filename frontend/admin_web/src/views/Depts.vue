@@ -7,16 +7,32 @@ const loading = ref(false)
 const items = ref<Dept[]>([])
 const dialog = ref(false)
 const form = ref({ dept_code: '', dept_name: '', sort_no: 0 })
+const page = ref(1)
+const size = ref(20)
+const total = ref(0)
 
 async function load() {
   loading.value = true
   try {
-    items.value = (await depts.list()).items
+    const d = await depts.list({ page: page.value, size: size.value })
+    items.value = d.items
+    total.value = d.total
   } catch (e) {
     ElMessage.error((e as Error).message || '加载失败')
   } finally {
     loading.value = false
   }
+}
+
+function onPageChange(p: number) {
+  page.value = p
+  load()
+}
+
+function onSizeChange(s: number) {
+  size.value = s
+  page.value = 1
+  load()
 }
 
 async function onCreate() {
@@ -67,6 +83,19 @@ onMounted(load)
       </el-table-column>
     </el-table>
 
+    <div class="pager">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="total"
+        :page-sizes="[10, 20, 50, 100]"
+        layout="total, sizes, prev, pager, next, jumper"
+        background
+        @current-change="onPageChange"
+        @size-change="onSizeChange"
+      />
+    </div>
+
     <el-dialog v-model="dialog" title="新增科室" width="420px">
       <el-form label-width="90px">
         <el-form-item label="科室编码"><el-input v-model="form.dept_code" placeholder="如 ORTH" /></el-form-item>
@@ -84,4 +113,5 @@ onMounted(load)
 <style scoped>
 .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 h2 { font-size: 18px; }
+.pager { display: flex; justify-content: flex-end; margin-top: 14px; }
 </style>
