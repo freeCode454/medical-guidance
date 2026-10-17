@@ -98,7 +98,7 @@ async def list_users(
     db: DbSession,
     admin: CurrentOrgAdmin,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(10, ge=1, le=100),
     role: str | None = None,
     dept_code: str | None = None,
     status: str | None = None,
@@ -150,7 +150,7 @@ async def list_depts(
     db: DbSession, admin: CurrentOrgAdmin,
     status: str | None = None, keyword: str | None = None,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=500),  # 科室下拉需要一次拉全量
+    size: int = Query(10, ge=1, le=500),  # 科室下拉需要一次拉全量
 ) -> ApiResponse[dict]:
     data = await admin_service.list_depts(
         db, tenant_id=admin["tenant_id"], status=status, keyword=keyword, page=page, size=size
@@ -275,7 +275,7 @@ async def list_audit_logs(
     db: DbSession,
     admin: CurrentKbAdmin,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(10, ge=1, le=100),
     action_type: str | None = None,
     actor_id: str | None = None,
     target_type: str | None = None,

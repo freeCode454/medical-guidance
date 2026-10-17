@@ -72,7 +72,7 @@ async def list_entries(
     db: DbSession,
     admin: CurrentKbAdmin,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(10, ge=1, le=100),
     kb_type: str | None = None,
     dept_code: str | None = None,
     status: str | None = None,
@@ -132,7 +132,7 @@ async def list_entry_history(
     db: DbSession,
     admin: CurrentKbAdmin,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(10, ge=1, le=100),
 ) -> ApiResponse[dict]:
     data = await kb_service.list_entry_history(
         db, tenant_id=admin["tenant_id"], entry_id=entry_id, page=page, size=size
@@ -161,7 +161,7 @@ async def list_golden_queries(
     db: DbSession,
     admin: CurrentKbAdmin,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(10, ge=1, le=100),
     category: str | None = None,
     is_active: bool | None = None,
 ) -> ApiResponse[dict]:
@@ -196,7 +196,7 @@ async def publish_kb(
 @router.get("/publishes", response_model=ApiResponse[dict])
 async def list_publishes(
     db: DbSession, admin: CurrentKbAdmin,
-    page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100),
+    page: int = Query(1, ge=1), size: int = Query(10, ge=1, le=100),
 ) -> ApiResponse[dict]:
     data = await kb_service.list_publishes(db, tenant_id=admin["tenant_id"], page=page, size=size)
     return ApiResponse(data=data)
@@ -213,7 +213,7 @@ async def trigger_ingest(db: DbSession, admin: CurrentKbAdmin) -> ApiResponse[di
 @router.get("/ingest-tasks", response_model=ApiResponse[dict])
 async def list_ingest_tasks(
     db: DbSession, admin: CurrentKbAdmin,
-    page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100),
+    page: int = Query(1, ge=1), size: int = Query(10, ge=1, le=100),
 ) -> ApiResponse[dict]:
     data = await kb_service.list_ingest_tasks(db, tenant_id=admin["tenant_id"], page=page, size=size)
     return ApiResponse(data=data)

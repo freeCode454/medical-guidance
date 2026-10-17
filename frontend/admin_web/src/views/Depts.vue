@@ -8,7 +8,7 @@ const items = ref<Dept[]>([])
 const dialog = ref(false)
 const form = ref({ dept_code: '', dept_name: '', sort_no: 0 })
 const page = ref(1)
-const size = ref(20)
+const size = ref(10)
 const total = ref(0)
 
 async function load() {

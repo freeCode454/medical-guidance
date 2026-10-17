@@ -9,7 +9,7 @@ const router = useRouter()
 const loading = ref(false)
 const items = ref<EncounterItem[]>([])
 const page = ref(1)
-const size = ref(20)
+const size = ref(10)
 const total = ref(0)
 
 async function load() {

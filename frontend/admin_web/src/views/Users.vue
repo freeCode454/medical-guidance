@@ -9,7 +9,7 @@ const deptList = ref<Dept[]>([])
 const dialog = ref(false)
 const form = ref({ account: '', real_name: '', role: 'DOCTOR', title: '', dept_code: '', initial_password: '' })
 const page = ref(1)
-const size = ref(20)
+const size = ref(10)
 const total = ref(0)
 
 async function load() {

@@ -62,7 +62,7 @@ onMounted(load)
     <el-pagination
       v-model:current-page="page"
       :total="total"
-      :page-size="20"
+      :page-size="10"
       layout="total, prev, pager, next"
       class="mt pager"
       @current-change="load"

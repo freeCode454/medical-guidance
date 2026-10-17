@@ -34,7 +34,7 @@ async def list_encounters(
     db: DbSession,
     doctor: CurrentDoctor,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(10, ge=1, le=100),
     status: str | None = None,
     encounter_date: str | None = None,
     sort_by: str = "started_time",
@@ -151,7 +151,7 @@ async def list_takeover_queue(
     db: DbSession,
     doctor: CurrentDoctor,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(10, ge=1, le=100),
 ) -> ApiResponse[dict]:
     """查询待接管队列（F21）。"""
     data = await doctor_service.list_takeover_queue(
@@ -188,7 +188,7 @@ async def list_patient_summaries(
     db: DbSession,
     doctor: CurrentDoctor,
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(10, ge=1, le=100),
 ) -> ApiResponse[dict]:
     """查询患者预问诊摘要列表（F24）。"""
     data = await doctor_service.list_patient_summaries(

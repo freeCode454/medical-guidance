@@ -78,7 +78,7 @@ export function listEncounters(params: Record<string, any> = {}) {
   return http.get<PageData<EncounterItem>>(`/doctor/encounters${q ? '?' + q : ''}`)
 }
 
-export function listTakeoverQueue(page = 1, size = 20) {
+export function listTakeoverQueue(page = 1, size = 10) {
   return http.get<PageData<EncounterItem>>(`/doctor/takeover-queue?page=${page}&size=${size}`)
 }
 
