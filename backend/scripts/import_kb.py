@@ -55,7 +55,7 @@ async def import_entries() -> None:
     plans = [
         ("科室字典", ["dept_code", "dept_name", "aliases", "expertise", "sub_specialty", "related_diseases"],
          "DEPT_EXPERTISE", "DEPT", ["dept_name", "expertise", "related_diseases"]),
-        ("疾病特征库", ["dept_code", "disease_name", "symptoms", "differential", "risk_factors"],
+        ("疾病特征库", ["disease_name", "dept_code", "symptoms", "differential", "risk_factors"],
          "SYMPTOM_DISEASE", "DISEASE", ["disease_name", "symptoms", "differential"]),
         ("临床指南", ["dept_code", "title", "content", "evidence_level", "year", "source"],
          "GUIDELINE", "GUIDE", ["title", "content"]),

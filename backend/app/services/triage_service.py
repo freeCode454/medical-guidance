@@ -142,7 +142,7 @@ async def recall_depts(
         c["final"] = 0.55 * rr_n + 0.30 * vec_n + 0.15 * rule_n
 
     candidates.sort(key=lambda x: x["final"], reverse=True)
-    return [
+    result = [
         {
             "dept_code": c["dept_code"],
             "dept_name": c["dept_name"],
@@ -150,6 +150,22 @@ async def recall_depts(
         }
         for c in candidates[:limit]
     ]
+
+    # 图谱推理路径：作为可解释证据附加（不参与排序，避免影响已验证的排序质量）
+    try:
+        from app.services.kg_service import get_kg
+
+        kg = get_kg()
+        kg_map = {r["dept_code"]: r for r in kg.infer_depts(complaint, limit=20)}
+        for r in result:
+            hit = kg_map.get(r["dept_code"])
+            if hit:
+                r["kg_paths"] = hit["paths"]
+                r["kg_disease_hits"] = hit["disease_hits"]
+    except Exception as exc:  # 图谱不可用不影响分诊
+        logger.debug("图谱证据跳过：%s", exc)
+
+    return result
 
 
 async def generate_triage(
