@@ -5664,1501 +5664,1501 @@
     {
       "complaint_type": "腹痛",
       "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "question": "疼痛具体在哪个部位（上腹/下腹/左右侧）？",
       "order": "1"
     },
     {
       "complaint_type": "腹痛",
       "target_slot": "duration",
-      "question": "出现多久了？",
+      "question": "疼了多久了？是持续还是阵发？",
       "order": "2"
     },
     {
       "complaint_type": "腹痛",
       "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "question": "疼痛是什么样的（绞痛/胀痛/隐痛/烧灼痛）？",
       "order": "3"
     },
     {
       "complaint_type": "腹痛",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "target_slot": "accompanying",
+      "question": "有没有腹泻、恶心、呕吐、发热？",
       "order": "4"
     },
     {
       "complaint_type": "腹痛",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "target_slot": "severity",
+      "question": "疼痛程度如何（轻/中/重）？",
       "order": "5"
     },
     {
-      "complaint_type": "腹痛",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "腹泻",
+      "target_slot": "duration",
+      "question": "腹泻多久了？",
       "order": "6"
     },
     {
-      "complaint_type": "腹痛",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "腹泻",
+      "target_slot": "frequency",
+      "question": "一天腹泻几次？大便是什么样子？",
       "order": "7"
     },
     {
-      "complaint_type": "腹痛",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "腹泻",
+      "target_slot": "accompanying",
+      "question": "有没有腹痛、发热、呕吐、脱水？",
       "order": "8"
     },
     {
-      "complaint_type": "腹痛",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "腹泻",
+      "target_slot": "trigger",
+      "question": "有没有吃不干净的东西？",
       "order": "9"
     },
     {
-      "complaint_type": "腹痛",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "腹泻",
+      "target_slot": "severity",
+      "question": "有没有精神差、尿少？",
       "order": "10"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "恶心",
+      "target_slot": "duration",
+      "question": "恶心多久了？",
       "order": "11"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "恶心",
+      "target_slot": "trigger",
+      "question": "和进食有关吗？",
       "order": "12"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "恶心",
+      "target_slot": "accompanying",
+      "question": "有没有呕吐、腹痛、头痛？",
       "order": "13"
     },
     {
-      "complaint_type": "腹泻",
+      "complaint_type": "恶心",
       "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "question": "是否影响进食？",
       "order": "14"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "恶心",
+      "target_slot": "history",
+      "question": "以前有没有类似情况？",
       "order": "15"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "呕吐",
+      "target_slot": "duration",
+      "question": "呕吐多久了？",
       "order": "16"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "呕吐",
+      "target_slot": "frequency",
+      "question": "吐了几次？吐的是什么？",
       "order": "17"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "呕吐",
+      "target_slot": "trigger",
+      "question": "进食后还是空腹？",
       "order": "18"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "呕吐",
+      "target_slot": "accompanying",
+      "question": "有没有腹痛、发热、头痛？",
       "order": "19"
     },
     {
-      "complaint_type": "腹泻",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "呕吐",
+      "target_slot": "severity",
+      "question": "有没有脱水表现？",
       "order": "20"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "胸痛",
+      "target_slot": "nature",
+      "question": "胸痛是什么样的（压榨/针刺/烧灼）？",
       "order": "21"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "胸痛",
+      "target_slot": "radiation",
+      "question": "有没有放射到左臂、下颌或后背？",
       "order": "22"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "胸痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重（活动/劳累/深呼吸）？",
       "order": "23"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "胸痛",
+      "target_slot": "accompanying",
+      "question": "有没有出汗、气短、恶心？",
       "order": "24"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "胸痛",
+      "target_slot": "duration",
+      "question": "每次持续多久？",
       "order": "25"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "胸闷",
+      "target_slot": "trigger",
+      "question": "胸闷什么情况下出现（活动/休息/夜间）？",
       "order": "26"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "胸闷",
+      "target_slot": "duration",
+      "question": "每次持续多久？能否自行缓解？",
       "order": "27"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "胸闷",
+      "target_slot": "accompanying",
+      "question": "有没有胸痛、气短、心悸？",
       "order": "28"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "胸闷",
+      "target_slot": "radiation",
+      "question": "有没有放射感？",
       "order": "29"
     },
     {
-      "complaint_type": "恶心",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "胸闷",
+      "target_slot": "history",
+      "question": "有没有心脏病史？",
       "order": "30"
     },
     {
-      "complaint_type": "呕吐",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "心悸",
+      "target_slot": "trigger",
+      "question": "心慌什么情况下出现？",
       "order": "31"
     },
     {
-      "complaint_type": "呕吐",
+      "complaint_type": "心悸",
       "target_slot": "duration",
-      "question": "出现多久了？",
+      "question": "每次持续多久？",
       "order": "32"
     },
     {
-      "complaint_type": "呕吐",
+      "complaint_type": "心悸",
       "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "question": "是心跳快、乱还是重？",
       "order": "33"
     },
     {
-      "complaint_type": "呕吐",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "心悸",
+      "target_slot": "accompanying",
+      "question": "有没有胸痛、气短、头晕、多汗？",
       "order": "34"
     },
     {
-      "complaint_type": "呕吐",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "心悸",
+      "target_slot": "history",
+      "question": "有没有甲亢或心脏病史？",
       "order": "35"
     },
     {
-      "complaint_type": "呕吐",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "咳嗽",
+      "target_slot": "duration",
+      "question": "咳嗽多久了？",
       "order": "36"
     },
     {
-      "complaint_type": "呕吐",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "咳嗽",
+      "target_slot": "sputum",
+      "question": "有没有痰？痰是什么颜色？",
       "order": "37"
     },
     {
-      "complaint_type": "呕吐",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "咳嗽",
+      "target_slot": "fever",
+      "question": "有没有发热？体温多少？",
       "order": "38"
     },
     {
-      "complaint_type": "呕吐",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "咳嗽",
+      "target_slot": "trigger",
+      "question": "夜间或活动后加重吗？",
       "order": "39"
     },
     {
-      "complaint_type": "呕吐",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "咳嗽",
+      "target_slot": "accompanying",
+      "question": "有没有气短、胸痛？",
       "order": "40"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "咳痰",
+      "target_slot": "color",
+      "question": "痰是什么颜色（白/黄/绿/带血）？",
       "order": "41"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "咳痰",
+      "target_slot": "amount",
+      "question": "痰量多不多？",
       "order": "42"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "咳痰",
+      "target_slot": "duration",
+      "question": "咳痰多久了？",
       "order": "43"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "咳痰",
+      "target_slot": "fever",
+      "question": "有没有发热？",
       "order": "44"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "咳痰",
+      "target_slot": "accompanying",
+      "question": "有没有气短、胸痛？",
       "order": "45"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "发热",
+      "target_slot": "duration",
+      "question": "发热多久了？",
       "order": "46"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "发热",
+      "target_slot": "degree",
+      "question": "最高体温多少？",
       "order": "47"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "发热",
+      "target_slot": "pattern",
+      "question": "是持续还是忽高忽低？",
       "order": "48"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "发热",
+      "target_slot": "accompanying",
+      "question": "有没有咳嗽、咽痛、腹泻、皮疹？",
       "order": "49"
     },
     {
-      "complaint_type": "胸痛",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "发热",
+      "target_slot": "history",
+      "question": "有没有接触发热病人或旅行史？",
       "order": "50"
     },
     {
-      "complaint_type": "胸闷",
+      "complaint_type": "头痛",
       "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "question": "头痛在哪个部位（太阳穴/后脑勺/全头）？",
       "order": "51"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "头痛",
+      "target_slot": "nature",
+      "question": "是胀痛、跳痛还是刺痛？",
       "order": "52"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "头痛",
+      "target_slot": "accompanying",
+      "question": "有没有恶心、呕吐、畏光、发热？",
       "order": "53"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "头痛",
+      "target_slot": "trigger",
+      "question": "什么情况下加重？",
       "order": "54"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "头痛",
+      "target_slot": "severity",
+      "question": "疼痛程度如何？",
       "order": "55"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "头晕",
+      "target_slot": "nature",
+      "question": "是旋转感（天旋地转）还是头重脚轻？",
       "order": "56"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "头晕",
+      "target_slot": "duration",
+      "question": "持续多久？是阵发还是持续？",
       "order": "57"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "头晕",
+      "target_slot": "trigger",
+      "question": "体位变化时加重吗？",
       "order": "58"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "头晕",
+      "target_slot": "accompanying",
+      "question": "有没有恶心、耳鸣、肢体无力？",
       "order": "59"
     },
     {
-      "complaint_type": "胸闷",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "头晕",
+      "target_slot": "history",
+      "question": "有没有高血压、颈椎病？",
       "order": "60"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "眩晕",
+      "target_slot": "duration",
+      "question": "眩晕持续多久？",
       "order": "61"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "眩晕",
+      "target_slot": "trigger",
+      "question": "头位变动时诱发吗？",
       "order": "62"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "眩晕",
+      "target_slot": "accompanying",
+      "question": "有没有耳鸣、听力下降、恶心？",
       "order": "63"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "眩晕",
+      "target_slot": "nature",
+      "question": "是天旋地转还是摇晃感？",
       "order": "64"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "眩晕",
+      "target_slot": "history",
+      "question": "以前有没有类似发作？",
       "order": "65"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "肢体无力",
+      "target_slot": "onset",
+      "question": "无力是突然发生还是慢慢出现的？",
       "order": "66"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "肢体无力",
+      "target_slot": "location",
+      "question": "是单侧还是双侧？具体哪边？",
       "order": "67"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "肢体无力",
+      "target_slot": "accompanying",
+      "question": "有没有言语不清、口角歪斜？",
       "order": "68"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "肢体无力",
+      "target_slot": "progression",
+      "question": "是加重还是好转？",
       "order": "69"
     },
     {
-      "complaint_type": "心悸",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "肢体无力",
+      "target_slot": "history",
+      "question": "有没有高血压、糖尿病？",
       "order": "70"
     },
     {
-      "complaint_type": "咳嗽",
+      "complaint_type": "麻木",
       "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "question": "麻木在哪个部位？",
       "order": "71"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "麻木",
+      "target_slot": "nature",
+      "question": "是持续还是阵发？",
       "order": "72"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "麻木",
+      "target_slot": "accompanying",
+      "question": "有没有无力、疼痛？",
       "order": "73"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "麻木",
+      "target_slot": "trigger",
+      "question": "什么姿势下出现？",
       "order": "74"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "麻木",
+      "target_slot": "history",
+      "question": "有没有糖尿病、颈椎病？",
       "order": "75"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "尿频",
+      "target_slot": "duration",
+      "question": "尿频多久了？",
       "order": "76"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "尿频",
+      "target_slot": "frequency",
+      "question": "一天几次？夜尿几次？",
       "order": "77"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "尿频",
+      "target_slot": "accompanying",
+      "question": "有没有尿痛、血尿、发热？",
       "order": "78"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "尿频",
+      "target_slot": "trigger",
+      "question": "和饮水、情绪有关吗？",
       "order": "79"
     },
     {
-      "complaint_type": "咳嗽",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "尿频",
+      "target_slot": "history",
+      "question": "有没有前列腺或妇科病史？",
       "order": "80"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "尿急",
+      "target_slot": "duration",
+      "question": "尿急多久了？",
       "order": "81"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "尿急",
+      "target_slot": "accompanying",
+      "question": "有没有尿痛、尿频、血尿？",
       "order": "82"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "尿急",
+      "target_slot": "trigger",
+      "question": "憋不住时有没有漏尿？",
       "order": "83"
     },
     {
-      "complaint_type": "咳痰",
+      "complaint_type": "尿急",
       "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "question": "是否影响生活？",
       "order": "84"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "尿急",
+      "target_slot": "history",
+      "question": "有没有尿路感染史？",
       "order": "85"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "尿痛",
+      "target_slot": "duration",
+      "question": "尿痛多久了？",
       "order": "86"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "尿痛",
+      "target_slot": "nature",
+      "question": "是排尿开始痛还是全程痛？",
       "order": "87"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "尿痛",
+      "target_slot": "accompanying",
+      "question": "有没有尿频、尿急、血尿、发热？",
       "order": "88"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "尿痛",
+      "target_slot": "trigger",
+      "question": "和性生活有关吗？",
       "order": "89"
     },
     {
-      "complaint_type": "咳痰",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "尿痛",
+      "target_slot": "history",
+      "question": "有没有尿路感染史？",
       "order": "90"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "血尿",
+      "target_slot": "nature",
+      "question": "是肉眼可见还是镜下血尿？",
       "order": "91"
     },
     {
-      "complaint_type": "发热",
+      "complaint_type": "血尿",
       "target_slot": "duration",
       "question": "出现多久了？",
       "order": "92"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "血尿",
+      "target_slot": "accompanying",
+      "question": "有没有腰痛、尿痛、发热？",
       "order": "93"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "血尿",
+      "target_slot": "trigger",
+      "question": "和运动、月经有关吗？",
       "order": "94"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "血尿",
+      "target_slot": "history",
+      "question": "有没有结石、肿瘤病史？",
       "order": "95"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "腰痛",
+      "target_slot": "location",
+      "question": "腰痛在哪个部位？",
       "order": "96"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "腰痛",
+      "target_slot": "nature",
+      "question": "是酸痛、绞痛还是刺痛？",
       "order": "97"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "腰痛",
+      "target_slot": "trigger",
+      "question": "什么姿势或动作加重？",
       "order": "98"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "腰痛",
+      "target_slot": "accompanying",
+      "question": "有没有下肢放射痛、麻木？",
       "order": "99"
     },
     {
-      "complaint_type": "发热",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "腰痛",
+      "target_slot": "history",
+      "question": "有没有外伤或久坐？",
       "order": "100"
     },
     {
-      "complaint_type": "头痛",
+      "complaint_type": "关节痛",
       "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "question": "哪个关节痛？单侧还是双侧？",
       "order": "101"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "关节痛",
+      "target_slot": "nature",
+      "question": "是肿痛、刺痛还是酸痛？",
       "order": "102"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "关节痛",
+      "target_slot": "duration",
+      "question": "痛了多久？晨僵吗？",
       "order": "103"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "关节痛",
+      "target_slot": "trigger",
+      "question": "活动后加重还是缓解？",
       "order": "104"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "关节痛",
+      "target_slot": "accompanying",
+      "question": "有没有红肿、发热？",
       "order": "105"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "皮疹",
+      "target_slot": "location",
+      "question": "皮疹在哪些部位？",
       "order": "106"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "皮疹",
+      "target_slot": "nature",
+      "question": "是什么样（红斑/丘疹/水疱/风团）？",
       "order": "107"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "皮疹",
+      "target_slot": "duration",
+      "question": "出现多久了？",
       "order": "108"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "皮疹",
+      "target_slot": "trigger",
+      "question": "有没有接触过敏原、用药、进食特殊食物？",
       "order": "109"
     },
     {
-      "complaint_type": "头痛",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "皮疹",
+      "target_slot": "accompanying",
+      "question": "有没有瘙痒、发热？",
       "order": "110"
     },
     {
-      "complaint_type": "头晕",
+      "complaint_type": "瘙痒",
       "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "question": "哪里痒？范围多大？",
       "order": "111"
     },
     {
-      "complaint_type": "头晕",
+      "complaint_type": "瘙痒",
       "target_slot": "duration",
-      "question": "出现多久了？",
+      "question": "痒了多久？",
       "order": "112"
     },
     {
-      "complaint_type": "头晕",
+      "complaint_type": "瘙痒",
       "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "question": "是阵发还是持续？夜间加重吗？",
       "order": "113"
     },
     {
-      "complaint_type": "头晕",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "瘙痒",
+      "target_slot": "trigger",
+      "question": "什么情况下加重？",
       "order": "114"
     },
     {
-      "complaint_type": "头晕",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "瘙痒",
+      "target_slot": "accompanying",
+      "question": "有没有皮疹、干燥？",
       "order": "115"
     },
     {
-      "complaint_type": "头晕",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "咽痛",
+      "target_slot": "duration",
+      "question": "咽痛多久了？",
       "order": "116"
     },
     {
-      "complaint_type": "头晕",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "咽痛",
+      "target_slot": "severity",
+      "question": "吞咽时疼吗？影响进食吗？",
       "order": "117"
     },
     {
-      "complaint_type": "头晕",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "咽痛",
+      "target_slot": "accompanying",
+      "question": "有没有发热、咳嗽、扁桃体肿大？",
       "order": "118"
     },
     {
-      "complaint_type": "头晕",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "咽痛",
+      "target_slot": "trigger",
+      "question": "有没有受凉或用嗓过度？",
       "order": "119"
     },
     {
-      "complaint_type": "头晕",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "咽痛",
+      "target_slot": "history",
+      "question": "以前有没有反复咽痛？",
       "order": "120"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "鼻塞",
+      "target_slot": "duration",
+      "question": "鼻塞多久了？",
       "order": "121"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "鼻塞",
+      "target_slot": "nature",
+      "question": "是单侧还是双侧？持续还是阵发？",
       "order": "122"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "鼻塞",
+      "target_slot": "accompanying",
+      "question": "有没有流涕、喷嚏、鼻痒？",
       "order": "123"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "鼻塞",
+      "target_slot": "trigger",
+      "question": "季节性或接触过敏原时加重吗？",
       "order": "124"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "鼻塞",
+      "target_slot": "history",
+      "question": "有没有鼻炎史？",
       "order": "125"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "耳鸣",
+      "target_slot": "nature",
+      "question": "耳鸣是什么样的声音？",
       "order": "126"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "耳鸣",
+      "target_slot": "duration",
+      "question": "持续多久了？",
       "order": "127"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "耳鸣",
+      "target_slot": "location",
+      "question": "单侧还是双侧？",
       "order": "128"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "耳鸣",
+      "target_slot": "accompanying",
+      "question": "有没有听力下降、眩晕？",
       "order": "129"
     },
     {
-      "complaint_type": "眩晕",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "耳鸣",
+      "target_slot": "history",
+      "question": "有没有噪声暴露或耳部疾病？",
       "order": "130"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "眼红",
+      "target_slot": "duration",
+      "question": "眼红多久了？",
       "order": "131"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "眼红",
+      "target_slot": "accompanying",
+      "question": "有没有眼痛、眼痒、分泌物？",
       "order": "132"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "眼红",
+      "target_slot": "location",
+      "question": "单眼还是双眼？",
       "order": "133"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "眼红",
+      "target_slot": "trigger",
+      "question": "有没有接触刺激物或揉眼？",
       "order": "134"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "眼红",
+      "target_slot": "history",
+      "question": "有没有过敏或戴隐形眼镜？",
       "order": "135"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "视力下降",
+      "target_slot": "onset",
+      "question": "视力下降是突然还是逐渐？",
       "order": "136"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "视力下降",
+      "target_slot": "location",
+      "question": "单眼还是双眼？",
       "order": "137"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "视力下降",
+      "target_slot": "accompanying",
+      "question": "有没有眼痛、视野缺损、黑影？",
       "order": "138"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "视力下降",
+      "target_slot": "trigger",
+      "question": "和用眼、外伤有关吗？",
       "order": "139"
     },
     {
-      "complaint_type": "肢体无力",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "视力下降",
+      "target_slot": "history",
+      "question": "有没有糖尿病、高血压？",
       "order": "140"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "失眠",
+      "target_slot": "nature",
+      "question": "是入睡困难、易醒还是早醒？",
       "order": "141"
     },
     {
-      "complaint_type": "麻木",
+      "complaint_type": "失眠",
       "target_slot": "duration",
-      "question": "出现多久了？",
+      "question": "失眠多久了？",
       "order": "142"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "失眠",
+      "target_slot": "trigger",
+      "question": "有没有精神压力或作息变化？",
       "order": "143"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "失眠",
+      "target_slot": "accompanying",
+      "question": "有没有焦虑、情绪低落？",
       "order": "144"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "失眠",
+      "target_slot": "history",
+      "question": "有没有用药或咖啡因摄入？",
       "order": "145"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "焦虑",
+      "target_slot": "duration",
+      "question": "焦虑多久了？",
       "order": "146"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "焦虑",
+      "target_slot": "trigger",
+      "question": "什么情况下加重？",
       "order": "147"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "焦虑",
+      "target_slot": "accompanying",
+      "question": "有没有心慌、多汗、坐立不安？",
       "order": "148"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "焦虑",
+      "target_slot": "severity",
+      "question": "是否影响工作生活？",
       "order": "149"
     },
     {
-      "complaint_type": "麻木",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "焦虑",
+      "target_slot": "history",
+      "question": "有没有类似发作或家族史？",
       "order": "150"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "乏力",
+      "target_slot": "duration",
+      "question": "乏力多久了？",
       "order": "151"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "乏力",
+      "target_slot": "trigger",
+      "question": "休息后能缓解吗？",
       "order": "152"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "乏力",
+      "target_slot": "accompanying",
+      "question": "有没有消瘦、发热、纳差？",
       "order": "153"
     },
     {
-      "complaint_type": "尿频",
+      "complaint_type": "乏力",
       "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "question": "是否影响日常活动？",
       "order": "154"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "乏力",
+      "target_slot": "history",
+      "question": "有没有慢性病或用药？",
       "order": "155"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "消瘦",
+      "target_slot": "duration",
+      "question": "体重下降多久了？",
       "order": "156"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "消瘦",
+      "target_slot": "amount",
+      "question": "下降了多少斤？",
       "order": "157"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "消瘦",
+      "target_slot": "accompanying",
+      "question": "有没有食欲亢进、多饮多尿、腹泻？",
       "order": "158"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "消瘦",
+      "target_slot": "trigger",
+      "question": "有没有刻意节食或运动？",
       "order": "159"
     },
     {
-      "complaint_type": "尿频",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "消瘦",
+      "target_slot": "history",
+      "question": "有没有糖尿病、甲亢、肿瘤史？",
       "order": "160"
     },
     {
-      "complaint_type": "尿痛",
+      "complaint_type": "水肿",
       "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "question": "水肿在哪个部位？",
       "order": "161"
     },
     {
-      "complaint_type": "尿痛",
+      "complaint_type": "水肿",
       "target_slot": "duration",
-      "question": "出现多久了？",
+      "question": "水肿多久了？",
       "order": "162"
     },
     {
-      "complaint_type": "尿痛",
+      "complaint_type": "水肿",
       "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "question": "是凹陷性还是非凹陷性？",
       "order": "163"
     },
     {
-      "complaint_type": "尿痛",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "水肿",
+      "target_slot": "accompanying",
+      "question": "有没有气短、尿少、泡沫尿？",
       "order": "164"
     },
     {
-      "complaint_type": "尿痛",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "水肿",
+      "target_slot": "history",
+      "question": "有没有心肝肾疾病？",
       "order": "165"
     },
     {
-      "complaint_type": "尿痛",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "便血",
+      "target_slot": "nature",
+      "question": "血是鲜红还是暗红？附在大便表面还是混在里？",
       "order": "166"
     },
     {
-      "complaint_type": "尿痛",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "便血",
+      "target_slot": "duration",
+      "question": "便血多久了？",
       "order": "167"
     },
     {
-      "complaint_type": "尿痛",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "便血",
+      "target_slot": "amount",
+      "question": "量大不大？",
       "order": "168"
     },
     {
-      "complaint_type": "尿痛",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "便血",
+      "target_slot": "accompanying",
+      "question": "有没有腹痛、排便习惯改变？",
       "order": "169"
     },
     {
-      "complaint_type": "尿痛",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "便血",
+      "target_slot": "history",
+      "question": "有没有痔疮或肠病家族史？",
       "order": "170"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "便秘",
+      "target_slot": "duration",
+      "question": "便秘多久了？",
       "order": "171"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "便秘",
+      "target_slot": "frequency",
+      "question": "几天一次？",
       "order": "172"
     },
     {
-      "complaint_type": "血尿",
+      "complaint_type": "便秘",
       "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "question": "大便干硬吗？排便费力吗？",
       "order": "173"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "便秘",
+      "target_slot": "accompanying",
+      "question": "有没有腹胀、腹痛、便血？",
       "order": "174"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "便秘",
+      "target_slot": "history",
+      "question": "有没有用药或饮水少？",
       "order": "175"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "腹胀",
+      "target_slot": "duration",
+      "question": "腹胀多久了？",
       "order": "176"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "腹胀",
+      "target_slot": "trigger",
+      "question": "和进食有关吗？",
       "order": "177"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "腹胀",
+      "target_slot": "accompanying",
+      "question": "有没有腹痛、排气减少、呕吐？",
       "order": "178"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "腹胀",
+      "target_slot": "nature",
+      "question": "是持续还是阵发？",
       "order": "179"
     },
     {
-      "complaint_type": "血尿",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "腹胀",
+      "target_slot": "history",
+      "question": "有没有胃肠疾病？",
       "order": "180"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "气短",
+      "target_slot": "trigger",
+      "question": "气短什么情况下出现（活动/休息/夜间）？",
       "order": "181"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "气短",
+      "target_slot": "severity",
+      "question": "能走多远或上几层楼？",
       "order": "182"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "气短",
+      "target_slot": "accompanying",
+      "question": "有没有咳嗽、胸痛、心悸？",
       "order": "183"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "气短",
+      "target_slot": "duration",
+      "question": "多久了？",
       "order": "184"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "气短",
+      "target_slot": "history",
+      "question": "有没有心肺疾病？",
       "order": "185"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "背痛",
+      "target_slot": "location",
+      "question": "背痛在哪个部位？",
       "order": "186"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "背痛",
+      "target_slot": "nature",
+      "question": "是酸痛、刺痛还是放射痛？",
       "order": "187"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "背痛",
+      "target_slot": "trigger",
+      "question": "什么姿势加重？",
       "order": "188"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "背痛",
+      "target_slot": "accompanying",
+      "question": "有没有下肢麻木、无力？",
       "order": "189"
     },
     {
-      "complaint_type": "腰痛",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "背痛",
+      "target_slot": "history",
+      "question": "有没有外伤或久坐？",
       "order": "190"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "颈痛",
+      "target_slot": "duration",
+      "question": "颈痛多久了？",
       "order": "191"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "颈痛",
+      "target_slot": "nature",
+      "question": "是酸痛、僵硬还是放射痛？",
       "order": "192"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "颈痛",
+      "target_slot": "trigger",
+      "question": "转头或低头时加重吗？",
       "order": "193"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "颈痛",
+      "target_slot": "accompanying",
+      "question": "有没有上肢麻木、头晕？",
       "order": "194"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "颈痛",
+      "target_slot": "history",
+      "question": "有没有久坐或外伤？",
       "order": "195"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "牙痛",
+      "target_slot": "location",
+      "question": "哪颗牙痛？上牙还是下牙？",
       "order": "196"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "牙痛",
+      "target_slot": "nature",
+      "question": "是持续痛、冷热痛还是咬合痛？",
       "order": "197"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "牙痛",
+      "target_slot": "duration",
+      "question": "痛了多久？夜间加重吗？",
       "order": "198"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "牙痛",
+      "target_slot": "trigger",
+      "question": "冷热刺激时痛吗？",
       "order": "199"
     },
     {
-      "complaint_type": "关节痛",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "牙痛",
+      "target_slot": "history",
+      "question": "有没有龋齿或牙周病？",
       "order": "200"
     },
     {
-      "complaint_type": "皮疹",
+      "complaint_type": "耳痛",
       "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "question": "哪只耳朵痛？",
       "order": "201"
     },
     {
-      "complaint_type": "皮疹",
+      "complaint_type": "耳痛",
       "target_slot": "duration",
-      "question": "出现多久了？",
+      "question": "痛了多久？",
       "order": "202"
     },
     {
-      "complaint_type": "皮疹",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "耳痛",
+      "target_slot": "accompanying",
+      "question": "有没有听力下降、耳鸣、流脓？",
       "order": "203"
     },
     {
-      "complaint_type": "皮疹",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "耳痛",
+      "target_slot": "trigger",
+      "question": "有没有感冒、游泳进水？",
       "order": "204"
     },
     {
-      "complaint_type": "皮疹",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "耳痛",
+      "target_slot": "history",
+      "question": "有没有中耳炎史？",
       "order": "205"
     },
     {
-      "complaint_type": "皮疹",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "月经不调",
+      "target_slot": "pattern",
+      "question": "周期怎么乱（提前/推迟/不规律）？",
       "order": "206"
     },
     {
-      "complaint_type": "皮疹",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "月经不调",
+      "target_slot": "duration",
+      "question": "持续多久了？",
       "order": "207"
     },
     {
-      "complaint_type": "皮疹",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "月经不调",
+      "target_slot": "amount",
+      "question": "经量多还是少？",
       "order": "208"
     },
     {
-      "complaint_type": "皮疹",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "月经不调",
+      "target_slot": "accompanying",
+      "question": "有没有痛经、白带异常？",
       "order": "209"
     },
     {
-      "complaint_type": "皮疹",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "月经不调",
+      "target_slot": "history",
+      "question": "有没有精神压力或体重变化？",
       "order": "210"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "白带异常",
+      "target_slot": "nature",
+      "question": "白带是什么颜色、气味、性状？",
       "order": "211"
     },
     {
-      "complaint_type": "瘙痒",
+      "complaint_type": "白带异常",
       "target_slot": "duration",
       "question": "出现多久了？",
       "order": "212"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "白带异常",
+      "target_slot": "accompanying",
+      "question": "有没有外阴瘙痒、灼痛？",
       "order": "213"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "白带异常",
+      "target_slot": "trigger",
+      "question": "和月经周期有关吗？",
       "order": "214"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "白带异常",
+      "target_slot": "history",
+      "question": "有没有阴道炎史？",
       "order": "215"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "停经",
+      "target_slot": "duration",
+      "question": "停经多久了？",
       "order": "216"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "停经",
+      "target_slot": "possibility",
+      "question": "有没有性生活？可能怀孕吗？",
       "order": "217"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "停经",
+      "target_slot": "accompanying",
+      "question": "有没有恶心、乳房胀痛？",
       "order": "218"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "停经",
+      "target_slot": "history",
+      "question": "以前月经规律吗？",
       "order": "219"
     },
     {
-      "complaint_type": "瘙痒",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "停经",
+      "target_slot": "trigger",
+      "question": "有没有精神压力或体重骤变？",
       "order": "220"
     },
     {
-      "complaint_type": "咽痛",
+      "complaint_type": "皮肤瘙痒",
       "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "question": "哪里痒？范围多大？",
       "order": "221"
     },
     {
-      "complaint_type": "咽痛",
+      "complaint_type": "皮肤瘙痒",
       "target_slot": "duration",
-      "question": "出现多久了？",
+      "question": "痒了多久？",
       "order": "222"
     },
     {
-      "complaint_type": "咽痛",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "皮肤瘙痒",
+      "target_slot": "trigger",
+      "question": "什么情况下加重？",
       "order": "223"
     },
     {
-      "complaint_type": "咽痛",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "皮肤瘙痒",
+      "target_slot": "accompanying",
+      "question": "有没有皮疹、干燥、黄疸？",
       "order": "224"
     },
     {
-      "complaint_type": "咽痛",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "皮肤瘙痒",
+      "target_slot": "history",
+      "question": "有没有过敏或肝胆疾病？",
       "order": "225"
     },
     {
-      "complaint_type": "咽痛",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "脱发",
+      "target_slot": "pattern",
+      "question": "是斑片状还是整体稀疏？",
       "order": "226"
     },
     {
-      "complaint_type": "咽痛",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "脱发",
+      "target_slot": "duration",
+      "question": "脱发多久了？",
       "order": "227"
     },
     {
-      "complaint_type": "咽痛",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "脱发",
+      "target_slot": "amount",
+      "question": "每天掉多少？",
       "order": "228"
     },
     {
-      "complaint_type": "咽痛",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "脱发",
+      "target_slot": "accompanying",
+      "question": "有没有头皮痒、红斑？",
       "order": "229"
     },
     {
-      "complaint_type": "咽痛",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "脱发",
+      "target_slot": "history",
+      "question": "有没有精神压力、用药、家族史？",
       "order": "230"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "口干",
+      "target_slot": "duration",
+      "question": "口干多久了？",
       "order": "231"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "duration",
-      "question": "出现多久了？",
+      "complaint_type": "口干",
+      "target_slot": "trigger",
+      "question": "喝水能缓解吗？",
       "order": "232"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "口干",
+      "target_slot": "accompanying",
+      "question": "有没有眼干、多饮多尿？",
       "order": "233"
     },
     {
-      "complaint_type": "鼻塞",
+      "complaint_type": "口干",
       "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "question": "是否影响进食吞咽？",
       "order": "234"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "口干",
+      "target_slot": "history",
+      "question": "有没有糖尿病或干燥综合征？",
       "order": "235"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "多饮",
+      "target_slot": "duration",
+      "question": "多饮多久了？",
       "order": "236"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "多饮",
+      "target_slot": "amount",
+      "question": "每天喝多少水？",
       "order": "237"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "多饮",
+      "target_slot": "accompanying",
+      "question": "有没有多尿、消瘦、乏力？",
       "order": "238"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "多饮",
+      "target_slot": "trigger",
+      "question": "和天气、运动有关吗？",
       "order": "239"
     },
     {
-      "complaint_type": "鼻塞",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "多饮",
+      "target_slot": "history",
+      "question": "有没有糖尿病史？",
       "order": "240"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "location",
-      "question": "具体在哪个部位？",
+      "complaint_type": "多尿",
+      "target_slot": "frequency",
+      "question": "一天尿几次？夜尿几次？",
       "order": "241"
     },
     {
-      "complaint_type": "耳鸣",
+      "complaint_type": "多尿",
       "target_slot": "duration",
-      "question": "出现多久了？",
+      "question": "多尿多久了？",
       "order": "242"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "nature",
-      "question": "是什么样的感觉（性质）？",
+      "complaint_type": "多尿",
+      "target_slot": "amount",
+      "question": "尿量多吗？",
       "order": "243"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "severity",
-      "question": "严重程度如何（轻/中/重）？",
+      "complaint_type": "多尿",
+      "target_slot": "accompanying",
+      "question": "有没有多饮、消瘦、乏力？",
       "order": "244"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "trigger",
-      "question": "什么情况下加重或缓解？",
+      "complaint_type": "多尿",
+      "target_slot": "history",
+      "question": "有没有糖尿病或尿崩症？",
       "order": "245"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "accompanying",
-      "question": "有没有其它伴随症状？",
+      "complaint_type": "体重下降",
+      "target_slot": "amount",
+      "question": "下降了多少？",
       "order": "246"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "history",
-      "question": "以前有没有类似情况或相关病史？",
+      "complaint_type": "体重下降",
+      "target_slot": "duration",
+      "question": "多久内下降的？",
       "order": "247"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "medication",
-      "question": "目前有没有在用药？",
+      "complaint_type": "体重下降",
+      "target_slot": "accompanying",
+      "question": "有没有食欲亢进、多饮多尿、腹泻？",
       "order": "248"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "fever",
-      "question": "有没有发热？体温多少？",
+      "complaint_type": "体重下降",
+      "target_slot": "trigger",
+      "question": "有没有刻意节食？",
       "order": "249"
     },
     {
-      "complaint_type": "耳鸣",
-      "target_slot": "radiation",
-      "question": "疼痛有没有向其它部位放射？",
+      "complaint_type": "体重下降",
+      "target_slot": "history",
+      "question": "有没有糖尿病、甲亢、肿瘤史？",
       "order": "250"
     }
   ],

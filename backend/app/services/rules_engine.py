@@ -126,7 +126,8 @@ def inquiry_templates(complaint_type: str) -> list[dict[str, Any]]:
 
 
 def infer_complaint_type(complaint: str) -> str | None:
-    """从主诉文本推断追问模板的主诉类型（最长匹配）。"""
+    """从主诉文本推断追问模板的主诉类型（先归一化，最长匹配）。"""
+    text = normalize_complaint(complaint)
     types = {t.get("complaint_type") for t in _load_rules().get("inquiry_templates", [])}
-    matched = [t for t in types if t and t in complaint]
+    matched = [t for t in types if t and t in text]
     return max(matched, key=len) if matched else None

@@ -15,6 +15,7 @@ from langgraph.types import interrupt
 
 from app.agents.state import TriageState
 from app.common.llm_client import ModelClient
+from app.services import rules_engine
 from app.ws import events
 
 logger = logging.getLogger(__name__)
@@ -122,6 +123,19 @@ def build_inquiry_node(client: ModelClient):
         # 不充分：先推送本轮追问，再挂起图等待患者回答
         missing = result.get("missing", [])
         question = result.get("question", "")
+
+        # 结构化追问模板优先：按主诉类型取模板，顺序固定（部位→时长→性质→程度→诱因→伴随…），
+        # 已问过的 slot 跳过；模板未命中（主诉类型未知）时才用 LLM 生成的追问。
+        complaint_type = rules_engine.infer_complaint_type(state.get("chief_complaint", ""))
+        if complaint_type:
+            asked = set(state.get("asked", []))
+            for tpl in rules_engine.inquiry_templates(complaint_type):
+                slot = tpl.get("target_slot")
+                if slot and slot not in asked:
+                    question = tpl.get("question") or question
+                    missing = [slot]
+                    break
+
         events.emit_node_complete(
             session_id,
             events.NODE_INQUIRY,
