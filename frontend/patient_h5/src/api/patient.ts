@@ -60,11 +60,17 @@ export function createAnonymousSession(deviceId: string) {
 }
 
 // 创建预问诊会话
-export function createSession(chiefComplaint: string, deviceId: string) {
+export function createSession(
+  chiefComplaint: string,
+  deviceId: string,
+  extra?: { gender?: '男' | '女'; age?: number },
+) {
   return http.post<{ session_id: string; session_no: string; status: string }>('/patient/sessions', {
     chief_complaint: chiefComplaint,
     device_id: deviceId,
     input_type: 'TEXT',
+    gender: extra?.gender ?? null,
+    age: extra?.age ?? null,
   })
 }
 

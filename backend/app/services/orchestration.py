@@ -52,6 +52,8 @@ class TriageOrchestrator:
         patient_id: str,
         chief_complaint: str,
         patient_hash: str | None = None,
+        gender: str | None = None,
+        age: int | None = None,
     ) -> None:
         """创建会话后首次触发：跑图到 interrupt（追问）或 done。
 
@@ -68,6 +70,10 @@ class TriageOrchestrator:
             "chief_complaint": chief_complaint,
             "messages": [{"role": "patient", "content": chief_complaint}],
         }
+        if gender:
+            state["gender"] = gender
+        if age is not None:
+            state["age"] = age
         try:
             result = await self.graph.ainvoke(state, config=self._config(session_id))
         except Exception as exc:

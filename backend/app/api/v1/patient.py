@@ -44,6 +44,8 @@ async def create_session(
             tenant_id=patient["tenant_id"],
             patient_id=patient["sub"],
             chief_complaint=req.chief_complaint,
+            gender=req.gender,
+            age=req.age,
         )
     return ApiResponse(data=data)
 

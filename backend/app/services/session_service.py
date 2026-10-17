@@ -20,7 +20,7 @@ from app.common.error_codes import (
     SESSION_TRIAGE_NOT_READY,
 )
 from app.common.exceptions import BizError
-from app.models import EmrRecord, Session, SessionMessage, TriageResult
+from app.models import EmrRecord, Patient, Session, SessionMessage, TriageResult
 from app.schemas.session import (
     MessageSendResponse,
     SessionCreateRequest,
@@ -108,6 +108,15 @@ async def create_session(
     )
     db.add(session)
     await db.flush()
+
+    # 采集性别/年龄（若请求提供），供分诊规则的人群过滤使用（妇科/产科仅女性、儿童/老年科室）
+    if req.gender or req.age is not None:
+        patient = await db.scalar(select(Patient).where(Patient.id == patient_id))
+        if patient is not None:
+            if req.gender:
+                patient.gender = "1" if req.gender == "男" else "2"
+            if req.age is not None:
+                patient.age = req.age
 
     # 主诉非空时落第一条患者消息
     if req.chief_complaint:

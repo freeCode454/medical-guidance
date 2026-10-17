@@ -20,6 +20,10 @@ class SessionCreateRequest(BaseModel):
     )
     input_type: Literal["TEXT", "VOICE", "BODY_MAP"] = Field(default="TEXT", description="输入方式")
     device_id: str | None = Field(default=None, max_length=128, description="设备标识")
+    gender: Literal["男", "女"] | None = Field(
+        default=None, description="性别（用于分诊规则的人群过滤，如妇科/产科仅女性）"
+    )
+    age: int | None = Field(default=None, ge=0, le=150, description="年龄（用于儿童/老年科室过滤）")
 
 
 class SessionCreateResponse(BaseModel):

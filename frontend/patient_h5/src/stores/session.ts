@@ -31,9 +31,12 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   // 开始一次问诊
-  async function startSession(chiefComplaint: string) {
+  async function startSession(
+    chiefComplaint: string,
+    extra?: { gender?: '男' | '女'; age?: number },
+  ) {
     await ensureAuth()
-    const s = await api.createSession(chiefComplaint, deviceId.value)
+    const s = await api.createSession(chiefComplaint, deviceId.value, extra)
     sessionId.value = s.session_id
     sessionNo.value = s.session_no
     route.value = null

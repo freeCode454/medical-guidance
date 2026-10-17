@@ -7,6 +7,8 @@ import { useSessionStore } from '@/stores/session'
 const router = useRouter()
 const store = useSessionStore()
 const complaint = ref('')
+const gender = ref<'男' | '女' | null>(null)
+const age = ref<number | null>(null)
 const loading = ref(false)
 
 async function start() {
@@ -17,7 +19,10 @@ async function start() {
   }
   loading.value = true
   try {
-    await store.startSession(text)
+    await store.startSession(text, {
+      gender: gender.value ?? undefined,
+      age: age.value ?? undefined,
+    })
     router.push('/chat')
   } catch (e) {
     showToast((e as Error).message || '启动问诊失败，请重试')
@@ -47,6 +52,23 @@ async function start() {
         <span class="hint">描述越具体，判断越准确</span>
         <span class="count">{{ complaint.length }}/300</span>
       </div>
+    </div>
+
+    <div class="basic-info">
+      <span class="label">性别</span>
+      <div class="gender-group">
+        <button
+          v-for="g in (['男', '女'] as const)"
+          :key="g"
+          class="gender-btn"
+          :class="{ active: gender === g }"
+          @click="gender = gender === g ? null : g"
+        >
+          {{ g }}
+        </button>
+      </div>
+      <span class="label">年龄</span>
+      <input v-model.number="age" class="age-input" type="number" min="0" max="150" placeholder="选填" />
     </div>
 
     <button class="start-btn" :disabled="loading" @click="start">
@@ -115,6 +137,55 @@ h1 {
   margin-top: 10px;
   font-size: 12px;
   color: var(--c-muted);
+}
+
+.basic-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.label {
+  color: var(--c-muted);
+  font-size: 13px;
+}
+
+.gender-group {
+  display: flex;
+  gap: 6px;
+  margin-right: 8px;
+}
+
+.gender-btn {
+  border: 1px solid var(--c-line);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.gender-btn.active {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+  color: #fff;
+}
+
+.age-input {
+  width: 88px;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  outline: none;
+  background: var(--c-surface);
+}
+
+.age-input:focus {
+  border-color: var(--c-primary);
 }
 
 .start-btn {

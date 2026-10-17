@@ -36,6 +36,8 @@ class TriageState(TypedDict, total=False):
     session_id: str
     tenant_id: str
     patient_hash: str
+    gender: str  # 男 / 女（供分诊规则人群过滤）
+    age: int  # 年龄（供儿童/老年科室过滤）
 
     # ---- 对话（追加） ----
     chief_complaint: str

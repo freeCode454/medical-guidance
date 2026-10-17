@@ -108,6 +108,12 @@ async def recall_depts(
         for h in fused
     ]
 
+    # 人群硬过滤：男性患者直接剔除妇科/产科。
+    # 规则加权（0.15）压不过向量+精排的分差，必须在候选层剔除，避免「男患者被推荐妇科」。
+    if gender == "男":
+        exclude = {"GYN", "OB"}
+        candidates = [c for c in candidates if c["dept_code"] not in exclude]
+
     # 分诊规则命中（确定性信号）：年龄/性别不符的规则会被过滤掉
     bonus = rules_engine.match_dept_bonus(complaint, gender=gender, age=age)
 
