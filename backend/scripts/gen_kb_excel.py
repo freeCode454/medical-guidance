@@ -194,17 +194,26 @@ def gen_triage_rules(n: int = 250) -> list[list]:
     }
     rows = []
     for dept, syms in dept_symptom.items():
-        rows.append([syms, dept, DEPT_NAME.get(dept, dept), "", "", 20 if dept == "EMER" else 10, f"{DEPT_NAME.get(dept, dept)}主症状"])
+        gender = "女" if dept in ("GYN", "OB") else ""
+        rows.append([syms, dept, DEPT_NAME.get(dept, dept), "", gender, 20 if dept == "EMER" else 10, f"{DEPT_NAME.get(dept, dept)}主症状"])
     # 补足到 n：症状 × 科室组合
     idx = len(rows)
+    male_kw = ["男性", "射精", "包皮", "阴茎", "睾丸", "阴囊"]
     for sym, aliases, part, _dur in ALL_SYMPTOMS:
         if idx >= n:
             break
-        # 简单按部位映射科室
-        dept = {"腹部": "DIG", "胸部": "CAR", "头部": "NEU", "泌尿": "URO", "生殖": "GYN",
-                "关节": "ORT", "皮肤": "DERM", "眼部": "OPH", "耳部": "ENT", "口腔": "STO",
-                "咽喉": "ENT", "鼻部": "ENT", "心理": "PSY", "下肢": "VS", "腰部": "ORT"}.get(part, "GEN")
-        rows.append([sym, dept, DEPT_NAME.get(dept, dept), "", "", 8, f"{sym}（{part}）"])
+        gender = ""
+        if part == "生殖":
+            # 男性生殖症状归泌尿外科；其余归妇科（性别过滤）
+            if any(k in sym for k in male_kw):
+                dept = "URO"
+            else:
+                dept, gender = "GYN", "女"
+        else:
+            dept = {"腹部": "DIG", "胸部": "CAR", "头部": "NEU", "泌尿": "URO",
+                    "关节": "ORT", "皮肤": "DERM", "眼部": "OPH", "耳部": "ENT", "口腔": "STO",
+                    "咽喉": "ENT", "鼻部": "ENT", "心理": "PSY", "下肢": "VS", "腰部": "ORT"}.get(part, "GEN")
+        rows.append([sym, dept, DEPT_NAME.get(dept, dept), "", gender, 8, f"{sym}（{part}）"])
         idx += 1
     return rows[:n]
 

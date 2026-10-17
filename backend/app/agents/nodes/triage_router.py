@@ -74,7 +74,13 @@ def build_router_node(client: ModelClient, embedder: BaseEmbedder, store: Milvus
             session_id, events.NODE_RETRIEVAL, "候选科室检索", "正在检索匹配科室"
         )
         depts = await recall_depts(
-            embedder, store, complaint=query, tenant_id=tenant_id
+            embedder,
+            store,
+            complaint=query,
+            tenant_id=tenant_id,
+            client=client,  # 启用 rerank 精排
+            gender=state.get("gender") or None,
+            age=state.get("age"),
         )
         events.emit_node_complete(
             session_id,
@@ -94,7 +100,13 @@ def build_router_node(client: ModelClient, embedder: BaseEmbedder, store: Milvus
             session_id, events.NODE_TRIAGE_DECIDE, "分诊决策", "正在综合判断"
         )
         result = await generate_triage(
-            client, embedder, store, complaint=query, tenant_id=tenant_id
+            client,
+            embedder,
+            store,
+            complaint=query,
+            tenant_id=tenant_id,
+            gender=state.get("gender") or None,
+            age=state.get("age"),
         )
         route = _decide_route(
             result.get("confidence", 0.0), result.get("recommended_depts", [])

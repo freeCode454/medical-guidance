@@ -252,14 +252,26 @@ def gen_rules_json() -> None:
     ]
 
     out = PROJECT_ROOT / "kb" / "rules.json"
+    # 症状同义词映射：标准名 → [同义词]，供规则匹配时把口语词归一化
+    synonyms = {}
+    for row in _rows("症状本体库"):
+        d = _kv(["standard_name", "synonyms", "body_part", "duration"], row)
+        if d["standard_name"]:
+            synonyms[d["standard_name"]] = [s for s in d["synonyms"].split("|") if s]
+
     out.write_text(
         json.dumps(
-            {"red_flags": red_flags, "triage_rules": triage_rules, "inquiry_templates": inquiry},
+            {
+                "red_flags": red_flags,
+                "triage_rules": triage_rules,
+                "inquiry_templates": inquiry,
+                "symptom_synonyms": synonyms,
+            },
             ensure_ascii=False, indent=2,
         ),
         encoding="utf-8",
     )
-    print(f"规则 JSON 生成 {out}（红旗 {len(red_flags)} / 分诊 {len(triage_rules)} / 追问 {len(inquiry)}）")
+    print(f"规则 JSON 生成 {out}（红旗 {len(red_flags)} / 分诊 {len(triage_rules)} / 追问 {len(inquiry)} / 同义词 {len(synonyms)}）")
 
 
 async def main() -> None:

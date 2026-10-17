@@ -8,6 +8,7 @@ from app.common.embedder import BaseEmbedder
 from app.common.llm_client import ModelClient
 from app.retrieval import KB_DEPT, MilvusStore
 from app.retrieval.fusion import fuse
+from app.services import rules_engine
 
 logger = logging.getLogger(__name__)
 
@@ -66,18 +67,24 @@ async def recall_depts(
     tenant_id: str,
     mode: str = "HYBRID",
     limit: int = 10,
+    client: ModelClient | None = None,
+    gender: str | None = None,
+    age: int | None = None,
 ) -> list[dict]:
-    """主诉 → 候选科室召回（按 score 降序）。
+    """主诉 → 候选科室。
 
-    返回：[{"dept_code": str, "score": float}, ...]
+    链路：向量召回（稠密+稀疏+RRF）→ rerank 精排 → 分诊规则加权。
+    rerank 或规则缺失时自动降级，不阻断主链路。
+    返回：[{"dept_code", "dept_name", "score"}, ...]，按最终分降序。
     """
     emb = (await embedder.embed([complaint]))[0]
+    recall_k = max(limit * 2, 20)  # 先多召回，再精排收窄
 
     dense_hits = store.dense_search(
         KB_DEPT,
         dense=emb.dense,
         filter_expr=f'tenant_id == "{tenant_id}"',
-        limit=limit,
+        limit=recall_k,
     )
 
     sparse_hits: list[dict] = []
@@ -86,17 +93,56 @@ async def recall_depts(
             KB_DEPT,
             sparse=emb.sparse or {},
             filter_expr=f'tenant_id == "{tenant_id}"',
-            limit=limit,
+            limit=recall_k,
         )
 
     fused = fuse(dense_hits, sparse_hits, mode=mode)
-    return [
+
+    candidates = [
         {
             "dept_code": h["dept_code"],
             "dept_name": h.get("dept_name", ""),
-            "score": float(h.get("score", 0)),
+            "text": h.get("text", "") or h.get("dept_name", ""),
+            "vec": float(h.get("score", 0)),
         }
         for h in fused
+    ]
+
+    # 分诊规则命中（确定性信号）：年龄/性别不符的规则会被过滤掉
+    bonus = rules_engine.match_dept_bonus(complaint, gender=gender, age=age)
+
+    # rerank 精排
+    rerank_scores: dict[str, float] = {}
+    if client is not None and candidates:
+        try:
+            docs = [c["text"] for c in candidates]
+            ranked = await client.rerank(complaint, docs, top_n=len(docs))
+            for idx, score in ranked:
+                if 0 <= idx < len(candidates):
+                    rerank_scores[candidates[idx]["dept_code"]] = float(score)
+        except Exception as exc:  # 精排失败降级，不影响可用性
+            logger.warning("rerank 失败，降级为向量+规则：%s", exc)
+
+    # 各分量归一化到 0~1
+    max_vec = max((c["vec"] for c in candidates), default=0) or 1.0
+    max_rr = max(rerank_scores.values(), default=0) or 1.0
+    max_rule = max(bonus.values(), default=0) or 1.0
+
+    for c in candidates:
+        vec_n = c["vec"] / max_vec
+        rr_n = rerank_scores.get(c["dept_code"], 0) / max_rr if rerank_scores else 0.0
+        rule_n = bonus.get(c["dept_code"], 0) / max_rule
+        # 权重：精排为主，向量次之，规则作确定性补充
+        c["final"] = 0.55 * rr_n + 0.30 * vec_n + 0.15 * rule_n
+
+    candidates.sort(key=lambda x: x["final"], reverse=True)
+    return [
+        {
+            "dept_code": c["dept_code"],
+            "dept_name": c["dept_name"],
+            "score": round(c["final"], 4),
+        }
+        for c in candidates[:limit]
     ]
 
 
@@ -107,16 +153,26 @@ async def generate_triage(
     *,
     complaint: str,
     tenant_id: str,
-    mode: str = "DENSE",
+    mode: str = "HYBRID",
     limit: int = 10,
+    gender: str | None = None,
+    age: int | None = None,
 ) -> dict:
-    """主诉 → 分诊结论（候选科室召回 + LLM 生成）。
+    """主诉 → 分诊结论（候选科室召回 + rerank + 规则加权 + LLM 生成）。
 
     返回：{"route", "confidence", "recommended_depts": [{dept_code, dept_name,
     confidence, reason}]}。患者视图只含科室，不含疾病名（R01）。
     """
     depts = await recall_depts(
-        embedder, store, complaint=complaint, tenant_id=tenant_id, mode=mode, limit=limit
+        embedder,
+        store,
+        complaint=complaint,
+        tenant_id=tenant_id,
+        mode=mode,
+        limit=limit,
+        client=client,
+        gender=gender,
+        age=age,
     )
     dept_map = {d["dept_code"]: d.get("dept_name", "") for d in depts}
 
