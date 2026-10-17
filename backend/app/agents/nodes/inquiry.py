@@ -133,14 +133,55 @@ def build_inquiry_node(client: ModelClient):
             complaint_type,
             state.get("asked"),
         )
+        template_exhausted = False
         if complaint_type:
-            asked = set(state.get("asked", []))
-            for tpl in rules_engine.inquiry_templates(complaint_type):
+            asked_slots = set(state.get("asked", []))
+            # 从对话历史反查已问过的问题原文：
+            # asked 状态依赖 interrupt 之后的 return，LangGraph 重放节点时可能拿不到，
+            # 而 messages 是累积的，用它兜底最可靠。
+            asked_questions = {
+                m.get("content", "")
+                for m in state.get("messages", [])
+                if m.get("role") in ("assistant", "AI")
+            }
+            templates = rules_engine.inquiry_templates(complaint_type)
+            for tpl in templates:
                 slot = tpl.get("target_slot")
-                if slot and slot not in asked:
-                    question = tpl.get("question") or question
+                q = tpl.get("question") or ""
+                # 双重判断：slot 没问过，且问题原文也没出现过
+                if slot and slot not in asked_slots and q not in asked_questions:
+                    question = q or question
                     missing = [slot]
+                    logger.info("模板选中追问 slot=%s session=%s", slot, session_id)
                     break
+            else:
+                # 该主诉的追问维度已全部问过，判定充分。
+                # 否则会回落到 LLM 自由生成问题，而 LLM 看不到已问过什么，容易原地打转。
+                template_exhausted = bool(templates)
+
+        if template_exhausted:
+            logger.info("追问维度已用尽，判定充分 session=%s type=%s", session_id, complaint_type)
+            events.emit_node_complete(
+                session_id,
+                events.NODE_INQUIRY,
+                {"sufficient": True, "reason": "template_exhausted", "inquiry_rounds": round_now},
+            )
+            return {"sufficient": True, "entities": entities, "inquiry_rounds": round_now}
+
+        # 双保险：LLM 生成的问题若与历史 AI 追问重复，同样判定充分
+        asked_before = {
+            m.get("content", "")
+            for m in state.get("messages", [])
+            if m.get("role") in ("assistant", "AI")
+        }
+        if question and question in asked_before:
+            logger.info("追问重复，判定充分 session=%s question=%r", session_id, question)
+            events.emit_node_complete(
+                session_id,
+                events.NODE_INQUIRY,
+                {"sufficient": True, "reason": "duplicate_question", "inquiry_rounds": round_now},
+            )
+            return {"sufficient": True, "entities": entities, "inquiry_rounds": round_now}
 
         events.emit_node_complete(
             session_id,
