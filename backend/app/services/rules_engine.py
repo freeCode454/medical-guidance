@@ -105,8 +105,9 @@ def match_dept_bonus(
 
 
 def match_red_flags(text: str) -> list[dict[str, Any]]:
-    """红旗症状命中（关键词匹配）。返回命中的规则列表。"""
+    """红旗症状命中（关键词匹配，先做同义词归一化）。返回命中的规则列表。"""
     flags = _load_rules().get("red_flags", [])
+    text = normalize_complaint(text)
     hit = []
     for f in flags:
         keywords = f.get("keywords") or []

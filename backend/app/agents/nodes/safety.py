@@ -29,9 +29,20 @@ _compiled = [re.compile(p) for p in _EMERGENCY_PATTERNS]
 
 
 def detect_emergency(text: str) -> bool:
-    """规则层判定：文本是否命中危重症红线。"""
+    """规则层判定：文本是否命中危重症红线。
+
+    优先用规则库（250 条红旗 + 同义词归一化，能识别「胸口疼冒冷汗」这类口语表述），
+    规则库不可用时回落到硬编码正则兜底。
+    """
     if not text:
         return False
+    try:
+        from app.services import rules_engine
+
+        if rules_engine.match_red_flags(text):
+            return True
+    except Exception:  # 规则库异常不应影响兜底判断
+        pass
     return any(p.search(text) for p in _compiled)
 
 
