@@ -83,18 +83,17 @@ onMounted(load)
       </el-table-column>
     </el-table>
 
-    <div class="pager">
-      <el-pagination
-        v-model:current-page="page"
-        v-model:page-size="size"
-        :total="total"
-        :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
-        background
-        @current-change="onPageChange"
-        @size-change="onSizeChange"
-      />
-    </div>
+    <el-pagination
+      v-model:current-page="page"
+      v-model:page-size="size"
+      :total="total"
+      :page-sizes="[10, 20, 50, 100]"
+      layout="total, sizes, prev, pager, next, jumper"
+      background
+      class="pager"
+      @current-change="onPageChange"
+      @size-change="onSizeChange"
+    />
 
     <el-dialog v-model="dialog" title="新增科室" width="420px">
       <el-form label-width="90px">
@@ -113,5 +112,5 @@ onMounted(load)
 <style scoped>
 .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 h2 { font-size: 18px; }
-.pager { display: flex; justify-content: flex-end; margin-top: 14px; }
+.pager { justify-content: center; margin-top: 14px; }
 </style>

@@ -74,18 +74,17 @@ onMounted(load)
       </el-table-column>
     </el-table>
 
-    <div class="pager">
-      <el-pagination
-        v-model:current-page="page"
-        v-model:page-size="size"
-        :total="total"
-        :page-sizes="[10, 20, 50]"
-        layout="total, sizes, prev, pager, next"
-        background
-        @current-change="onPageChange"
-        @size-change="onSizeChange"
-      />
-    </div>
+    <el-pagination
+      v-model:current-page="page"
+      v-model:page-size="size"
+      :total="total"
+      :page-sizes="[10, 20, 50]"
+      layout="total, sizes, prev, pager, next"
+      background
+      class="pager"
+      @current-change="onPageChange"
+      @size-change="onSizeChange"
+    />
 
     <el-empty v-if="!loading && !items.length" description="暂无待接管患者" />
   </main>
@@ -108,5 +107,5 @@ onMounted(load)
 h1 { font-size: 22px; }
 .count { color: var(--c-muted); font-size: 14px; }
 .muted { color: var(--c-muted); }
-.pager { display: flex; justify-content: flex-end; margin-top: 14px; }
+.pager { justify-content: center; margin-top: 14px; }
 </style>

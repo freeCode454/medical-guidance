@@ -138,7 +138,7 @@ onMounted(load)
       :total="total"
       :page-size="20"
       layout="total, prev, pager, next"
-      class="mt"
+      class="mt pager"
       @current-change="load"
     />
 
@@ -169,6 +169,7 @@ h2 { font-size: 18px; }
 h3 { font-size: 15px; margin-bottom: 10px; }
 .mb { margin-bottom: 16px; }
 .mt { margin-top: 16px; }
+.pager { justify-content: center; }
 .mr8 { margin-right: 8px; }
 .test-row { display: flex; gap: 10px; }
 .results { margin-top: 12px; }

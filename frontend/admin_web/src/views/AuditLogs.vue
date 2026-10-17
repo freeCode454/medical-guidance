@@ -64,7 +64,7 @@ onMounted(load)
       :total="total"
       :page-size="20"
       layout="total, prev, pager, next"
-      class="mt"
+      class="mt pager"
       @current-change="load"
     />
   </div>
@@ -74,4 +74,5 @@ onMounted(load)
 .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 h2 { font-size: 18px; }
 .mt { margin-top: 16px; }
+.pager { justify-content: center; }
 </style>
