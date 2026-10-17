@@ -169,9 +169,8 @@ python scripts/seed_dev.py        # 租户/用户/科室/系统配置/模型配�
 python scripts/gen_kb_excel.py    # 生成 kb/医学知识库源数据.xlsx（2556 条）
 python scripts/import_kb.py       # 导入 mg_kb_entry + Milvus + rules.json
 
-# 5.5 知识图谱（可选，需 Neo4j 运行）
-# Neo4j 2026 的 bin\neo4j.bat 在部分 Windows PowerShell 5.1 环境会报「重复键」，
-# 可用 java 直接启动：java -cp "lib/*;plugins/*" org.neo4j.server.startup.Neo4jCommand console
+# 5.5 知识图谱（可选）
+make neo4j                        # 启动 Neo4j（绕过 Windows 下有兼容 bug 的 neo4j.bat）
 python scripts/build_kg.py        # 从 Excel 抽三元组建图（节点打 :Mg 标签隔离）
 
 # 6. 启动三端前端（另开终端）

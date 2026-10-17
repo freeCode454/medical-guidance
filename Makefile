@@ -109,6 +109,15 @@ typecheck:  ## 类型检查
 test:  ## 运行测试
 	cd backend && ../.venv/Scripts/pytest.exe -q
 
+kb-validate:  ## 校验知识库源数据（Excel 各 sheet 条数/字段）
+	cd backend && python scripts/gen_kb_excel.py
+
+kg-build:  ## 构建知识图谱（需 Neo4j 运行）
+	cd backend && python scripts/build_kg.py
+
+neo4j:  ## 启动 Neo4j（绕过 Windows PowerShell 5.1 下有兼容 bug 的 neo4j.bat）
+	cd /d/neo4jcommunity2026 && java -cp "lib/*;plugins/*" org.neo4j.server.startup.Neo4jCommand console
+
 .PHONY: help db-up vector-up cache-up storage-up infra-down infra-logs \
         db-verify db-tables db-reset venv install dev check probe-vector \
-        kb-validate kb-ingest kb-verify lint fmt typecheck test
+        kb-validate kb-ingest kb-verify kg-build neo4j lint fmt typecheck test
