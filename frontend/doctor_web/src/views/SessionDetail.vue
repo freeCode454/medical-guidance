@@ -160,6 +160,18 @@ onMounted(load)
           <el-card shadow="never" class="mb">
             <h3>候选科室</h3>
             <el-table :data="diagnosis.candidates" size="small">
+              <el-table-column type="expand">
+                <template #default="{ row }">
+                  <div class="kg-box">
+                    <p class="kg-title">
+                      知识图谱推理路径
+                      <span v-if="row.kg_disease_hits" class="kg-hits">（{{ row.kg_disease_hits }} 个疾病命中）</span>
+                    </p>
+                    <div v-for="p in row.kg_paths" :key="p" class="kg-path">{{ p }}</div>
+                    <p v-if="!row.kg_paths || !row.kg_paths.length" class="muted">该科室暂无图谱路径</p>
+                  </div>
+                </template>
+              </el-table-column>
               <el-table-column prop="rank" label="#" width="50" />
               <el-table-column prop="dept_name" label="科室" width="140" />
               <el-table-column label="置信度" width="100">
@@ -167,6 +179,12 @@ onMounted(load)
               </el-table-column>
               <el-table-column label="命中症状" min-width="160">
                 <template #default="{ row }">{{ row.hit_symptoms.join('、') || '依据不足' }}</template>
+              </el-table-column>
+              <el-table-column label="图谱" width="90">
+                <template #default="{ row }">
+                  <el-tag v-if="row.kg_paths && row.kg_paths.length" size="small" type="success">有路径</el-tag>
+                  <span v-else class="muted">—</span>
+                </template>
               </el-table-column>
             </el-table>
           </el-card>
@@ -294,6 +312,33 @@ h3 {
 }
 
 .muted { color: var(--c-muted); }
+
+.kg-box {
+  padding: 8px 16px 10px 20px;
+  background: var(--c-primary-soft);
+  border-radius: 6px;
+}
+
+.kg-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-primary);
+  margin: 0 0 6px;
+}
+
+.kg-hits {
+  font-weight: 400;
+  color: var(--c-muted);
+}
+
+.kg-path {
+  font-size: 13px;
+  color: var(--c-ink);
+  line-height: 1.9;
+  padding-left: 10px;
+  border-left: 2px solid var(--c-accent);
+  margin-bottom: 4px;
+}
 .mb { margin-bottom: 14px; }
 .mt { margin-top: 12px; }
 .mr8 { margin-right: 8px; }

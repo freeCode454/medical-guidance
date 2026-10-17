@@ -342,6 +342,8 @@ async def get_diagnosis(
             "confidence": float(c.get("confidence", 0)),
             "hit_symptoms": [c.get("reason", "")] if c.get("reason") else [],
             "guideline_refs": [],  # 依据不足须显式为空，不隐藏候选
+            "kg_paths": c.get("kg_paths", []),  # 知识图谱推理路径（症状→疾病→科室）
+            "kg_disease_hits": c.get("kg_disease_hits", 0),
         }
         for i, c in enumerate(triage.candidates_json or [])
     ]

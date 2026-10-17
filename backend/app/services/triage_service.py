@@ -221,6 +221,12 @@ async def generate_triage(
         if rec.get("dept_code") not in dept_map:
             rec["dept_code"] = top["dept_code"]
             rec["dept_name"] = dept_map.get(top["dept_code"], top.get("dept_name", ""))
+        # 附加图谱推理路径（供医生端展示「为什么推荐这个科室」）
+        for d in depts:
+            if d["dept_code"] == rec.get("dept_code") and d.get("kg_paths"):
+                rec["kg_paths"] = d["kg_paths"]
+                rec["kg_disease_hits"] = d.get("kg_disease_hits", 0)
+                break
     return result
 
 
