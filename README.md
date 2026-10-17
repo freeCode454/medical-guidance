@@ -57,6 +57,23 @@
   否则 0.15 的加权压不过向量+精排的分差。
 - **追问不靠大模型临场发挥**：按主诉类型走模板，顺序可预期，避免「尿频也问哪个部位」。
 
+### 知识图谱：可解释的分诊依据
+
+除向量检索外，另有一条 Neo4j 图谱链路提供**推理路径**（`scripts/build_kg.py` 从同一份 Excel 抽取三元组构建）：
+
+```
+(症状)-[:INDICATES]->(疾病)-[:BELONGS_TO]->(科室)    症状→疾病→科室 两跳推理
+(症状)-[:SYNONYM_OF]->(症状)                          口语同义词 → 标准症状
+(疾病)-[:CODED_AS]->(ICD)                             疾病 → ICD-10
+(药物)-[:CONTRAINDICATED_FOR]->(禁忌条件)              用药禁忌
+(症状)-[:SUGGESTS_DEPT]->(科室)                       分诊规则
+```
+
+图谱结果作为**可解释证据**挂在分诊结论上（不参与排序，避免干扰已验证的排序质量），
+医生端可以展示「腹痛 → 急性胃肠炎 → 消化内科」这样的推理链，而不是一个孤立的置信度数字。
+
+节点统一带 `:Mg` 标签，与同一 Neo4j 实例里的其他图谱隔离。
+
 ## 知识库数据资产
 
 `kb/医学知识库源数据.xlsx` 是知识库的唯一源头（10 个 sheet / 2556 条），改数据 → 跑
@@ -86,7 +103,7 @@
 | 接口 | FastAPI + WebSocket（对话流式） |
 | 编排 | LangGraph（有环状态机、检查点持久化、人工介入挂起） |
 | 模型 | Qwen2.5-32B（推理）+ Qwen2.5-7B（意图/抽取）；BGE-M3 本地向量化 + bge-reranker-v2-m3 精排 |
-| 存储 | PostgreSQL + Milvus（混合检索）+ Redis + MinIO |
+| 存储 | PostgreSQL + Milvus（混合检索）+ Neo4j（知识图谱）+ Redis + MinIO |
 | 外部能力 | FastMCP 封装 HIS 号源/排班/既往病历 |
 | 交付 | Docker Compose，前后端合并单镜像 |
 
@@ -151,6 +168,11 @@ cd backend
 python scripts/seed_dev.py        # 租户/用户/科室/系统配置/模型配置
 python scripts/gen_kb_excel.py    # 生成 kb/医学知识库源数据.xlsx（2556 条）
 python scripts/import_kb.py       # 导入 mg_kb_entry + Milvus + rules.json
+
+# 5.5 知识图谱（可选，需 Neo4j 运行）
+# Neo4j 2026 的 bin\neo4j.bat 在部分 Windows PowerShell 5.1 环境会报「重复键」，
+# 可用 java 直接启动：java -cp "lib/*;plugins/*" org.neo4j.server.startup.Neo4jCommand console
+python scripts/build_kg.py        # 从 Excel 抽三元组建图（节点打 :Mg 标签隔离）
 
 # 6. 启动三端前端（另开终端）
 cd frontend/patient_h5 && npm install && npm run dev   # 患者端  http://localhost:5173
