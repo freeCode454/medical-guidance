@@ -19,6 +19,7 @@ export interface KbPublish {
   publish_id: string
   version_tag: string
   entry_count: number
+  snapshot_hash?: string | null
   published_by: string
   published_time: string | null
 }

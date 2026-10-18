@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -259,8 +260,10 @@ async def toggle_entry(
     if entry is None:
         raise BizError(KB_ENTRY_NOT_FOUND)
 
-    # 启停：is_active 翻转（0 ↔ 1）
-    entry.is_active = "0" if entry.is_active == "1" else "1"
+    # 启停：is_active 翻转（0 ↔ 1），status 同步为 1 已发布 / 2 已停用
+    enabled = entry.is_active != "1"
+    entry.is_active = "1" if enabled else "0"
+    entry.status = "1" if enabled else "2"
     entry.update_by = actor_id
     entry.update_time = datetime.now(UTC)
 
@@ -417,15 +420,35 @@ async def publish_kb(
         from app.common.error_codes import KB_VERSION_EXISTS
         raise BizError(KB_VERSION_EXISTS)
 
-    entry_count = await db.scalar(
-        select(func.count()).select_from(KbEntry).where(
-            KbEntry.tenant_id == tenant_id, KbEntry.status == "1"
+    active_entries = (
+        await db.scalars(
+            select(KbEntry)
+            .where(
+                KbEntry.tenant_id == tenant_id,
+                KbEntry.is_active == "1",
+                KbEntry.del_flag == "0",
+            )
+            .order_by(KbEntry.entry_code)
         )
-    )
+    ).all()
+    if not active_entries:
+        from app.common.error_codes import KB_ENTRY_INVALID
+        raise BizError(KB_ENTRY_INVALID, "没有参与检索的条目，无法发布")
+
+    # 快照指纹：按 entry_code 排序后对编码/正文做 SHA-256，可用于对比两次发布
+    digest = hashlib.sha256()
+    for entry in active_entries:
+        digest.update(entry.entry_code.encode("utf-8"))
+        digest.update(b"\x00")
+        digest.update(entry.content.encode("utf-8"))
+        digest.update(b"\x00")
+        entry.status = "1"
+
     publish = KbPublish(
         tenant_id=tenant_id,
         version_tag=tag,
-        entry_count=entry_count or 0,
+        entry_count=len(active_entries),
+        snapshot_hash=digest.hexdigest(),
         published_by=actor_id,
     )
     db.add(publish)
@@ -434,6 +457,7 @@ async def publish_kb(
         "publish_id": publish.id,
         "version_tag": tag,
         "entry_count": publish.entry_count,
+        "snapshot_hash": publish.snapshot_hash,
         "published_time": publish.published_time.isoformat() if publish.published_time else None,
     }
 
@@ -456,6 +480,7 @@ async def list_publishes(db: AsyncSession, *, tenant_id: str, page: int, size: i
                 "publish_id": p.id,
                 "version_tag": p.version_tag,
                 "entry_count": p.entry_count,
+                "snapshot_hash": p.snapshot_hash,
                 "published_by": p.published_by,
                 "published_time": p.published_time.isoformat() if p.published_time else None,
             }

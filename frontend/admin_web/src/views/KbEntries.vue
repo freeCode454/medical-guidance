@@ -250,6 +250,10 @@ onMounted(() => {
           <dl class="publish-meta">
             <div><dt>条目数</dt><dd>{{ latestPublish.entry_count }}</dd></div>
             <div><dt>发布时间</dt><dd>{{ fmtDateTime(latestPublish.published_time) }}</dd></div>
+            <div v-if="latestPublish.snapshot_hash">
+              <dt>快照指纹</dt>
+              <dd class="mono">{{ latestPublish.snapshot_hash.slice(0, 12) }}…</dd>
+            </div>
           </dl>
         </template>
         <template v-else>

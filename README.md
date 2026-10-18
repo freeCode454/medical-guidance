@@ -19,7 +19,7 @@
 
 | 项目 | 结果 | 位置 |
 |---|---|---|
-| 后端单元测试 | 62 passed | [`backend/tests/unit`](backend/tests/unit) |
+| 后端单元测试 | 69 passed | [`backend/tests/unit`](backend/tests/unit) |
 | 静态检查 | ruff 0 / mypy 0 | [CI](.github/workflows/ci.yml) |
 | 端到端冒烟 | 完整问诊 + 红旗拦截（需真实 PG/Milvus/LLM） | [`test_e2e_smoke.py`](backend/tests/test_e2e_smoke.py) |
 | 检查点恢复 | interrupt → 新连接 → resume（真实 PostgreSQL） | [`tests/integration`](backend/tests/integration) |
@@ -62,7 +62,7 @@
 4. **一致性**：会话消息序号用 PostgreSQL advisory lock 串行化；分诊/病历落库幂等；后台任务异常不再静默。
 5. **检查点持久化**：LangGraph 挂起态落 PostgreSQL（`AsyncPostgresSaver`），服务重启/多 worker 后患者回答仍能继续追问；
    Windows 用 `python -m app` 启动以避开 Proactor 事件循环限制。
-6. **质量门禁**：ruff + mypy + 62 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
+6. **质量门禁**：ruff + mypy + 69 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
    `pre-commit` 本地对齐。
 7. **隐私授权**：患者显式授权（scope / 有效期 / 撤回），医生调阅历史病历前强制校验；
    无授权返回空列表并写审计，不泄露"有无病历"。
@@ -186,7 +186,7 @@ cd frontend/admin_web  && npm install && npm run dev   # 5175
 ```bash
 make lint         # ruff
 make typecheck    # mypy（基线）
-make test-unit    # 62 个单测，不依赖外部服务
+make test-unit    # 69 个单测，不依赖外部服务
 make front-check  # 三端 typecheck + build
 make verify       # 以上一次跑完
 
@@ -203,7 +203,7 @@ CI 见 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端 lint/type
 - 设备密钥保存在 localStorage，存在 XSS 读取风险；高风险操作尚未二次校验；
 - 检查点已落 PostgreSQL，但使用单条连接（无池化/自动重连），且历史检查点尚未做 TTL 清理；
 - 接管/确认/修正已加条件更新与行锁，但还缺基于真实 PG 的并发回归测试；
-- 知识库发布/入库链路还没有真正的 worker 与向量库同步；
+- 知识库发布已有真实计数与快照，但入库任务仍无 worker，停用条目的检索侧过滤也还没做；
 - 医生端/管理后台首屏包体偏大（Element Plus 全量）。
 
 ## 文档

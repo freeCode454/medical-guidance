@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.common.crypto import encrypt_secret
 from app.common.enums import AuditActionType, AuditResult
 from app.common.error_codes import (
     CONFIG_NOT_FOUND,
@@ -390,7 +391,7 @@ async def create_model_provider(db: AsyncSession, *, tenant_id: str, actor_id: s
         provider_name=payload.get("provider_name"),
         base_url=payload["base_url"],
         model_name=payload.get("model_name"),
-        api_key_enc=payload.get("api_key_enc"),
+        api_key_enc=encrypt_secret(payload.get("api_key_enc")),
         is_on_prem="1" if payload.get("is_on_prem") else "0",
         timeout_seconds=payload.get("timeout_seconds", 60),
         extra_json=payload.get("extra_json"),
@@ -410,7 +411,10 @@ async def update_model_provider(db: AsyncSession, *, tenant_id: str, actor_id: s
         raise BizError(MODEL_PROVIDER_NOT_FOUND)
     for field in ("provider_name", "base_url", "model_name", "api_key_enc", "timeout_seconds", "extra_json"):
         if field in payload and payload[field] is not None:
-            setattr(p, field, payload[field])
+            value = payload[field]
+            if field == "api_key_enc":
+                value = encrypt_secret(value)
+            setattr(p, field, value)
     p.update_by = actor_id
     p.update_time = datetime.now(UTC)
     await db.commit()

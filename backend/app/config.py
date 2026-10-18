@@ -101,6 +101,9 @@ class Settings(BaseSettings):
     # 默认值长度须 >= 32 字节（HMAC-SHA256 推荐下限），否则 pyjwt 会告警
     jwt_secret: str = "dev-only-secret-change-me-0123456789abcdef"
     jwt_algorithm: str = "HS256"
+    # 模型服务 API Key 等敏感字段的加密口令；留空时从 jwt_secret 派生。
+    # 生产建议独立配置，便于与 JWT 密钥分别轮换。
+    field_encryption_key: str = ""
     # 三档有效期（秒）：院内用户访问令牌 / 刷新令牌 / 匿名患者令牌
     access_token_expires_seconds: int = 7200
     refresh_token_expires_seconds: int = 28800

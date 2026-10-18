@@ -49,6 +49,7 @@ dependencies = [
     # 安全
     "pyjwt>=2.10",
     "passlib[bcrypt]>=1.7",
+    "cryptography>=42",
 
     # 异步任务
     "celery>=5.4",
