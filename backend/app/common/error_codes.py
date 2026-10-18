@@ -117,6 +117,7 @@ USER_HAS_ACTIVE_SESSION = ErrorCode(50006, "该医生存在未完成接诊")
 CONFIG_NOT_FOUND = ErrorCode(50007, "配置项不存在")
 CONFIG_VALUE_INVALID = ErrorCode(50008, "配置项取值非法")
 MODEL_PROVIDER_NOT_FOUND = ErrorCode(50009, "模型配置不存在")
+MODEL_PROVIDER_CODE_EXISTS = ErrorCode(50010, "模型配置编码已存在")
 MODEL_DEFAULT_EXISTS = ErrorCode(50010, "该类型已有默认配置")
 TENANT_NOT_FOUND = ErrorCode(50011, "机构信息不存在")
 
@@ -203,6 +204,7 @@ __all__ = [
     "KB_VERSION_EXISTS",
     "LLM_UNAVAILABLE",
     "MODEL_DEFAULT_EXISTS",
+    "MODEL_PROVIDER_CODE_EXISTS",
     "MODEL_PROVIDER_NOT_FOUND",
     "NOT_FOUND",
     "OK",

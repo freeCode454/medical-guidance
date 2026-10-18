@@ -39,6 +39,9 @@ export const org = {
 // 模型配置
 export const providers = {
   list: () => http.get<{ total: number; items: any[] }>('/admin/model-providers'),
+  create: (b: any) => http.post('/admin/model-providers', b),
+  update: (id: string, b: any) => http.put(`/admin/model-providers/${id}`, b),
+  setDefault: (id: string) => http.post(`/admin/model-providers/${id}/default`, {}),
 }
 
 // 审计

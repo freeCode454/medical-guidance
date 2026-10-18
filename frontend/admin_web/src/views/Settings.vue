@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { org, providers } from '@/api/admin'
 
 const loading = ref(false)
@@ -8,6 +8,32 @@ const saving = ref(false)
 const orgInfo = ref<any>(null)
 const configs = ref<any[]>([])
 const providerList = ref<any[]>([])
+
+const providerDialog = ref(false)
+const providerSaving = ref(false)
+const editingProviderId = ref('')
+const providerFormRef = ref<FormInstance>()
+const providerForm = reactive({
+  provider_code: '',
+  provider_type: 'LLM',
+  provider_name: '',
+  base_url: '',
+  model_name: '',
+  api_key: '',
+  is_on_prem: false,
+})
+
+const providerTypes = [
+  { value: 'LLM', label: 'LLM 内容生成' },
+  { value: 'EMBEDDING', label: 'Embedding 向量化' },
+  { value: 'RERANK', label: 'Rerank 精排' },
+]
+
+const providerRules: FormRules = {
+  provider_code: [{ required: true, message: '请输入配置编码', trigger: 'blur' }],
+  provider_type: [{ required: true, message: '请选择类型', trigger: 'change' }],
+  base_url: [{ required: true, message: '请输入服务地址', trigger: 'blur' }],
+}
 
 async function load() {
   loading.value = true
@@ -45,6 +71,93 @@ async function onSaveOrg() {
     ElMessage.error((e as Error).message || '保存失败')
   } finally {
     saving.value = false
+  }
+}
+
+function resetProviderForm() {
+  editingProviderId.value = ''
+  Object.assign(providerForm, {
+    provider_code: '',
+    provider_type: 'LLM',
+    provider_name: '',
+    base_url: '',
+    model_name: '',
+    api_key: '',
+    is_on_prem: false,
+  })
+  providerFormRef.value?.clearValidate()
+}
+
+function openProviderCreate() {
+  resetProviderForm()
+  providerDialog.value = true
+}
+
+function openProviderEdit(row: any) {
+  editingProviderId.value = row.provider_id
+  Object.assign(providerForm, {
+    provider_code: row.provider_code,
+    provider_type: row.provider_type,
+    provider_name: row.provider_name || '',
+    base_url: row.base_url || '',
+    model_name: row.model_name || '',
+    api_key: '',
+    is_on_prem: !!row.is_on_prem,
+  })
+  providerDialog.value = true
+}
+
+async function saveProvider() {
+  if (!providerFormRef.value) return
+  const valid = await providerFormRef.value.validate().catch(() => false)
+  if (!valid) return
+  providerSaving.value = true
+  try {
+    if (editingProviderId.value) {
+      await providers.update(editingProviderId.value, {
+        provider_name: providerForm.provider_name,
+        base_url: providerForm.base_url,
+        model_name: providerForm.model_name,
+        ...(providerForm.api_key ? { api_key_enc: providerForm.api_key } : {}),
+      })
+      ElMessage.success('模型配置已更新')
+    } else {
+      await providers.create({
+        provider_code: providerForm.provider_code,
+        provider_type: providerForm.provider_type,
+        provider_name: providerForm.provider_name,
+        base_url: providerForm.base_url,
+        model_name: providerForm.model_name,
+        api_key_enc: providerForm.api_key || undefined,
+        is_on_prem: providerForm.is_on_prem,
+      })
+      ElMessage.success('模型配置已创建，密钥将加密存储')
+    }
+    providerDialog.value = false
+    await load()
+  } catch (e) {
+    ElMessage.error((e as Error).message || '保存失败')
+  } finally {
+    providerSaving.value = false
+  }
+}
+
+async function setDefaultProvider(row: any) {
+  try {
+    await ElMessageBox.confirm(
+      `将「${row.provider_name || row.provider_code}」设为 ${row.provider_type} 类型的默认服务？`,
+      '设为默认',
+      { confirmButtonText: '设为默认', cancelButtonText: '取消' },
+    )
+  } catch {
+    return
+  }
+  try {
+    await providers.setDefault(row.provider_id)
+    ElMessage.success('已设为该类型默认服务')
+    await load()
+  } catch (e) {
+    ElMessage.error((e as Error).message || '操作失败')
   }
 }
 
@@ -141,7 +254,10 @@ onMounted(load)
     <article class="panel provider-card">
       <div class="panel-head panel-head--pad">
         <p class="section-label">模型配置</p>
-        <span class="muted">LLM / Embedding / Rerank</span>
+        <div class="provider-head">
+          <span class="muted">LLM / Embedding / Rerank</span>
+          <el-button size="small" type="primary" @click="openProviderCreate">新增模型服务</el-button>
+        </div>
       </div>
       <el-table :data="providerList" size="small" class="config-table">
         <el-table-column prop="provider_name" label="名称" width="180">
@@ -171,15 +287,76 @@ onMounted(load)
             </span>
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="160" fixed="right">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="openProviderEdit(row)">编辑</el-button>
+            <el-button
+              v-if="!row.is_default"
+              link
+              type="success"
+              size="small"
+              @click="setDefaultProvider(row)"
+            >
+              设为默认
+            </el-button>
+          </template>
+        </el-table-column>
 
         <template #empty>
           <div class="empty-block">
             <p class="empty-block__title">还没有模型配置</p>
-            <p>通过管理接口添加 LLM / Embedding / Rerank 服务后展示在这里。</p>
+            <p>点击右上角「新增模型服务」添加 LLM / Embedding / Rerank。</p>
           </div>
         </template>
       </el-table>
     </article>
+
+    <el-dialog
+      v-model="providerDialog"
+      :title="editingProviderId ? '编辑模型服务' : '新增模型服务'"
+      width="560px"
+      destroy-on-close
+    >
+      <el-form ref="providerFormRef" :model="providerForm" :rules="providerRules" label-position="top">
+        <div class="form-grid">
+          <el-form-item label="配置编码" prop="provider_code">
+            <el-input v-model="providerForm.provider_code" :disabled="!!editingProviderId" placeholder="如 qwen-llm" />
+          </el-form-item>
+          <el-form-item label="类型" prop="provider_type">
+            <el-select v-model="providerForm.provider_type" :disabled="!!editingProviderId" style="width: 100%">
+              <el-option v-for="t in providerTypes" :key="t.value" :label="t.label" :value="t.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="名称">
+            <el-input v-model="providerForm.provider_name" placeholder="如 Qwen2.5-32B" />
+          </el-form-item>
+          <el-form-item label="模型">
+            <el-input v-model="providerForm.model_name" placeholder="如 Qwen/Qwen2.5-32B-Instruct" />
+          </el-form-item>
+        </div>
+        <el-form-item label="服务地址" prop="base_url">
+          <el-input v-model="providerForm.base_url" placeholder="https://api.example.com/v1" />
+        </el-form-item>
+        <el-form-item :label="editingProviderId ? 'API Key（留空不修改）' : 'API Key'">
+          <el-input
+            v-model="providerForm.api_key"
+            type="password"
+            show-password
+            autocomplete="new-password"
+            placeholder="仅提交时传输，服务端 Fernet 加密存储"
+          />
+        </el-form-item>
+        <el-form-item label="部署位置">
+          <el-switch v-model="providerForm.is_on_prem" active-text="院内" inactive-text="院外" :disabled="!!editingProviderId" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="providerDialog = false">取消</el-button>
+        <el-button type="primary" :loading="providerSaving" @click="saveProvider">
+          {{ editingProviderId ? '保存修改' : '创建配置' }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -263,6 +440,12 @@ onMounted(load)
   font-size: 11.5px;
   line-height: 1.7;
   color: var(--c-faint);
+}
+
+.provider-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .config-card,

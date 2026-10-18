@@ -15,6 +15,7 @@ from app.common.error_codes import (
     CONFIG_NOT_FOUND,
     DEPT_CODE_EXISTS,
     DEPT_NOT_FOUND,
+    MODEL_PROVIDER_CODE_EXISTS,
     MODEL_PROVIDER_NOT_FOUND,
     TENANT_NOT_FOUND,
     USER_ACCOUNT_EXISTS,
@@ -384,6 +385,14 @@ async def list_model_providers(db: AsyncSession, *, tenant_id: str) -> dict:
 
 
 async def create_model_provider(db: AsyncSession, *, tenant_id: str, actor_id: str, payload: dict) -> dict:
+    exists = await db.scalar(
+        select(ModelProvider).where(
+            ModelProvider.tenant_id == tenant_id,
+            ModelProvider.provider_code == payload["provider_code"],
+        )
+    )
+    if exists is not None:
+        raise BizError(MODEL_PROVIDER_CODE_EXISTS)
     p = ModelProvider(
         tenant_id=tenant_id,
         provider_code=payload["provider_code"],
