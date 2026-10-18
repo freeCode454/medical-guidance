@@ -19,7 +19,7 @@
 
 | 项目 | 结果 | 位置 |
 |---|---|---|
-| 后端单元测试 | 52 passed | [`backend/tests/unit`](backend/tests/unit) |
+| 后端单元测试 | 55 passed | [`backend/tests/unit`](backend/tests/unit) |
 | 静态检查 | ruff 0 / mypy 0 | [CI](.github/workflows/ci.yml) |
 | 端到端冒烟 | 完整问诊 + 红旗拦截（需真实 PG/Milvus/LLM） | [`test_e2e_smoke.py`](backend/tests/test_e2e_smoke.py) |
 | 典型主诉回归 | 8/8（含胸痛→心血管内科、胸口疼冒冷汗→急诊） | [工程质量报告](docs/05-工程质量报告.md) |
@@ -59,7 +59,7 @@
 3. **认证生命周期完整**：access/refresh 双令牌，refresh 真正可用且**轮换**（`jti`）；登录失败统一文案、
    账号锁定、bcrypt 放线程池；前端单飞刷新并重放失败请求。
 4. **一致性**：会话消息序号用 PostgreSQL advisory lock 串行化；分诊/病历落库幂等；后台任务异常不再静默。
-5. **质量门禁**：ruff + mypy + 52 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
+5. **质量门禁**：ruff + mypy + 55 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
    `pre-commit` 本地对齐。
 6. **诚实的数据视图**：分诊摘要、风险标记、SOAP 内容都落 JSONB 快照，接口返回真实生成内容，
    不再用写死占位符拼页面。
@@ -169,7 +169,7 @@ cd frontend/admin_web  && npm install && npm run dev   # 5175
 ```bash
 make lint         # ruff
 make typecheck    # mypy（基线）
-make test-unit    # 52 个单测，不依赖外部服务
+make test-unit    # 55 个单测，不依赖外部服务
 make front-check  # 三端 typecheck + build
 make verify       # 以上一次跑完
 ```
@@ -180,7 +180,7 @@ CI 见 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端 lint/type
 
 不藏着掖着，这些问题正在按优先级处理，明细见 [工程质量报告 §4](docs/05-工程质量报告.md#4-仍未解决按优先级)：
 
-- 匿名身份目前以 `device_id` 为 bearer 语义，尚未叠加不可猜测的设备密钥；
+- 匿名身份使用「高熵设备密钥 + 服务端只存指纹」，但密钥仍保存在 localStorage，存在 XSS 读取风险，高风险操作也未做二次校验；
 - 病历调阅尚未强制校验 `PatientConsent`；
 - LangGraph 检查点仍是 `InMemorySaver`，重启/多 worker 会丢挂起会话；
 - 接管/确认/修正已加条件更新与行锁，但还缺基于真实 PG 的并发回归测试；

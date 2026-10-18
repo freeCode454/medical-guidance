@@ -4,12 +4,23 @@ import { ref } from 'vue'
 import * as api from '@/api/patient'
 import { setToken } from '@/api/client'
 
+// 设备密钥：等价于匿名身份凭证，必须是高熵随机串（服务端只存指纹）。
+// 旧版本生成了可猜测的 dev_xxx，检测到长度不足时直接换成新的。
+const DEVICE_KEY_MIN_LENGTH = 32
+
 function genDeviceId(): string {
-  let id = localStorage.getItem('mg_device_id')
-  if (!id) {
-    id = 'dev_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
-    localStorage.setItem('mg_device_id', id)
+  const existing = localStorage.getItem('mg_device_id')
+  if (existing && existing.length >= DEVICE_KEY_MIN_LENGTH) return existing
+
+  const bytes = new Uint8Array(32)
+  if (globalThis.crypto?.getRandomValues) {
+    globalThis.crypto.getRandomValues(bytes)
+  } else {
+    // 极老浏览器兜底；现代浏览器都会走 getRandomValues
+    for (let i = 0; i < bytes.length; i += 1) bytes[i] = Math.floor(Math.random() * 256)
   }
+  const id = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+  localStorage.setItem('mg_device_id', id)
   return id
 }
 

@@ -13,6 +13,7 @@ JWT payload 约定
 """
 from __future__ import annotations
 
+import hashlib
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
@@ -43,6 +44,18 @@ def verify_password(password: str, hashed: str) -> bool:
         return bcrypt.checkpw(data, hashed.encode("utf-8"))
     except (ValueError, TypeError):
         return False
+
+
+# --- 匿名设备密钥 ------------------------------------------------------------
+
+
+def device_fingerprint(device_secret: str) -> str:
+    """设备密钥的单向指纹。
+
+    设备密钥等价于匿名身份的凭证，服务端**不得保存明文**（数据库泄露即身份泄露）。
+    客户端持有原始密钥，服务端只存 SHA-256 指纹用于查找。
+    """
+    return hashlib.sha256(device_secret.encode("utf-8")).hexdigest()
 
 
 # --- JWT -------------------------------------------------------------------

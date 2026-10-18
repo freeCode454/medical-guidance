@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.database import lock_message_sequence
@@ -21,6 +21,7 @@ from app.common.error_codes import (
     SESSION_TRIAGE_NOT_READY,
 )
 from app.common.exceptions import BizError
+from app.common.security import device_fingerprint
 from app.models import EmrRecord, Patient, Session, SessionMessage, TriageResult
 from app.schemas.session import (
     MessageSendResponse,
@@ -81,13 +82,17 @@ async def create_session(
     patient_id = payload["sub"]
     tenant_id = payload["tenant_id"]
 
-    # 同设备存在未完成会话则复用（幂等兜底）
+    # 同设备存在未完成会话则复用（幂等兜底）；设备密钥只存指纹，兼容旧的明文记录
     if req.device_id:
+        fingerprint = device_fingerprint(req.device_id)
         existing = await db.scalar(
             select(Session).where(
                 Session.tenant_id == tenant_id,
                 Session.patient_id == patient_id,
-                Session.device_id == req.device_id,
+                or_(
+                    Session.device_id == fingerprint,
+                    Session.device_id == req.device_id,
+                ),
                 Session.status.in_([SessionStatus.IN_PROGRESS.value]),
             )
         )
@@ -109,7 +114,7 @@ async def create_session(
         chief_complaint=req.chief_complaint,
         status=SessionStatus.IN_PROGRESS.value,
         inquiry_rounds=0,
-        device_id=req.device_id,
+        device_id=device_fingerprint(req.device_id) if req.device_id else None,
         started_time=now,
         expire_time=now + timedelta(hours=24),
     )

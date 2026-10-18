@@ -19,7 +19,12 @@ class SessionCreateRequest(BaseModel):
         default=None, max_length=500, description="主诉原文，不超过 500 字，为空时先建空会话"
     )
     input_type: Literal["TEXT", "VOICE", "BODY_MAP"] = Field(default="TEXT", description="输入方式")
-    device_id: str | None = Field(default=None, max_length=128, description="设备标识")
+    device_id: str | None = Field(
+        default=None,
+        min_length=32,
+        max_length=128,
+        description="设备密钥（与匿名会话创建时一致；服务端只保存指纹）",
+    )
     gender: Literal["男", "女"] | None = Field(
         default=None, description="性别（用于分诊规则的人群过滤，如妇科/产科仅女性）"
     )

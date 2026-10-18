@@ -43,7 +43,7 @@ class Session(Base, PKMixin, TenantMixin, AuditMixin):
     sufficiency_score: Mapped[Decimal | None] = mapped_column(
         Numeric(5, 4), comment="最后一次信息充分度评分"
     )
-    device_id: Mapped[str | None] = mapped_column(String(128), comment="设备标识，用于匿名会话恢复")
+    device_id: Mapped[str | None] = mapped_column(String(128), comment="设备密钥指纹，用于匿名会话恢复")
     started_time: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now(), comment="会话开始时间"
     )

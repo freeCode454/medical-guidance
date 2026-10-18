@@ -9,14 +9,15 @@
 """
 from __future__ import annotations
 
+import secrets
 import time
 
 import httpx
 import pytest
 
 BASE = "http://127.0.0.1:8000"
-# 唯一 device_id：避免命中「同设备未完成会话复用」逻辑，导致拿到旧会话
-DEVICE = f"e2e_{int(time.time())}"
+# 唯一设备密钥（高熵）：避免命中「同设备未完成会话复用」逻辑，导致拿到旧会话
+DEVICE = "e2e_" + secrets.token_hex(16)
 
 # 需要真实后端 + 数据库 + 向量库 + LLM；默认 CI 只跑 tests/unit
 pytestmark = pytest.mark.integration

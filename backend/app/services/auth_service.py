@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import secrets
 from datetime import UTC, datetime, timedelta
-from uuid import uuid4
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,10 +21,12 @@ from app.common.error_codes import (
     AUTH_ACCOUNT_LOCKED,
     AUTH_CREDENTIAL_INVALID,
     AUTH_ROLE_NOT_ALLOWED,
+    BAD_REQUEST,
 )
 from app.common.exceptions import BizError
 from app.common.security import (
     decode_token,
+    device_fingerprint,
     hash_password,
     issue_access_token,
     issue_patient_token,
@@ -147,37 +149,57 @@ def _device_hash(tenant_id: str, device_id: str) -> str:
     return hashlib.sha256(f"{tenant_id}:{device_id}".encode()).hexdigest()
 
 
+# 设备密钥最小长度：32 字符（约 128 bit 以上），低熵旧 ID 一律拒绝
+DEVICE_SECRET_MIN_LENGTH = 32
+
+
 async def create_patient_session(
     db: AsyncSession, device_id: str | None, client_type: str, channel: str
 ) -> PatientSessionCreateResponse:
-    """创建匿名患者会话：按 device_id 复用患者，签发患者令牌。"""
+    """创建匿名患者会话。
+
+    ``device_id`` 是客户端持有的**设备密钥**（不是可猜测的编号）：
+    - 服务端只保存 SHA-256 指纹（``patient_hash`` / ``device_id`` 两列），不存明文；
+    - 未提供时由服务端生成高熵密钥，客户端负责持久化；
+    - 低于 32 字符的旧格式/伪造格式直接拒绝，避免低熵凭证被枚举。
+    """
     tenant_id = settings.default_tenant_id
 
-    device = device_id or f"dev_{uuid4().hex[:20]}"
+    if device_id is not None:
+        device_id = device_id.strip()
+        if len(device_id) < DEVICE_SECRET_MIN_LENGTH:
+            raise BizError(BAD_REQUEST, "设备标识无效，请重新进入")
+    else:
+        device_id = secrets.token_hex(32)
 
-    patient = None
-    if device_id:
-        patient = await db.scalar(
-            select(Patient).where(
-                Patient.tenant_id == tenant_id, Patient.device_id == device_id
-            )
+    patient_hash = _device_hash(tenant_id, device_id)
+    fingerprint = device_fingerprint(device_id)
+
+    patient = await db.scalar(
+        select(Patient).where(
+            Patient.tenant_id == tenant_id,
+            Patient.patient_hash == patient_hash,
         )
+    )
 
     if patient is None:
         patient = Patient(
             tenant_id=tenant_id,
-            patient_hash=_device_hash(tenant_id, device),
-            device_id=device,
+            patient_hash=patient_hash,
+            device_id=fingerprint,
         )
         db.add(patient)
         await db.flush()
+    elif patient.device_id != fingerprint:
+        # 旧数据迁移：历史记录里的明文设备标识替换为指纹
+        patient.device_id = fingerprint
 
     await db.commit()
 
     return PatientSessionCreateResponse(
         access_token=issue_patient_token(patient.id, tenant_id),
         patient_id=patient.id,
-        device_id=device,
+        device_id=device_id,
         scope=["session:create", "session:read", "session:write"],
         need_verify_before=["APPOINTMENT", "EMR_ACCESS"],
     )

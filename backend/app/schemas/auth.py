@@ -16,7 +16,12 @@ from app.common.enums import UserRole
 class PatientSessionCreateRequest(BaseModel):
     """创建匿名会话的请求体。"""
 
-    device_id: str | None = Field(default=None, max_length=128, description="客户端设备标识")
+    device_id: str | None = Field(
+        default=None,
+        min_length=32,
+        max_length=128,
+        description="设备密钥（客户端生成的高熵随机串，等价于匿名身份凭证）",
+    )
     client_type: Literal["H5", "MINIPROGRAM", "APP"] = Field(default="H5", description="客户端类型")
     channel: Literal["WECHAT_MP", "GUIDE_MACHINE", "SMS_LINK", "DIRECT"] = Field(
         default="DIRECT", description="进入渠道"
@@ -30,7 +35,7 @@ class PatientSessionCreateResponse(BaseModel):
     token_type: str = Field(default="Bearer", description="令牌类型")
     expires_in: int = Field(default=1800, description="有效期（秒）")
     patient_id: str = Field(description="患者标识（32 位无连字符）")
-    device_id: str = Field(description="设备标识")
+    device_id: str = Field(description="设备密钥（客户端持久化；服务端只保存指纹）")
     scope: list[str] = Field(default_factory=list, description="匿名身份允许的操作范围")
     need_verify_before: list[str] = Field(default_factory=list, description="需实名验证才能执行的操作")
 

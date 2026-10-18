@@ -25,7 +25,7 @@ class Patient(Base, PKMixin, TenantMixin, AuditMixin):
     gender: Mapped[str | None] = mapped_column(String(1), comment="性别：1 男 / 2 女 / 0 未知")
     phone_masked: Mapped[str | None] = mapped_column(String(32), comment="手机号脱敏形式")
     phone_hash: Mapped[str | None] = mapped_column(String(64), comment="手机号哈希，不存明文")
-    device_id: Mapped[str | None] = mapped_column(String(128), comment="设备标识，用于匿名会话关联与恢复")
+    device_id: Mapped[str | None] = mapped_column(String(128), comment="设备密钥指纹（不存明文）")
     status: Mapped[str] = mapped_column(
         String(1), nullable=False, default="1", server_default="1", comment="状态：1 正常 / 0 停用"
     )
