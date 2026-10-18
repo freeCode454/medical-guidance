@@ -44,7 +44,10 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - ../data/postgres:/var/lib/postgresql/data
+      # 用 named volume 而非 bind mount：Windows 上 bind mount 的 9p/virtiofs
+      # 写语义会导致 WAL 尾部出现 0 字节填充（invalid record length），
+      # PG 反复进入崩溃恢复。named volume 落在 WSL 的 ext4 上，稳定。
+      - mg_pgdata:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medguide} -d ${POSTGRES_DB:-medguide}"]
@@ -158,3 +161,12 @@ services:
       echo '对象存储桶已就绪：${MINIO_BUCKET:-medguide}'
       "
     restart: "no"
+
+# ── 数据卷 ──────────────────────────────────────────────────────────────
+# PostgreSQL 数据放在 named volume 而非 bind mount：Windows 上 bind mount 的
+# 9p/virtiofs 写语义会让 WAL 尾部出现 0 字节填充（invalid record length），
+# 导致 PG 反复进入崩溃恢复。named volume 落在 WSL 的 ext4 上，稳定。
+volumes:
+  mg_pgdata:
+    name: mg_pgdata
+

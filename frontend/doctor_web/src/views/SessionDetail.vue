@@ -170,6 +170,21 @@ onMounted(load)
                     <div v-for="p in row.kg_paths" :key="p" class="kg-path">{{ p }}</div>
                     <p v-if="!row.kg_paths || !row.kg_paths.length" class="muted">该科室暂无图谱路径</p>
                   </div>
+
+                  <div v-if="row.guideline_refs && row.guideline_refs.length" class="gl-box">
+                    <p class="gl-title">指南推荐意见</p>
+                    <div v-for="(g, gi) in row.guideline_refs" :key="gi" class="gl-item">
+                      <div class="gl-head">
+                        <el-tag size="small" type="warning">{{ g.disease_name }}</el-tag>
+                        <el-tag size="small" effect="plain">证据 {{ g.evidence_level }}</el-tag>
+                        <el-tag size="small" :type="g.strength === '强' ? 'danger' : 'info'">{{ g.strength }}推荐</el-tag>
+                        <span v-if="g.population && g.population !== '通用'" class="gl-pop">{{ g.population }}</span>
+                      </div>
+                      <div class="gl-text">{{ g.recommendation }}</div>
+                      <div class="gl-src">{{ g.source }}</div>
+                    </div>
+                  </div>
+                  <p v-else class="muted">该科室暂无指南推荐</p>
                 </template>
               </el-table-column>
               <el-table-column prop="rank" label="#" width="50" />
@@ -339,6 +354,32 @@ h3 {
   border-left: 2px solid var(--c-accent);
   margin-bottom: 4px;
 }
+
+.gl-box {
+  margin-top: 10px;
+  padding: 8px 16px 10px 20px;
+  background: #fff8ec;
+  border-radius: 6px;
+}
+
+.gl-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #b25e00;
+  margin: 0 0 6px;
+}
+
+.gl-item {
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--c-line);
+}
+
+.gl-item:last-child { border-bottom: none; }
+
+.gl-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.gl-pop { font-size: 12px; color: var(--c-muted); }
+.gl-text { font-size: 13px; color: var(--c-ink); line-height: 1.6; }
+.gl-src { font-size: 12px; color: var(--c-muted); margin-top: 2px; }
 .mb { margin-bottom: 14px; }
 .mt { margin-top: 12px; }
 .mr8 { margin-right: 8px; }

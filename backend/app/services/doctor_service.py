@@ -28,6 +28,7 @@ from app.models import (
     AuditLog,
     Dept,
     EmrRecord,
+    KbEntry,
     MdtCouncil,
     Patient,
     Session,
@@ -317,6 +318,38 @@ async def get_emr(
     }
 
 
+async def _load_guidelines(
+    db: AsyncSession, tenant_id: str, dept_code: str, limit: int = 3
+) -> list[dict]:
+    """加载某科室的结构化指南推荐意见（GUIDELINE_REC）。"""
+    rows = (
+        await db.scalars(
+            select(KbEntry)
+            .where(
+                KbEntry.tenant_id == tenant_id,
+                KbEntry.kb_type == "GUIDELINE_REC",
+                KbEntry.dept_code == dept_code,
+                KbEntry.is_active == "1",
+            )
+            .limit(limit)
+        )
+    ).all()
+    refs = []
+    for r in rows:
+        j = r.content_json or {}
+        refs.append(
+            {
+                "disease_name": j.get("disease_name", ""),
+                "recommendation": j.get("recommendation", "") or r.content or "",
+                "evidence_level": j.get("evidence_level", ""),
+                "strength": j.get("recommendation_strength", ""),
+                "population": j.get("population", ""),
+                "source": j.get("guideline_source", ""),
+            }
+        )
+    return refs
+
+
 async def get_diagnosis(
     db: AsyncSession,
     *,
@@ -334,19 +367,21 @@ async def get_diagnosis(
     if triage is None:
         raise BizError(SESSION_TRIAGE_NOT_READY)
 
-    candidates = [
-        {
-            "rank": i + 1,
-            "dept_code": c.get("dept_code", ""),
-            "dept_name": c.get("dept_name", ""),
-            "confidence": float(c.get("confidence", 0)),
-            "hit_symptoms": [c.get("reason", "")] if c.get("reason") else [],
-            "guideline_refs": [],  # 依据不足须显式为空，不隐藏候选
-            "kg_paths": c.get("kg_paths", []),  # 知识图谱推理路径（症状→疾病→科室）
-            "kg_disease_hits": c.get("kg_disease_hits", 0),
-        }
-        for i, c in enumerate(triage.candidates_json or [])
-    ]
+    candidates = []
+    for i, c in enumerate(triage.candidates_json or []):
+        dept_code = c.get("dept_code", "")
+        candidates.append(
+            {
+                "rank": i + 1,
+                "dept_code": dept_code,
+                "dept_name": c.get("dept_name", ""),
+                "confidence": float(c.get("confidence", 0)),
+                "hit_symptoms": [c.get("reason", "")] if c.get("reason") else [],
+                "guideline_refs": await _load_guidelines(db, tenant_id, dept_code),
+                "kg_paths": c.get("kg_paths", []),
+                "kg_disease_hits": c.get("kg_disease_hits", 0),
+            }
+        )
 
     mdt_data = None
     if include_mdt:
