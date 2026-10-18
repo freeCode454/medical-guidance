@@ -22,6 +22,7 @@
 | 后端单元测试 | 62 passed | [`backend/tests/unit`](backend/tests/unit) |
 | 静态检查 | ruff 0 / mypy 0 | [CI](.github/workflows/ci.yml) |
 | 端到端冒烟 | 完整问诊 + 红旗拦截（需真实 PG/Milvus/LLM） | [`test_e2e_smoke.py`](backend/tests/test_e2e_smoke.py) |
+| 检查点恢复 | interrupt → 新连接 → resume（真实 PostgreSQL） | [`tests/integration`](backend/tests/integration) |
 | 典型主诉回归 | 8/8（含胸痛→心血管内科、胸口疼冒冷汗→急诊） | [工程质量报告](docs/05-工程质量报告.md) |
 | 三端构建 | typecheck + build 全过 | [CI](.github/workflows/ci.yml) |
 
