@@ -23,14 +23,14 @@ from __future__ import annotations
 
 import ipaddress
 import logging
-from enum import Enum
-from typing import Callable
+from collections.abc import Callable
+from enum import StrEnum
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
 
-class EgressPolicy(str, Enum):
+class EgressPolicy(StrEnum):
     """出域策略。
 
     注意取值是**策略名**而非环境名——避免出现「看环境自动放宽」的隐式分支
@@ -46,7 +46,7 @@ class EgressPolicy(str, Enum):
     DEV_SANDBOX = "dev_sandbox"  # 仅开发形态；放行需满足四项约束
 
 
-class DataResidencyViolation(RuntimeError):
+class DataResidencyViolation(RuntimeError):  # noqa: N818 - 领域内固定术语，保持既有命名
     """违反数据驻留策略。
 
     调用方**不得**捕获后继续执行——按数据安全要求，这类调用必须直接失败。
@@ -119,7 +119,9 @@ def is_private_host(host_or_url: str) -> bool:
 
 def is_synthetic_patient_id(patient_hash: str | None) -> bool:
     """合成病例判定：开发形态下唯一被允许出域的患者数据类型。"""
-    return bool(patient_hash) and patient_hash.startswith(SYNTHETIC_PATIENT_PREFIX)
+    if not patient_hash:
+        return False
+    return patient_hash.startswith(SYNTHETIC_PATIENT_PREFIX)
 
 
 class EgressGuard:

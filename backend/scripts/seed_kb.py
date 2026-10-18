@@ -56,7 +56,7 @@ async def main() -> None:
     embeddings = await embedder.embed(texts)
 
     rows = []
-    for (code, name, symptoms), emb in zip(DEPTS, embeddings):
+    for (code, name, symptoms), emb in zip(DEPTS, embeddings, strict=False):
         rows.append(
             {
                 "id": f"dept_{code}",

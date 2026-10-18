@@ -68,9 +68,10 @@ export interface Diagnosis {
 }
 
 export function login(account: string, password: string) {
-  return http.post<{ access_token: string; user: DoctorInfo }>('/auth/staff/login', {
-    account, password, client_type: 'WEB',
-  })
+  return http.post<{ access_token: string; refresh_token: string; user: DoctorInfo }>(
+    '/auth/staff/login',
+    { account, password, client_type: 'WEB' },
+  )
 }
 
 export function listEncounters(params: Record<string, any> = {}) {

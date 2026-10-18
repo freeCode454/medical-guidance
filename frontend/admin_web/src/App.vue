@@ -1,19 +1,32 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { getTokenRole } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 
-const menus = [
-  { path: '/users', label: '用户管理' },
-  { path: '/depts', label: '科室管理' },
-  { path: '/kb', label: '知识库' },
-  { path: '/kg', label: '知识图谱' },
-  { path: '/audit', label: '审计日志' },
-  { path: '/settings', label: '系统设置' },
+interface MenuItem {
+  path: string
+  label: string
+  roles: string[]
+}
+
+const allMenus: MenuItem[] = [
+  { path: '/users', label: '用户管理', roles: ['ORG_ADMIN'] },
+  { path: '/depts', label: '科室管理', roles: ['ORG_ADMIN'] },
+  { path: '/kb', label: '知识库', roles: ['ORG_ADMIN', 'KB_ADMIN'] },
+  { path: '/kg', label: '知识图谱', roles: ['ORG_ADMIN', 'KB_ADMIN'] },
+  { path: '/audit', label: '审计日志', roles: ['ORG_ADMIN', 'KB_ADMIN'] },
+  { path: '/settings', label: '系统设置', roles: ['ORG_ADMIN'] },
 ]
+
+const role = computed(() => auth.user?.role ?? getTokenRole())
+const menus = computed(() =>
+  allMenus.filter((item) => !role.value || item.roles.includes(role.value)),
+)
 
 function logout() {
   auth.logout()

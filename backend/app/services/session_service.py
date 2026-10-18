@@ -5,13 +5,14 @@ WebSocket 推送。分诊结果接口在结论未生成时返回 20006。
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.common.enums import MessageRole, MessageType, SessionStatus
+from app.common.database import lock_message_sequence
+from app.common.enums import MessageRole, MessageType, SessionStatus, TriageRoute
 from app.common.error_codes import (
     NOT_FOUND,
     SESSION_ALREADY_CLOSED,
@@ -26,7 +27,12 @@ from app.schemas.session import (
     SessionCreateRequest,
     SessionCreateResponse,
 )
-from app.schemas.triage import TriageResultResponse
+from app.schemas.triage import (
+    EmergencyGuidance,
+    RecommendedDept,
+    SymptomSummary,
+    TriageResultResponse,
+)
 
 
 def _gen_session_no() -> str:
@@ -94,7 +100,7 @@ async def create_session(
                 ws_url=f"/api/v1/ws/sessions/{existing.id}",
             )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     session = Session(
         tenant_id=tenant_id,
         patient_id=patient_id,
@@ -166,7 +172,8 @@ async def send_message(
     if not content:
         raise BizError(SESSION_MESSAGE_EMPTY)
 
-    # 会话内序号 = 当前最大 + 1
+    # 会话内序号 = 当前最大 + 1；先加事务级会话锁，避免并发消息撞唯一键
+    await lock_message_sequence(db, session_id)
     current_max = await db.scalar(
         select(func.max(SessionMessage.seq_no)).where(
             SessionMessage.session_id == session_id,
@@ -201,7 +208,7 @@ async def get_triage_result(
     patient_id = payload["sub"]
     tenant_id = payload["tenant_id"]
 
-    await _get_owned_session(db, session_id, patient_id, tenant_id)
+    session = await _get_owned_session(db, session_id, patient_id, tenant_id)
 
     result = await db.scalar(
         select(TriageResult).where(
@@ -213,8 +220,6 @@ async def get_triage_result(
         raise BizError(SESSION_TRIAGE_NOT_READY)
 
     # 从 JSONB 快照还原候选科室（患者视图：只含科室，不含疾病名）
-    from app.schemas.triage import EmergencyGuidance, RecommendedDept, SymptomSummary
-
     candidates = result.candidates_json or []
     recommended = [
         RecommendedDept(
@@ -226,14 +231,37 @@ async def get_triage_result(
         for i, c in enumerate(candidates)
     ]
 
+    # 症状摘要来自落库时的 state 快照，进程重启后仍可还原
+    evidence = result.evidence_json or {}
+    raw_summary = evidence.get("symptom_summary") or {}
+    summary = SymptomSummary(
+        chief_complaint=raw_summary.get("chief_complaint") or session.chief_complaint,
+        duration=raw_summary.get("duration"),
+        location=raw_summary.get("location"),
+        nature=raw_summary.get("nature"),
+        accompanying=raw_summary.get("accompanying"),
+        past_history=raw_summary.get("past_history"),
+        allergy=raw_summary.get("allergy"),
+    )
+
+    emergency = None
+    if result.route == TriageRoute.EMERGENCY.value:
+        emergency = EmergencyGuidance(
+            triggered=True,
+            reason=evidence.get("risk_reason") or "症状命中急危重症预警规则",
+            advice="请立即前往就近医院急诊科就诊，或拨打 120 急救电话。",
+            emergency_phone="120",
+            recommended_dept="急诊科",
+        )
+
     return TriageResultResponse(
         triage_result_id=result.id,
-        route=result.route,
+        route=TriageRoute(result.route),
         confidence=float(result.confidence or 0),
         recommended_depts=recommended,
-        symptom_summary=SymptomSummary(),
-        inquiry_rounds=0,
-        emergency_guidance=None,
+        symptom_summary=summary,
+        inquiry_rounds=session.inquiry_rounds,
+        emergency_guidance=emergency,
         disclaimer="本系统仅提供分诊建议，不构成医学诊断。请以医生面诊为准。",
         generated_time=result.create_time,
     )
@@ -296,7 +324,10 @@ async def get_session_detail(db: AsyncSession, session_id: str, payload: dict) -
     session = await _get_owned_session(db, session_id, patient_id, tenant_id)
 
     triage = await db.scalar(
-        select(TriageResult).where(TriageResult.session_id == session_id)
+        select(TriageResult).where(
+            TriageResult.session_id == session_id,
+            TriageResult.tenant_id == tenant_id,
+        )
     )
     return {
         "session_id": session.id,
@@ -315,40 +346,60 @@ async def get_emr(db: AsyncSession, session_id: str, payload: dict) -> dict:
     """查询预问诊病历（患者视图）。A 段恒为 null（R01），不含疾病名与用药建议。"""
     patient_id = payload["sub"]
     tenant_id = payload["tenant_id"]
-    await _get_owned_session(db, session_id, patient_id, tenant_id)
+    session = await _get_owned_session(db, session_id, patient_id, tenant_id)
 
     emr = await db.scalar(
-        select(EmrRecord).where(EmrRecord.session_id == session_id)
+        select(EmrRecord).where(
+            EmrRecord.session_id == session_id,
+            EmrRecord.tenant_id == tenant_id,
+        )
     )
     if emr is None:
         raise BizError(SESSION_TRIAGE_NOT_READY)
 
     triage = await db.scalar(
-        select(TriageResult).where(TriageResult.session_id == session_id)
+        select(TriageResult).where(
+            TriageResult.session_id == session_id,
+            TriageResult.tenant_id == tenant_id,
+        )
     )
     dept_names = [
-        c.get("dept_name", "") for c in (triage.candidates_json or []) if c.get("dept_name")
+        c.get("dept_name", "")
+        for c in ((triage.candidates_json if triage else []) or [])
+        if c.get("dept_name")
     ]
+
+    # 结构化实体在生成时随 soap_json 一起保存，这里只读取，不臆造
+    soap = emr.soap_json or {}
+    entities = soap.get("entities") or {}
+
+    def _as_list(value: object) -> list[str]:
+        if isinstance(value, list):
+            return [str(item) for item in value if item]
+        if isinstance(value, str) and value:
+            return [value]
+        return []
 
     return {
         "emr_record_id": emr.id,
         "schema_version": emr.schema_version,
         "generate_status": emr.generate_status,
         "subjective": {
-            "chief_complaint": emr.subjective or "",
-            "present_illness": "",
-            "past_history": [],
-            "allergy": [],
+            "chief_complaint": session.chief_complaint or "",
+            "present_illness": emr.subjective or "",
+            "past_history": _as_list(entities.get("past_history")),
+            "allergy": _as_list(entities.get("allergy")),
         },
         "objective": {
             "collected_vitals": [],
-            "note": "本次为线上预问诊，未采集体格检查数据",
+            "note": emr.objective
+            or "本次为线上预问诊，未采集体格检查数据",
         },
         "assessment": None,  # 患者视图恒为 null
         "plan": {
             "recommended_depts": dept_names,
             "suggested_workup": [],
-            "note": "以上为就诊建议，不构成诊断",
+            "note": emr.plan or "以上为就诊建议，不构成诊断",
         },
         "disclaimer": "本系统仅提供分诊建议，不构成医学诊断。请以医生面诊为准。",
         "generated_time": emr.create_time.isoformat() if emr.create_time else None,

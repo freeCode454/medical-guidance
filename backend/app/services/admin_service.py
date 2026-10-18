@@ -4,7 +4,7 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -91,7 +91,7 @@ async def list_users(
             "role_label": _ROLE_LABELS.get(u.role, u.role),
             "title": u.title,
             "dept_code": u.dept_code,
-            "dept_name": dept_names.get(u.dept_code),
+            "dept_name": dept_names.get(u.dept_code) if u.dept_code else None,
             "status": u.status,
             "last_login_time": u.last_login_time.isoformat() if u.last_login_time else None,
             "create_time": u.create_time.isoformat() if u.create_time else None,
@@ -170,7 +170,7 @@ async def update_user(
         if field in payload and payload[field] is not None:
             setattr(user, field, payload[field])
     user.update_by = actor_id
-    user.update_time = datetime.now(timezone.utc)
+    user.update_time = datetime.now(UTC)
     await _write_audit(
         db, tenant_id=tenant_id, actor_id=actor_id, actor_role=actor_role,
         action_type=AuditActionType.PERM_CHANGE.value, target_type="user", target_id=user.id,
@@ -189,7 +189,7 @@ async def toggle_user(
         raise BizError(USER_NOT_FOUND)
     user.status = "0" if user.status == "1" else "1"
     user.update_by = actor_id
-    user.update_time = datetime.now(timezone.utc)
+    user.update_time = datetime.now(UTC)
     await _write_audit(
         db, tenant_id=tenant_id, actor_id=actor_id, actor_role=actor_role,
         action_type=AuditActionType.PERM_CHANGE.value, target_type="user", target_id=user.id,
@@ -276,7 +276,7 @@ async def update_dept(db: AsyncSession, *, tenant_id: str, actor_id: str, actor_
         if field in payload and payload[field] is not None:
             setattr(dept, field, payload[field])
     dept.update_by = actor_id
-    dept.update_time = datetime.now(timezone.utc)
+    dept.update_time = datetime.now(UTC)
     await db.commit()
     return {"dept_id": dept_id}
 
@@ -289,7 +289,7 @@ async def toggle_dept(db: AsyncSession, *, tenant_id: str, actor_id: str, actor_
         raise BizError(DEPT_NOT_FOUND)
     dept.status = "0" if dept.status == "1" else "1"
     dept.update_by = actor_id
-    dept.update_time = datetime.now(timezone.utc)
+    dept.update_time = datetime.now(UTC)
     await db.commit()
     return {"dept_id": dept_id, "status": dept.status}
 
@@ -349,7 +349,7 @@ async def update_config(
         raise BizError(CONFIG_NOT_FOUND)
     config.config_value = config_value
     config.update_by = actor_id
-    config.update_time = datetime.now(timezone.utc)
+    config.update_time = datetime.now(UTC)
     await db.commit()
     return {"config_key": config_key, "config_type": config.config_type}
 
@@ -410,7 +410,7 @@ async def update_model_provider(db: AsyncSession, *, tenant_id: str, actor_id: s
         if field in payload and payload[field] is not None:
             setattr(p, field, payload[field])
     p.update_by = actor_id
-    p.update_time = datetime.now(timezone.utc)
+    p.update_time = datetime.now(UTC)
     await db.commit()
     return {"provider_id": provider_id}
 

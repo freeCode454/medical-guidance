@@ -13,8 +13,9 @@ JWT payload 约定
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
+from uuid import uuid4
 
 import bcrypt
 import jwt
@@ -22,7 +23,6 @@ import jwt
 from app.common.error_codes import AUTH_TOKEN_EXPIRED, AUTH_TOKEN_INVALID
 from app.common.exceptions import BizError
 from app.config import settings
-
 
 # --- 口令 ------------------------------------------------------------------
 
@@ -48,12 +48,15 @@ def verify_password(password: str, hashed: str) -> bool:
 # --- JWT -------------------------------------------------------------------
 
 def _issue(subject: str, token_type: str, expires_seconds: int, claims: dict[str, Any]) -> str:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     payload: dict[str, Any] = {
         "sub": subject,
         "type": token_type,
         "iat": now,
         "exp": now + timedelta(seconds=expires_seconds),
+        # jti 让每次签发都唯一：刷新令牌轮换才真正换了令牌，
+        # 也为后续「单令牌吊销 / token_version」留出锚点。
+        "jti": uuid4().hex,
     }
     payload.update(claims)
     return jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)

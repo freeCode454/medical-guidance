@@ -1,24 +1,28 @@
-"""最小可运行后端。
+"""应用入口：组装中间件、路由、生命周期与探针。
 
-当前只提供健康检查与自检接口，用于在开始业务开发前确认三件事：
+启动期只做「必须成功」的初始化（模型客户端、向量库、编排器）；
+依赖不可用时宁可起不来，也不要带病运行（与《02 架构》一致）。
 
-1. 配置是否正确加载（切换后端靠的就是配置）
-2. 云端 API 是否连通（开发期唯一可用的推理路径）
-3. 出域守卫是否生效（数据安全的代码级兜底）
-
-业务接口后续按需求文档 `F01` 起逐步补充。
+探针分两个：
+- ``/healthz`` 存活探针：只回答进程是否活着，不访问外部依赖
+- ``/readyz``  就绪探针：检查 PostgreSQL 与 Milvus，任一不可用返回 503
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.staticfiles import StaticFiles
 
+from app.api import ws as ws_router
+from app.api.v1 import api_v1_router
+from app.common.database import ping_database
 from app.common.egress_guard import (
     ABSOLUTE_PII_CAPABILITIES,
     PATIENT_PIPELINE_CAPABILITIES,
@@ -26,16 +30,15 @@ from app.common.egress_guard import (
     EgressGuard,
     is_private_host,
 )
-from app.common.llm_client import ModelClient
-from app.api import ws as ws_router
-from app.api.v1 import api_v1_router
 from app.common.exceptions import register_exception_handlers
+from app.common.llm_client import ModelClient
 from app.config import settings
+from app.middleware.request_context import RequestContextMiddleware
 from app.retrieval import MilvusStore
 from app.services.orchestration import init_orchestrator
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=getattr(logging, settings.log_level.upper(), logging.INFO),
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 logger = logging.getLogger("app")
@@ -70,6 +73,18 @@ async def lifespan(app: FastAPI):
 # 由下方自定义路由用本地静态资源接管
 app = FastAPI(title="MedicalGuidance", version="0.1.0", lifespan=lifespan, docs_url=None)
 
+# 中间件：请求上下文（trace/访问日志/安全头）+ CORS。
+# 后添加的在外层：CORS 包住请求上下文，异常响应也能拿到跨域头。
+app.add_middleware(RequestContextMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    expose_headers=["X-Trace-ID"],
+)
+
 # Swagger UI 静态资源本地托管：不依赖公网 CDN（内网/私有化部署同样可用）
 _STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static")
@@ -79,7 +94,7 @@ app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static")
 async def custom_swagger_ui_html():
     """用本地静态资源渲染 Swagger UI。"""
     return get_swagger_ui_html(
-        openapi_url=app.openapi_url,
+        openapi_url=app.openapi_url or "/openapi.json",
         title=app.title + " - Swagger UI",
         swagger_js_url="/static/swagger-ui/swagger-ui-bundle.js",
         swagger_css_url="/static/swagger-ui/swagger-ui.css",
@@ -99,12 +114,40 @@ def _require_debug() -> None:
 
 @app.get("/healthz")
 async def healthz() -> dict[str, str]:
-    """健康检查。不含任何敏感信息，可用于探针。"""
+    """存活探针。只回答进程是否活着，不访问任何外部依赖。"""
     return {
         "status": "ok",
         "deploy_mode": settings.deploy_mode,
         "egress_policy": settings.egress_policy.value,
     }
+
+
+@app.get("/readyz")
+async def readyz(response: Response) -> dict[str, object]:
+    """就绪探针。PostgreSQL 或 Milvus 不可用时返回 503，供网关摘流量。"""
+    checks: dict[str, str] = {}
+
+    async def _check_db() -> None:
+        await asyncio.wait_for(ping_database(), timeout=2.0)
+
+    async def _check_milvus() -> None:
+        store: MilvusStore | None = getattr(app.state, "milvus_store", None)
+        if store is None:
+            raise RuntimeError("向量库未初始化")
+        await asyncio.wait_for(asyncio.to_thread(store.ping), timeout=2.0)
+
+    results = await asyncio.gather(
+        _check_db(), _check_milvus(), return_exceptions=True
+    )
+    for name, result in zip(("postgres", "milvus"), results, strict=True):
+        checks[name] = (
+            "ok" if not isinstance(result, BaseException) else type(result).__name__
+        )
+
+    ok = all(value == "ok" for value in checks.values())
+    if not ok:
+        response.status_code = 503
+    return {"status": "ok" if ok else "degraded", "checks": checks}
 
 
 @app.get("/debug/config")
@@ -174,7 +217,7 @@ async def debug_llm() -> dict[str, object]:
         "chat": {"model": settings.small_llm_model, "reply": reply},
         "embedding": {
             "model": settings.embedding_model,
-            "dim": len(vectors[0]) if vectors else 0,
+            "dim": len(vectors[0].dense) if vectors else 0,
         },
     }
 

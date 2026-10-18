@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { kb, type KbEntry } from '@/api/kb'
 
 const loading = ref(false)
@@ -52,9 +52,19 @@ async function onCreate() {
 }
 
 async function onToggle(row: KbEntry) {
+  const action = row.is_active ? '停用' : '启用'
+  try {
+    await ElMessageBox.confirm(
+      `${action}后该条目将${row.is_active ? '不再' : ''}参与检索，确定继续？`,
+      `确认${action}`,
+      { type: 'warning', confirmButtonText: '确定' + action, cancelButtonText: '取消' },
+    )
+  } catch {
+    return
+  }
   try {
     await kb.toggle(row.entry_id)
-    ElMessage.success('已切换')
+    ElMessage.success(`已${action}`)
     load()
   } catch (e) {
     ElMessage.error((e as Error).message || '操作失败')
@@ -75,6 +85,15 @@ async function onTest() {
 }
 
 async function onPublish() {
+  try {
+    await ElMessageBox.confirm(
+      '发布会把当前启用的知识条目固化为新版本，并切换线上检索依据。确定发布？',
+      '发布知识库',
+      { type: 'warning', confirmButtonText: '确认发布', cancelButtonText: '取消' },
+    )
+  } catch {
+    return
+  }
   try {
     const d = await kb.publish()
     ElMessage.success('已发布版本 ' + d.version_tag)

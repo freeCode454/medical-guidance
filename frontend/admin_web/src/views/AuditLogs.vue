@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { audits, type AuditItem } from '@/api/admin'
+import { fmtDateTime } from '@/utils/format'
 
 const loading = ref(false)
 const items = ref<AuditItem[]>([])
@@ -55,7 +56,7 @@ onMounted(load)
         <template #default="{ row }">{{ JSON.stringify(row.detail) }}</template>
       </el-table-column>
       <el-table-column label="时间" width="170">
-        <template #default="{ row }">{{ row.action_time ? row.action_time.replace('T', ' ').slice(0, 19) : '' }}</template>
+        <template #default="{ row }">{{ fmtDateTime(row.action_time) }}</template>
       </el-table-column>
     </el-table>
 

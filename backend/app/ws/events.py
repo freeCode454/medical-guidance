@@ -5,8 +5,6 @@
 """
 from __future__ import annotations
 
-import time
-
 from app.ws.event_bus import event_bus
 
 # 节点标识常量（04 文档 11.3 节 node_start 的 node 取值）

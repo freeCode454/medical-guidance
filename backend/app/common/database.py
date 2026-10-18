@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import settings
@@ -34,3 +35,22 @@ async def get_db() -> AsyncIterator[AsyncSession]:
     """FastAPI 依赖：提供数据库会话，请求结束自动关闭。"""
     async with AsyncSessionFactory() as session:
         yield session
+
+
+async def ping_database() -> None:
+    """就绪探针：验证连接池能取到连接并执行最小查询。"""
+    async with engine.connect() as conn:
+        await conn.execute(text("SELECT 1"))
+
+
+async def lock_message_sequence(db: AsyncSession, session_id: str) -> None:
+    """对同一会话的消息序号分配加事务级锁（PostgreSQL advisory lock）。
+
+    ``seq_no = max + 1`` 在并发发送时会撞唯一键 ``uk_mg_msg_tenant_session_seq``，
+    并且 AI 追问与患者消息也会并发插入。锁在事务结束（commit/rollback）自动释放，
+    不额外占用连接。
+    """
+    await db.execute(
+        text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"),
+        {"key": f"mg:msg:{session_id}"},
+    )

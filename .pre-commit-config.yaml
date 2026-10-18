@@ -1,0 +1,23 @@
+# 本地提交前的最小门禁：与 CI 的 lint 步骤对齐。
+# 安装：pip install pre-commit && pre-commit install
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^backend/
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(kb/|docs/.*\.md$)
+      - id: end-of-file-fixer
+        exclude: ^(kb/|frontend/.*/package-lock\.json$)
+      - id: check-yaml
+      - id: check-json
+        exclude: ^frontend/.*/tsconfig.*\.json$
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=2048"]

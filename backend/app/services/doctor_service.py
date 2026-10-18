@@ -8,7 +8,7 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, time, timedelta, timezone
+from datetime import UTC, datetime, time, timedelta
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -123,8 +123,8 @@ async def list_encounters(
     if encounter_date:
         day = datetime.strptime(encounter_date, "%Y-%m-%d").date()
     else:
-        day = datetime.now(timezone.utc).date()
-    day_start = datetime.combine(day, time.min, tzinfo=timezone.utc)
+        day = datetime.now(UTC).date()
+    day_start = datetime.combine(day, time.min, tzinfo=UTC)
     day_end = day_start + timedelta(days=1)
 
     conds = [
@@ -161,7 +161,11 @@ async def list_encounters(
             "session_id": s.id,
             "session_no": s.session_no,
             "patient_display": _patient_display(patients.get(s.patient_id)),
-            "patient_hash": patients.get(s.patient_id).patient_hash if patients.get(s.patient_id) else None,
+            "patient_hash": (
+                patients[s.patient_id].patient_hash
+                if s.patient_id in patients
+                else None
+            ),
             "chief_complaint": s.chief_complaint,
             "status": s.status,
             "risk_flag": s.risk_flag == "1",
@@ -263,16 +267,22 @@ async def get_emr(
     db: AsyncSession, *, session_id: str, doctor_id: str, tenant_id: str
 ) -> dict:
     """SOAP 病历（医生视图，保留评估段与鉴别方向）。"""
-    await _get_doctor_session(db, session_id, doctor_id, tenant_id)
+    session = await _get_doctor_session(db, session_id, doctor_id, tenant_id)
 
     emr = await db.scalar(
-        select(EmrRecord).where(EmrRecord.session_id == session_id)
+        select(EmrRecord).where(
+            EmrRecord.session_id == session_id,
+            EmrRecord.tenant_id == tenant_id,
+        )
     )
     if emr is None:
         raise BizError(SESSION_TRIAGE_NOT_READY)
 
     triage = await db.scalar(
-        select(TriageResult).where(TriageResult.session_id == session_id)
+        select(TriageResult).where(
+            TriageResult.session_id == session_id,
+            TriageResult.tenant_id == tenant_id,
+        )
     )
     differential = []
     if triage and triage.candidates_json:
@@ -285,24 +295,34 @@ async def get_emr(
                 }
             )
 
+    soap = emr.soap_json or {}
+    entities = soap.get("entities") or {}
+
+    def _as_list(value: object) -> list[str]:
+        if isinstance(value, list):
+            return [str(item) for item in value if item]
+        if isinstance(value, str) and value:
+            return [value]
+        return []
+
     return {
         "emr_record_id": emr.id,
         "schema_version": emr.schema_version,
         "generate_status": emr.generate_status,
         "completeness_rate": float(emr.completeness_rate or 0),
         "subjective": {
-            "chief_complaint": emr.subjective or "",
-            "present_illness": "",
-            "past_history": [],
-            "allergy": [],
+            "chief_complaint": session.chief_complaint or "",
+            "present_illness": emr.subjective or "",
+            "past_history": _as_list(entities.get("past_history")),
+            "allergy": _as_list(entities.get("allergy")),
         },
         "objective": {
             "collected_vitals": [],
-            "note": "本次为线上预问诊，未采集体格检查数据",
+            "note": emr.objective or "本次为线上预问诊，未采集体格检查数据",
         },
         "assessment": {
             "differential_directions": differential,
-            "note": "以上为鉴别方向参考，不构成诊断",
+            "note": emr.assessment or "以上为鉴别方向参考，不构成诊断",
         },
         "plan": {
             "recommended_depts": (
@@ -311,7 +331,7 @@ async def get_emr(
                 else []
             ),
             "suggested_workup": [],
-            "note": "以上为就诊建议，不构成诊断",
+            "note": emr.plan or "以上为就诊建议，不构成诊断",
         },
         "disclaimer": "本系统仅提供分诊建议，不构成医学诊断。请以医生面诊为准。",
         "generated_time": emr.create_time.isoformat() if emr.create_time else None,
@@ -464,7 +484,7 @@ async def confirm_triage(
         }
 
     triage.doctor_confirmed = "1"
-    triage.confirmed_time = datetime.now(timezone.utc)
+    triage.confirmed_time = datetime.now(UTC)
 
     await _write_audit(
         db,

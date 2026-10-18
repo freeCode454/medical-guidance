@@ -15,6 +15,7 @@ from app.schemas.auth import (
     PatientSessionCreateResponse,
     StaffLoginRequest,
     StaffLoginResponse,
+    StaffRefreshRequest,
 )
 from app.schemas.common import ApiResponse
 from app.services import auth_service
@@ -42,3 +43,12 @@ async def staff_login(
     """院内用户（医生/管理员）账号口令登录。"""
     data = await auth_service.staff_login(db, req.account, req.password, req.client_type)
     return ApiResponse(data=data, message="登录成功")
+
+
+@router.post("/staff/refresh", response_model=ApiResponse[StaffLoginResponse])
+async def staff_refresh(
+    req: StaffRefreshRequest, db: DbSession
+) -> ApiResponse[StaffLoginResponse]:
+    """用刷新令牌续期（令牌轮换：同时返回新的 access / refresh）。"""
+    data = await auth_service.refresh_staff_session(db, req.refresh_token)
+    return ApiResponse(data=data, message="续期成功")

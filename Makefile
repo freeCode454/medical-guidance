@@ -5,13 +5,14 @@
 # 确认余量后再逐个加 Redis 与 MinIO。每个目标都可以单独执行，出问题好回退。
 #
 # ── 环境变量 ────────────────────────────────────────────────────────────
-# PY      后端解释器（默认用 backend/.venv，Windows 路径）
-# COMPOSE compose 文件路径
+# PY       后端解释器（默认当前环境的 python；conda activate medguide 后直接 make）
+# COMPOSE  compose 文件路径
+#
+# 本项目后端依赖以 backend/pyproject.toml 为唯一来源（requirements.txt 已移除）。
 
 SHELL   := /bin/bash
 COMPOSE := docker compose -f deploy/docker-compose.infra.yml
-PY      ?= backend/.venv/Scripts/python.exe
-PIP     := backend/.venv/Scripts/pip.exe
+PY      ?= python
 PG      := docker exec -i mg-postgres psql -U medguide -d medguide
 
 .DEFAULT_GOAL := help
@@ -50,7 +51,6 @@ db-verify:  ## 核对 init.sql 的建表结果（表 / 索引 / 触发器 / 种�
 	@$(PG) -c "SELECT count(*) AS 表数量 FROM information_schema.tables WHERE table_schema='public' AND table_name LIKE 'mg\_%';"
 	@$(PG) -c "SELECT count(*) AS 索引数量 FROM pg_indexes WHERE schemaname='public' AND tablename LIKE 'mg\_%';"
 	@$(PG) -c "SELECT count(*) AS 触发器数量 FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid WHERE NOT t.tgisinternal AND c.relname LIKE 'mg\_%';"
-	@$(PG) -c "SELECT count(*) AS 审计拦截函数 FROM pg_proc WHERE proname='fn_mg_audit_log_immutable';"
 	@$(PG) -c "SELECT tenant_code, tenant_name FROM mg_tenant;"
 	@$(PG) -c "SELECT account, role FROM mg_user ORDER BY account;"
 
@@ -64,60 +64,66 @@ db-reset:  ## ⚠️ 删除数据卷并重建（会丢失所有数据）
 	$(MAKE) db-up
 
 # ══ 应用 ═══════════════════════════════════════════════════════════════
-venv:  ## 创建后端虚拟环境
-	python -m venv backend/.venv
-	$(PIP) install -U pip
-	@echo "虚拟环境已创建：backend/.venv"
-
-install:  ## 安装后端依赖
-	$(PIP) install -r backend/requirements.txt
+install:  ## 安装后端依赖（pyproject 为唯一来源）
+	cd backend && $(PY) -m pip install -e ".[dev]"
 
 dev:  ## 启动后端（热重载）
-	cd backend && ../$(PY) -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+	cd backend && $(PY) -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-check:  ## 开发第一天必跑：环境自检
+check:  ## 环境自检（需 DEBUG_ENDPOINTS=true）
 	@echo "── 配置 ──"
-	@curl -s http://localhost:8000/debug/config | python -m json.tool || echo "后端未启动"
+	@curl -s http://localhost:8000/debug/config | $(PY) -m json.tool || echo "后端未启动"
 	@echo "── 云端 API 连通性 ──"
-	@curl -s http://localhost:8000/debug/llm | python -m json.tool || echo "后端未启动"
+	@curl -s http://localhost:8000/debug/llm | $(PY) -m json.tool || echo "后端未启动"
 	@echo "── 出域守卫判定 ──"
-	@curl -s http://localhost:8000/debug/egress | python -m json.tool || echo "后端未启动"
+	@curl -s http://localhost:8000/debug/egress | $(PY) -m json.tool || echo "后端未启动"
 
-probe-vector:  ## 探测向量库能力边界（Milvus Lite）
-	cd backend && ../$(PY) scripts/probe_milvus_lite.py
+ready:  ## 检查依赖是否就绪（PostgreSQL + Milvus）
+	@curl -s http://localhost:8000/readyz | $(PY) -m json.tool || echo "后端未启动"
 
 # ══ 知识库 ═════════════════════════════════════════════════════════════
-kb-validate:  ## 校验知识库源文件的 schema 与引用完整性
-	cd backend && ../$(PY) -m app.jobs.kb_validate
+kb-gen:  ## 生成知识库源数据 Excel（kb/医学知识库源数据.xlsx）
+	cd backend && $(PY) scripts/gen_kb_excel.py
 
-kb-ingest:  ## 全量入库（长任务）
-	cd backend && ../$(PY) -m app.jobs.kb_ingest
+kb-import:  ## Excel → PostgreSQL + Milvus + kb/rules.json
+	cd backend && $(PY) scripts/import_kb.py
 
-kb-verify:  ## 黄金查询集回归验证
-	cd backend && ../$(PY) -m app.jobs.kb_verify
+kg-build:  ## 从 Excel 抽三元组构建 Neo4j 知识图谱（需 Neo4j 运行）
+	cd backend && $(PY) scripts/build_kg.py
 
-# ══ 质量 ═══════════════════════════════════════════════════════════════
-lint:  ## 静态检查
-	cd backend && ../.venv/Scripts/ruff.exe check app scripts
-
-fmt:  ## 格式化
-	cd backend && ../.venv/Scripts/ruff.exe format app scripts
-
-typecheck:  ## 类型检查
-	cd backend && ../.venv/Scripts/mypy.exe app
-
-test:  ## 运行测试
-	cd backend && ../.venv/Scripts/pytest.exe -q
-
-kb-validate:  ## 校验知识库源数据（Excel 各 sheet 条数/字段）
-	cd backend && python scripts/gen_kb_excel.py
-
-kg-build:  ## 构建知识图谱（需 Neo4j 运行）
-	cd backend && python scripts/build_kg.py
+kg-dept-network:  ## 图谱科室视角自检（示例：心血管内科）
+	@curl -s "http://localhost:8000/api/v1/kg/dept-network?dept_code=CAR&limit=5" | $(PY) -m json.tool || echo "后端未启动"
 
 neo4j:  ## 启动 Neo4j（绕过 Windows PowerShell 5.1 下有兼容 bug 的 neo4j.bat）
 	cd /d/neo4jcommunity2026 && java -cp "lib/*;plugins/*" org.neo4j.server.startup.Neo4jCommand console
 
+# ══ 质量 ═══════════════════════════════════════════════════════════════
+lint:  ## 静态检查（后端 ruff）
+	cd backend && $(PY) -m ruff check app tests scripts
+
+fmt:  ## 格式化（后端 ruff format）
+	cd backend && $(PY) -m ruff format app tests scripts
+
+typecheck:  ## 后端类型检查（当前为报告模式，逐步收敛）
+	cd backend && $(PY) -m mypy app
+
+test-unit:  ## 后端单元测试（不依赖数据库/模型/向量库）
+	cd backend && $(PY) -m pytest tests/unit -q
+
+test-e2e:  ## 端到端冒烟（需后端 + PostgreSQL + Milvus + LLM）
+	cd backend && $(PY) -m pytest tests/test_e2e_smoke.py -q
+
+front-check:  ## 三端前端类型检查 + 构建
+	cd frontend/patient_h5 && npm run typecheck && npm run build
+	cd frontend/doctor_web && npm run typecheck && npm run build
+	cd frontend/admin_web && npm run typecheck && npm run build
+
+verify:  ## 提交前一次跑完：lint + 单测 + 三端构建
+	$(MAKE) lint
+	$(MAKE) test-unit
+	$(MAKE) front-check
+
 .PHONY: help db-up vector-up cache-up storage-up infra-down infra-logs \
-        db-verify db-tables db-reset venv install dev check probe-vector \
-        kb-validate kb-ingest kb-verify kg-build neo4j lint fmt typecheck test
+        db-verify db-tables db-reset install dev check ready \
+        kb-gen kb-import kg-build kg-dept-network neo4j \
+        lint fmt typecheck test-unit test-e2e front-check verify

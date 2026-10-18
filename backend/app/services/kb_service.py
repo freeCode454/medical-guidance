@@ -4,7 +4,7 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from sqlalchemy import func, or_, select
@@ -16,7 +16,6 @@ from app.common.error_codes import (
     KB_ENTRY_INVALID,
     KB_ENTRY_NOT_FOUND,
     KB_ENTRY_REF_MISSING,
-    KB_GOLDEN_NOT_FOUND,
     KB_SEARCH_EMPTY,
 )
 from app.common.exceptions import BizError
@@ -229,7 +228,7 @@ async def update_entry(
         return {"entry_id": entry_id, "changed_fields": [], "message": "无变更"}
 
     entry.update_by = actor_id
-    entry.update_time = datetime.now(timezone.utc)
+    entry.update_time = datetime.now(UTC)
 
     history = KbEntryHistory(
         tenant_id=tenant_id,
@@ -263,7 +262,7 @@ async def toggle_entry(
     # 启停：is_active 翻转（0 ↔ 1）
     entry.is_active = "0" if entry.is_active == "1" else "1"
     entry.update_by = actor_id
-    entry.update_time = datetime.now(timezone.utc)
+    entry.update_time = datetime.now(UTC)
 
     history = KbEntryHistory(
         tenant_id=tenant_id,
@@ -410,7 +409,7 @@ async def publish_kb(
     db: AsyncSession, *, tenant_id: str, actor_id: str, version_tag: str | None
 ) -> dict:
     """发布知识库：生成版本快照记录（实际向量化入库由 ingest 任务承担）。"""
-    tag = version_tag or f"kb-v{datetime.now(timezone.utc):%Y.%m.%d.%H%M%S}"
+    tag = version_tag or f"kb-v{datetime.now(UTC):%Y.%m.%d.%H%M%S}"
     exists = await db.scalar(
         select(KbPublish).where(KbPublish.tenant_id == tenant_id, KbPublish.version_tag == tag)
     )
@@ -467,7 +466,7 @@ async def list_publishes(db: AsyncSession, *, tenant_id: str, page: int, size: i
 
 async def trigger_ingest(db: AsyncSession, *, tenant_id: str, actor_id: str) -> dict:
     """触发知识库入库：创建异步任务记录（实际向量化入库后续接入 Celery）。"""
-    task_no = f"ING{datetime.now(timezone.utc):%Y%m%d%H%M%S}{uuid4().hex[:4]}"
+    task_no = f"ING{datetime.now(UTC):%Y%m%d%H%M%S}{uuid4().hex[:4]}"
     total = await db.scalar(
         select(func.count()).select_from(KbEntry).where(
             KbEntry.tenant_id == tenant_id, KbEntry.is_active == "1"

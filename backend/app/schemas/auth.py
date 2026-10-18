@@ -46,6 +46,12 @@ class StaffLoginRequest(BaseModel):
     client_type: Literal["WEB", "ADMIN_WEB"] = Field(default="WEB", description="客户端类型")
 
 
+class StaffRefreshRequest(BaseModel):
+    """刷新访问令牌请求体。"""
+
+    refresh_token: str = Field(min_length=20, max_length=1024, description="登录时下发的刷新令牌")
+
+
 class UserInfo(BaseModel):
     """用户身份信息。"""
 

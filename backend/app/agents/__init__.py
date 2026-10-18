@@ -2,4 +2,4 @@
 from app.agents.graph import build_triage_graph
 from app.agents.state import TriageState
 
-__all__ = ["build_triage_graph", "TriageState"]
+__all__ = ["TriageState", "build_triage_graph"]

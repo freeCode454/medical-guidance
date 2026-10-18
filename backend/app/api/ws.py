@@ -83,7 +83,7 @@ async def ws_session(websocket: WebSocket, session_id: str, token: str = "") -> 
                 {"sub": info["sub"], "tenant_id": info["tenant_id"]},
                 content,
                 msg_type,
-                None,
+                {},
             )
         # 触发编排图 resume
         orchestrator = websocket.app.state.orchestrator
@@ -102,7 +102,7 @@ async def ws_session(websocket: WebSocket, session_id: str, token: str = "") -> 
                 raw = await asyncio.wait_for(
                     websocket.receive_text(), timeout=_CLIENT_HEARTBEAT_SECONDS
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 if time.time() - last_active > _SERVER_TIMEOUT_SECONDS:
                     return
                 continue

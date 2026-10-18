@@ -7,6 +7,7 @@ Milvus 的 insert 是异步的，`insert` 后必须 `flush` 才能统计与检�
 """
 from __future__ import annotations
 
+import contextlib
 import logging
 from typing import Any
 
@@ -186,8 +187,10 @@ class MilvusStore:
             out.append(item)
         return out
 
+    def ping(self) -> None:
+        """就绪探针：能列出集合即视为可用（连接失败会抛异常）。"""
+        self._client.list_collections()
+
     def close(self) -> None:
-        try:
+        with contextlib.suppress(Exception):  # pragma: no cover
             self._client.close()
-        except Exception:  # pragma: no cover
-            pass

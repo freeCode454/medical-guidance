@@ -101,10 +101,10 @@ DEPT_TREE = {
 def build_departments() -> list[list]:
     """生成科室字典：一级科室 + 亚专科（共 250 条）。"""
     rows = []
-    for code, name, aliases, expertise, sub, related, parent in BASE_DEPTS:
+    for code, name, aliases, expertise, sub, related, _parent in BASE_DEPTS:
         rows.append([code, name, aliases, expertise, sub, related])
     # 亚专科展开
-    for code, name, aliases, expertise, sub, related, parent in BASE_DEPTS:
+    for code, name, _aliases, expertise, _sub, related, _parent in BASE_DEPTS:
         subs = DEPT_TREE.get(code, [])
         for idx, sub_name in enumerate(subs, start=1):
             sub_code = f"{code}-{idx:02d}"

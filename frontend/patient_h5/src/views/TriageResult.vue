@@ -10,6 +10,7 @@ const error = ref('')
 
 const primary = computed(() => store.triage?.recommended_depts?.[0] ?? null)
 const others = computed(() => store.triage?.recommended_depts?.slice(1) ?? [])
+const emergency = computed(() => store.triage?.emergency_guidance ?? null)
 
 async function load() {
   loading.value = true
@@ -62,18 +63,32 @@ function pct(n: number) {
 
     <template v-else-if="store.triage">
       <header class="head">
-        <span class="badge" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
+        <span class="badge" :class="{ 'badge--danger': emergency }" aria-hidden="true">
+          <svg v-if="emergency" viewBox="0 0 24 24" fill="none">
+            <path d="M12 4l8.5 15h-17L12 4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M12 9.5v4M12 16.6v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+          <svg v-else viewBox="0 0 24 24" fill="none">
             <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-        <p class="eyebrow">分诊完成</p>
-        <h1>建议您就诊</h1>
-        <p class="lede">根据您的描述，最匹配的科室是</p>
+        <p class="eyebrow">{{ emergency ? '危重症预警' : '分诊完成' }}</p>
+        <h1>{{ emergency ? '请立即前往急诊' : '建议您就诊' }}</h1>
+        <p class="lede">
+          {{ emergency ? '您的描述触发了急危重症预警，请优先线下就医' : '根据您的描述，最匹配的科室是' }}
+        </p>
       </header>
 
+      <!-- 危重症引导：优先于科室推荐展示 -->
+      <section v-if="emergency" class="emergency" role="alert">
+        <span class="emergency__tag">需要立即处理</span>
+        <p class="emergency__reason">{{ emergency.reason }}</p>
+        <p class="emergency__advice">{{ emergency.advice }}</p>
+        <p class="emergency__dept">建议直接前往：{{ emergency.recommended_dept }}</p>
+      </section>
+
       <!-- 首选科室 -->
-      <section v-if="primary" class="primary">
+      <section v-if="primary && !emergency" class="primary">
         <span class="primary__glow" aria-hidden="true" />
         <div class="primary__top">
           <span class="tag">首选科室</span>
@@ -87,7 +102,7 @@ function pct(n: number) {
       </section>
 
       <!-- 其他候选 -->
-      <section v-if="others.length" class="others">
+      <section v-if="others.length && !emergency" class="others">
         <h3 class="others__title">其他可能相关</h3>
         <ul class="list">
           <li v-for="(d, i) in others" :key="d.dept_code" class="item">
@@ -110,13 +125,24 @@ function pct(n: number) {
       </p>
 
       <div class="actions">
-        <button class="primary-btn" type="button" @click="router.push('/emr')">
-          查看预问诊病历
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5 12h13M12.5 5.5L19 12l-6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-        <button class="ghost-btn" type="button" @click="router.push('/')">重新问诊</button>
+        <template v-if="emergency">
+          <a class="primary-btn primary-btn--danger" :href="`tel:${emergency.emergency_phone}`">
+            拨打 {{ emergency.emergency_phone }} 急救电话
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6.5 4.5h3l1.5 4-2 1.5a11 11 0 005 5l1.5-2 4 1.5v3a2 2 0 01-2.2 2A15.5 15.5 0 014.5 6.7a2 2 0 012-2.2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+          </a>
+          <button class="ghost-btn" type="button" @click="router.push('/')">重新问诊</button>
+        </template>
+        <template v-else>
+          <button class="primary-btn" type="button" @click="router.push('/emr')">
+            查看预问诊病历
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h13M12.5 5.5L19 12l-6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button class="ghost-btn" type="button" @click="router.push('/')">重新问诊</button>
+        </template>
       </div>
     </template>
   </div>
@@ -244,6 +270,63 @@ function pct(n: number) {
 .badge svg {
   width: 24px;
   height: 24px;
+}
+
+.badge--danger {
+  background: rgba(180, 67, 47, 0.12);
+  color: var(--c-danger);
+  box-shadow: 0 0 0 6px rgba(180, 67, 47, 0.06);
+}
+
+/* ---------- 危重症引导 ---------- */
+.emergency {
+  margin-bottom: 16px;
+  padding: 20px 20px 18px;
+  border: 1px solid rgba(180, 67, 47, 0.32);
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgba(180, 67, 47, 0.12), transparent 60%),
+    #fff6f2;
+  box-shadow: 0 20px 40px -28px rgba(180, 67, 47, 0.55);
+  animation: rise 0.55s var(--ease-out) both;
+}
+
+.emergency__tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: rgba(180, 67, 47, 0.12);
+  color: var(--c-danger);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.emergency__reason {
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #7d2c1d;
+}
+
+.emergency__advice {
+  margin-top: 6px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: #8a4030;
+}
+
+.emergency__dept {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(180, 67, 47, 0.25);
+  font-size: 12.5px;
+  color: #93503f;
+}
+
+.primary-btn.primary-btn--danger {
+  background: linear-gradient(135deg, #c2503a, #a53a25);
+  box-shadow: 0 2px 4px rgba(165, 58, 37, 0.16), 0 16px 30px -14px rgba(165, 58, 37, 0.55);
+  text-decoration: none;
 }
 
 .eyebrow {

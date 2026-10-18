@@ -7,7 +7,10 @@ export interface Dept { dept_id: string; dept_code: string; dept_name: string; s
 export interface AuditItem { audit_id: string; actor_role: string; action_type: string; target_type: string; result: string; detail: any; action_time: string }
 
 export function login(account: string, password: string) {
-  return http.post<{ access_token: string; user: any }>('/auth/staff/login', { account, password, client_type: 'ADMIN_WEB' })
+  return http.post<{ access_token: string; refresh_token: string; user: any }>(
+    '/auth/staff/login',
+    { account, password, client_type: 'ADMIN_WEB' },
+  )
 }
 
 // 用户

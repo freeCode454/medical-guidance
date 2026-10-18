@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
 const account = ref('doctor01')
 const password = ref('')
@@ -18,7 +19,8 @@ async function doLogin() {
   loading.value = true
   try {
     await auth.login(account.value, password.value)
-    router.push('/')
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+    router.push(redirect || '/')
   } catch (e) {
     ElMessage.error((e as Error).message || '登录失败')
   } finally {

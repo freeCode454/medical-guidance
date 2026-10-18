@@ -151,7 +151,7 @@ async def import_dept_vectors(embedder, store: MilvusStore) -> None:
 
     embeddings = await embedder.embed(texts)
     vec_rows = []
-    for d, emb in zip(dept_rows, embeddings):
+    for d, emb in zip(dept_rows, embeddings, strict=False):
         vec_rows.append(
             {
                 "id": f"dept_{d['dept_code']}",

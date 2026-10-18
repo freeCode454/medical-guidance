@@ -15,13 +15,15 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC, datetime
 
 from langgraph.types import Command
 from sqlalchemy import func, select
 
 from app.agents import build_triage_graph
+from app.agents.nodes.safety import detect_emergency
 from app.agents.state import TriageState
-from app.common.database import AsyncSessionFactory
+from app.common.database import AsyncSessionFactory, lock_message_sequence
 from app.common.embedder import BaseEmbedder
 from app.common.enums import MessageRole, MessageType, SessionStatus
 from app.common.llm_client import ModelClient
@@ -30,6 +32,39 @@ from app.retrieval import MilvusStore
 from app.ws import events
 
 logger = logging.getLogger(__name__)
+
+
+def _build_evidence(result: dict) -> dict:
+    """把 state 里的症状摘要 / 风险标记固化为分诊依据快照。
+
+    患者端只读这份快照（``mg_triage_result.evidence_json``），不接触仅存在于
+    编排进程内存里的 state，因此进程重启后仍能还原「当时问了什么」。
+    """
+    entities = result.get("entities") or {}
+    summary = {
+        "chief_complaint": result.get("chief_complaint"),
+        "duration": entities.get("duration"),
+        "location": entities.get("location"),
+        "nature": entities.get("nature"),
+        "accompanying": entities.get("accompanying"),
+        "past_history": entities.get("past_history"),
+        "allergy": entities.get("allergy"),
+    }
+    triage = result.get("triage_result") or {}
+    kg_paths: list[dict] = []
+    for dept in triage.get("recommended_depts") or []:
+        kg_paths.extend(dept.get("kg_paths") or [])
+
+    return {
+        "symptom_summary": {
+            key: value
+            for key, value in summary.items()
+            if value not in (None, "", [])
+        },
+        "risk_flag": bool(result.get("risk_flag")),
+        "risk_reason": result.get("risk_reason"),
+        "kg_paths": kg_paths,
+    }
 
 
 class TriageOrchestrator:
@@ -76,10 +111,10 @@ class TriageOrchestrator:
             state["age"] = age
         try:
             result = await self.graph.ainvoke(state, config=self._config(session_id))
-        except Exception as exc:
-            logger.error("编排启动失败 session=%s: %s", session_id, exc)
+        except Exception:
+            logger.exception("编排启动失败 session=%s", session_id)
             return
-        await self._after_run(session_id, tenant_id, patient_id, result)
+        await self._safe_after_run(session_id, tenant_id, patient_id, result)
 
     async def resume(
         self,
@@ -93,14 +128,54 @@ class TriageOrchestrator:
         if session_id not in self._pending:
             logger.info("会话 %s 不在挂起态，忽略 resume", session_id)
             return
+
+        # 危重症规则不能只判首轮主诉：追问回答里补出「胸口疼、冒冷汗」
+        # 同样必须立即转急诊（临床红线，F50）。
+        if detect_emergency(answer):
+            logger.warning("追问回答命中危重症红线 session=%s", session_id)
+            self._pending.discard(session_id)
+            events.emit_emergency(
+                session_id,
+                "追问回答命中危重症红线",
+                "您的症状需要立即就医，请立即前往就近医院急诊科或拨打 120",
+            )
+            await self._safe_after_run(
+                session_id,
+                tenant_id,
+                patient_id,
+                {
+                    "route": "EMERGENCY",
+                    "risk_flag": True,
+                    "risk_reason": "追问回答命中急危重症预警规则",
+                    "chief_complaint": answer,
+                },
+            )
+            return
+
         try:
             result = await self.graph.ainvoke(
                 Command(resume=answer), config=self._config(session_id)
             )
-        except Exception as exc:
-            logger.error("编排恢复失败 session=%s: %s", session_id, exc)
+        except Exception:
+            logger.exception("编排恢复失败 session=%s", session_id)
             return
-        await self._after_run(session_id, tenant_id, patient_id, result)
+        await self._safe_after_run(session_id, tenant_id, patient_id, result)
+
+    async def _safe_after_run(
+        self, session_id: str, tenant_id: str, patient_id: str, result: dict
+    ) -> None:
+        """落库失败不能静默：记录堆栈并给患者端一个可重试的错误事件。"""
+        try:
+            await self._after_run(session_id, tenant_id, patient_id, result)
+        except Exception:
+            logger.exception("编排结果落库失败 session=%s", session_id)
+            events.emit_node_error(
+                session_id,
+                "ORCHESTRATION",
+                60000,
+                "问诊结果保存失败，请稍后重试",
+                degraded=False,
+            )
 
     # ---- 图结果处理 -------------------------------------------------------
 
@@ -142,6 +217,7 @@ class TriageOrchestrator:
         if not question:
             return
         async with AsyncSessionFactory() as db:
+            await lock_message_sequence(db, session_id)
             current_max = await db.scalar(
                 select(func.max(SessionMessage.seq_no)).where(
                     SessionMessage.session_id == session_id,
@@ -164,22 +240,34 @@ class TriageOrchestrator:
         self, session_id: str, tenant_id: str, patient_id: str, result: dict
     ) -> None:
         """图完成后落库：分诊结论 + SOAP 病历 + MDT 会诊 + 会话状态。"""
+        triage = result.get("triage_result") or {}
+        route = result.get("route") or triage.get("route") or "MANUAL"
+        risk_flag = bool(result.get("risk_flag"))
+        final_status = (
+            SessionStatus.EMERGENCY.value
+            if route == "EMERGENCY" or risk_flag
+            else SessionStatus.FINISHED.value
+        )
         triage_result_id: str | None = None
         emr_record_id: str | None = None
+
         async with AsyncSessionFactory() as db:
             # 幂等：已有分诊结论则跳过
             existing = await db.scalar(
-                select(TriageResult).where(TriageResult.session_id == session_id)
+                select(TriageResult).where(
+                    TriageResult.session_id == session_id,
+                    TriageResult.tenant_id == tenant_id,
+                )
             )
             if existing is None:
-                triage = result.get("triage_result") or {}
                 tr = TriageResult(
                     tenant_id=tenant_id,
                     session_id=session_id,
                     candidates_json=triage.get("recommended_depts", []),
                     confidence=triage.get("confidence", 0.0),
-                    route=result.get("route", triage.get("route", "MANUAL")),
-                    retrieval_mode="DENSE",
+                    route=route,
+                    retrieval_mode=result.get("retrieval_mode") or "HYBRID",
+                    evidence_json=_build_evidence(result),
                 )
                 db.add(tr)
                 triage_result_id = tr.id
@@ -207,12 +295,15 @@ class TriageOrchestrator:
                         )
                     )
 
-            # SOAP 病历（一次会话仅一份）
+            # SOAP 病历（一次会话仅一份；急诊直达不生成空病历）
+            emr = result.get("emr") or {}
             emr_exists = await db.scalar(
-                select(EmrRecord).where(EmrRecord.session_id == session_id)
+                select(EmrRecord).where(
+                    EmrRecord.session_id == session_id,
+                    EmrRecord.tenant_id == tenant_id,
+                )
             )
-            if emr_exists is None:
-                emr = result.get("emr") or {}
+            if emr_exists is None and emr:
                 er = EmrRecord(
                     tenant_id=tenant_id,
                     session_id=session_id,
@@ -221,6 +312,13 @@ class TriageOrchestrator:
                     objective=emr.get("objective"),
                     assessment=emr.get("assessment"),
                     plan=emr.get("plan"),
+                    soap_json={
+                        "subjective": emr.get("subjective"),
+                        "objective": emr.get("objective"),
+                        "assessment": emr.get("assessment"),
+                        "plan": emr.get("plan"),
+                        "entities": result.get("entities") or {},
+                    },
                     completeness_rate=emr.get("completeness_rate"),
                     generate_status=emr.get("generate_status", "SUCCESS"),
                 )
@@ -228,27 +326,26 @@ class TriageOrchestrator:
                 emr_record_id = er.id
 
             # 会话状态更新
-            final_status = SessionStatus.FINISHED.value
             session = await db.get(Session, session_id)
             if session is not None:
-                route = result.get("route")
-                if route == "EMERGENCY" or result.get("risk_flag"):
-                    final_status = SessionStatus.EMERGENCY.value
-                    session.status = final_status
-                else:
-                    session.status = SessionStatus.FINISHED.value
+                session.status = final_status
                 session.inquiry_rounds = result.get("inquiry_rounds", 0)
-                session.risk_flag = "1" if result.get("risk_flag") else "0"
-                triage = result.get("triage_result") or {}
+                session.risk_flag = "1" if risk_flag else "0"
+                if final_status == SessionStatus.FINISHED.value:
+                    session.finished_time = datetime.now(UTC)
                 if triage.get("recommended_depts"):
                     session.dept_code = triage["recommended_depts"][0].get("dept_code")
 
             await db.commit()
 
-        logger.info("编排完成 session=%s route=%s", session_id, result.get("route"))
+        logger.info(
+            "编排完成 session=%s route=%s status=%s",
+            session_id,
+            route,
+            final_status,
+        )
 
         # 发射 task_complete 事件（对话通道）
-        triage = result.get("triage_result") or {}
         depts = triage.get("recommended_depts") or []
         top = depts[0] if depts else {}
         events.emit_task_complete(
@@ -257,7 +354,7 @@ class TriageOrchestrator:
                 "session_id": session_id,
                 "session_status": final_status,
                 "result": {
-                    "route": result.get("route"),
+                    "route": route,
                     "dept_code": top.get("dept_code"),
                     "dept_name": top.get("dept_name"),
                     "confidence": triage.get("confidence", 0.0),
@@ -265,7 +362,11 @@ class TriageOrchestrator:
                     "triage_result_id": triage_result_id,
                     "emr_record_id": emr_record_id,
                 },
-                "suggest_next": ["FETCH_TRIAGE_RESULT", "FETCH_EMR"],
+                "suggest_next": (
+                    ["FETCH_TRIAGE_RESULT"]
+                    if final_status == SessionStatus.EMERGENCY.value
+                    else ["FETCH_TRIAGE_RESULT", "FETCH_EMR"]
+                ),
             },
         )
 

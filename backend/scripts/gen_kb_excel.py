@@ -17,14 +17,14 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from kb_data.depts import build_departments  # noqa: E402
-from kb_data.diseases import DISEASES_1  # noqa: E402
-from kb_data.diseases2 import DISEASES_2  # noqa: E402
-from kb_data.drugs import DRUG_SAFETY  # noqa: E402
-from kb_data.drugs2 import DRUG_SAFETY_2  # noqa: E402
-from kb_data.icd10 import DEPT_CHAPTER, ICD_EXACT  # noqa: E402
-from kb_data.symptoms import SYMPTOMS  # noqa: E402
-from kb_data.symptoms2 import SYMPTOMS_2  # noqa: E402
+from kb_data.depts import build_departments
+from kb_data.diseases import DISEASES_1
+from kb_data.diseases2 import DISEASES_2
+from kb_data.drugs import DRUG_SAFETY
+from kb_data.drugs2 import DRUG_SAFETY_2
+from kb_data.icd10 import DEPT_CHAPTER, ICD_EXACT
+from kb_data.symptoms import SYMPTOMS
+from kb_data.symptoms2 import SYMPTOMS_2
 
 ALL_DISEASES = DISEASES_1 + DISEASES_2
 ALL_SYMPTOMS = SYMPTOMS + SYMPTOMS_2
@@ -170,7 +170,7 @@ def gen_red_flags(n: int = 250) -> list[list]:
         rows.append([f"RF{i:03d}", symptom, kw, 1, "GUIDE_TO_EMERGENCY", msg])
     # 基于症状 × 危重修饰，扩充到 n 条
     idx = len(rows)
-    for sym, aliases, part, _dur in ALL_SYMPTOMS:
+    for sym, aliases, _part, _dur in ALL_SYMPTOMS:
         if idx >= n:
             break
         for mod in RED_MODIFIERS:
@@ -237,7 +237,7 @@ def gen_triage_rules(n: int = 250) -> list[list]:
     # 补足到 n：症状 × 科室组合
     idx = len(rows)
     male_kw = ["男性", "射精", "包皮", "阴茎", "睾丸", "阴囊"]
-    for sym, aliases, part, _dur in ALL_SYMPTOMS:
+    for sym, _aliases, part, _dur in ALL_SYMPTOMS:
         if idx >= n:
             break
         gender = ""

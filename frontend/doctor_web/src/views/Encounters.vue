@@ -4,12 +4,15 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import AppHeader from '@/components/AppHeader.vue'
 import { listEncounters, type EncounterItem } from '@/api/doctor'
+import { fmtTime } from '@/utils/format'
 
 const router = useRouter()
 const loading = ref(false)
 const items = ref<EncounterItem[]>([])
 const total = ref(0)
 const status = ref('')
+const page = ref(1)
+const size = ref(10)
 
 const statusMap: Record<string, { label: string; type: string }> = {
   IN_PROGRESS: { label: '问诊中', type: 'info' },
@@ -23,7 +26,11 @@ const statusMap: Record<string, { label: string; type: string }> = {
 async function load() {
   loading.value = true
   try {
-    const d = await listEncounters({ status: status.value || null })
+    const d = await listEncounters({
+      status: status.value || null,
+      page: page.value,
+      size: size.value,
+    })
     items.value = d.items
     total.value = d.total
   } catch (e) {
@@ -31,6 +38,16 @@ async function load() {
   } finally {
     loading.value = false
   }
+}
+
+function changePage(next: number) {
+  page.value = next
+  void load()
+}
+
+function changeFilter() {
+  page.value = 1
+  void load()
 }
 
 onMounted(load)
@@ -42,7 +59,7 @@ onMounted(load)
     <div class="page-head">
       <h1>今日接诊</h1>
       <span class="count">共 {{ total }} 位患者</span>
-      <el-select v-model="status" placeholder="全部状态" clearable style="width: 140px; margin-left: auto" @change="load">
+      <el-select v-model="status" placeholder="全部状态" clearable style="width: 140px; margin-left: auto" @change="changeFilter">
         <el-option v-for="(v, k) in statusMap" :key="k" :label="v.label" :value="k" />
       </el-select>
     </div>
@@ -65,11 +82,26 @@ onMounted(load)
       </el-table-column>
       <el-table-column prop="inquiry_rounds" label="追问轮次" width="90" />
       <el-table-column label="开始时间" width="100">
-        <template #default="{ row }">{{ row.started_time ? row.started_time.slice(11, 16) : '' }}</template>
+        <template #default="{ row }">{{ fmtTime(row.started_time) }}</template>
       </el-table-column>
+
+      <template #empty>
+        <div class="table-empty">
+          <p>今日暂无接诊记录</p>
+          <el-button size="small" @click="load">刷新</el-button>
+        </div>
+      </template>
     </el-table>
 
-    <el-empty v-if="!loading && !items.length" description="今日暂无接诊记录" />
+    <el-pagination
+      v-if="total > size"
+      class="pager"
+      layout="prev, pager, next, total"
+      :total="total"
+      :page-size="size"
+      :current-page="page"
+      @current-change="changePage"
+    />
   </main>
 </template>
 
@@ -98,6 +130,20 @@ h1 {
 
 .muted {
   color: var(--c-muted);
+}
+
+.table-empty {
+  padding: 24px 0;
+  color: var(--c-muted);
+}
+
+.table-empty p {
+  margin: 0 0 10px;
+}
+
+.pager {
+  margin-top: 16px;
+  justify-content: flex-end;
 }
 
 :deep(.el-table__row) {

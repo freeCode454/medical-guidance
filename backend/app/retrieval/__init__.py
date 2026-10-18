@@ -10,11 +10,11 @@ from app.retrieval.collections import (
 from app.retrieval.vector_store import MilvusStore
 
 __all__ = [
-    "MilvusStore",
-    "VectorCollection",
+    "ALL_COLLECTIONS",
     "KB_DEPT",
     "KB_SYMPTOM",
     "TRIAGE_COLLECTIONS",
-    "ALL_COLLECTIONS",
+    "MilvusStore",
+    "VectorCollection",
     "get_collection",
 ]

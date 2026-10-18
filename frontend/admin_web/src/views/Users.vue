@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { users, depts, type User, type Dept } from '@/api/admin'
 
 const loading = ref(false)
@@ -50,9 +50,19 @@ async function onCreate() {
 }
 
 async function onToggle(row: User) {
+  const action = row.status === '1' ? '停用' : '启用'
+  try {
+    await ElMessageBox.confirm(`确定${action}账号「${row.account}」？`, '确认操作', {
+      type: 'warning',
+      confirmButtonText: '确定' + action,
+      cancelButtonText: '取消',
+    })
+  } catch {
+    return
+  }
   try {
     await users.toggle(row.user_id)
-    ElMessage.success('已切换状态')
+    ElMessage.success(`已${action}`)
     load()
   } catch (e) {
     ElMessage.error((e as Error).message || '操作失败')

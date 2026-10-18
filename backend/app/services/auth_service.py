@@ -7,8 +7,9 @@
 """
 from __future__ import annotations
 
+import asyncio
 import hashlib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from sqlalchemy import select
@@ -22,7 +23,14 @@ from app.common.error_codes import (
     AUTH_ROLE_NOT_ALLOWED,
 )
 from app.common.exceptions import BizError
-from app.common.security import issue_access_token, issue_patient_token, issue_refresh_token, verify_password
+from app.common.security import (
+    decode_token,
+    hash_password,
+    issue_access_token,
+    issue_patient_token,
+    issue_refresh_token,
+    verify_password,
+)
 from app.config import settings
 from app.models import Dept, Patient, Tenant, User
 from app.schemas.auth import (
@@ -33,6 +41,8 @@ from app.schemas.auth import (
 
 LOGIN_FAIL_LIMIT = 5
 LOCK_MINUTES = 15
+# 账号不存在时也跑一次 bcrypt，避免通过响应时间枚举账号（恒定耗时）
+_DUMMY_HASH = hash_password("medical-guidance-dummy-password")
 
 
 async def staff_login(
@@ -46,41 +56,33 @@ async def staff_login(
     users = result.scalars().all()
     # 账号不存在 / 多个租户同名：统一返回账号或口令错误，防账号枚举
     if len(users) != 1:
+        await asyncio.to_thread(verify_password, password, _DUMMY_HASH)
         raise BizError(AUTH_CREDENTIAL_INVALID, "账号或口令错误")
 
     user = users[0]
-    now = datetime.now(timezone.utc)
-
-    if user.status == "0":
-        raise BizError(AUTH_ACCOUNT_DISABLED)
+    now = datetime.now(UTC)
 
     # 锁定检查：仍在锁定期则拒绝；已过期则解锁
     if user.lock_until and user.lock_until > now:
-        remaining = int((user.lock_until - now).total_seconds() // 60) + 1
-        raise BizError(AUTH_ACCOUNT_LOCKED, f"账号已锁定，请 {remaining} 分钟后重试")
+        raise BizError(AUTH_ACCOUNT_LOCKED, "登录失败次数过多，请稍后重试")
     if user.lock_until and user.lock_until <= now:
         user.fail_count = 0
         user.lock_until = None
 
-    # 客户端类型与角色匹配（医生账号不得登录管理后台）
-    if client_type == "ADMIN_WEB" and user.role == UserRole.DOCTOR.value:
-        raise BizError(AUTH_ROLE_NOT_ALLOWED)
-
-    # 口令校验（失败计数 + 锁定）
-    if not verify_password(password, user.credential_hash):
+    # bcrypt 是 CPU 密集同步调用，阻塞事件循环会让全站卡住，必须放线程池
+    if not await asyncio.to_thread(verify_password, password, user.credential_hash):
         user.fail_count += 1
         if user.fail_count >= LOGIN_FAIL_LIMIT:
             user.lock_until = now + timedelta(minutes=LOCK_MINUTES)
-            await db.commit()
-            raise BizError(
-                AUTH_ACCOUNT_LOCKED,
-                f"连续失败 {LOGIN_FAIL_LIMIT} 次，账号已锁定 {LOCK_MINUTES} 分钟",
-            )
         await db.commit()
-        raise BizError(
-            AUTH_CREDENTIAL_INVALID,
-            f"账号或口令错误，还可尝试 {LOGIN_FAIL_LIMIT - user.fail_count} 次",
-        )
+        # 不返回剩余次数：否则可据此确认账号存在
+        raise BizError(AUTH_CREDENTIAL_INVALID, "账号或口令错误")
+
+    # 口令正确后才暴露账号状态，避免用「已停用 / 角色不符」探测账号
+    if user.status == "0":
+        raise BizError(AUTH_ACCOUNT_DISABLED)
+    if client_type == "ADMIN_WEB" and user.role == UserRole.DOCTOR.value:
+        raise BizError(AUTH_ROLE_NOT_ALLOWED)
 
     # 登录成功：重置计数、记录时间、签发令牌
     user.fail_count = 0
@@ -88,6 +90,11 @@ async def staff_login(
     user.last_login_time = now
     await db.commit()
 
+    return await _build_staff_response(db, user)
+
+
+async def _build_staff_response(db: AsyncSession, user: User) -> StaffLoginResponse:
+    """组装登录/刷新响应：令牌 + 用户与科室/租户信息。"""
     dept_name = None
     if user.dept_code:
         dept_name = await db.scalar(
@@ -116,9 +123,28 @@ async def staff_login(
     )
 
 
+async def refresh_staff_session(
+    db: AsyncSession, refresh_token: str
+) -> StaffLoginResponse:
+    """用刷新令牌换一对新令牌（轮换：每次刷新同时下发新的 refresh_token）。
+
+    - 令牌必须未过期、类型为 refresh（decode_token 校验）
+    - 用户必须仍存在、启用，且角色/租户与令牌一致（防越权与降权后旧令牌续命）
+    """
+    payload = decode_token(refresh_token, expected_type="refresh")
+    user = await db.scalar(
+        select(User).where(User.id == payload.get("sub"), User.del_flag == "0")
+    )
+    if user is None or user.status == "0":
+        raise BizError(AUTH_CREDENTIAL_INVALID, "登录状态已失效，请重新登录")
+    if payload.get("role") != user.role or payload.get("tenant_id") != user.tenant_id:
+        raise BizError(AUTH_CREDENTIAL_INVALID, "登录状态已失效，请重新登录")
+    return await _build_staff_response(db, user)
+
+
 def _device_hash(tenant_id: str, device_id: str) -> str:
     """患者标识哈希：加租户盐，同一设备在不同租户下哈希不同。"""
-    return hashlib.sha256(f"{tenant_id}:{device_id}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(f"{tenant_id}:{device_id}".encode()).hexdigest()
 
 
 async def create_patient_session(

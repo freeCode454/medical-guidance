@@ -103,8 +103,8 @@ def build_emr_writer_node(client: ModelClient):
 
         # 检查 P 段是否误含用药建议（简单关键词兜底）
         plan = result.get("plan", "")
-        _DRUG_HINTS = ("用药", "服用", "处方", "mg", "片", "口服", "静脉", "注射")
-        if any(k in plan for k in _DRUG_HINTS):
+        drug_hints = ("用药", "服用", "处方", "mg", "片", "口服", "静脉", "注射")
+        if any(k in plan for k in drug_hints):
             logger.warning("SOAP P 段疑似含用药建议，已剔除")
             result["plan"] = "建议就诊科室进一步评估，用药方案由接诊医生根据面诊结果制定。"
 

@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import random
 import shutil
 import sys
@@ -273,8 +274,8 @@ def main() -> int:
     print("=" * 68)
 
     try:
-        from pymilvus import __version__ as pymilvus_version
         from pymilvus import MilvusClient
+        from pymilvus import __version__ as pymilvus_version
 
         print(f"pymilvus 版本：{pymilvus_version}")
     except ImportError as exc:
@@ -309,10 +310,8 @@ def main() -> int:
     finally:
         _drop(client, COLLECTION)
         _drop(client, PARTITION_COLLECTION)
-        try:
+        with contextlib.suppress(Exception):
             client.close()
-        except Exception:
-            pass
         if not args.keep and db_path is not None and db_path.exists():
             shutil.rmtree(db_path, ignore_errors=True) if db_path.is_dir() else db_path.unlink()
 

@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import operator
-from typing import Annotated, Any, TypedDict
+from typing import Annotated, TypedDict
 
 
 def _merge_dict(left: dict, right: dict) -> dict:
@@ -35,7 +35,7 @@ class TriageState(TypedDict, total=False):
     # ---- 服务端注入（覆盖） ----
     session_id: str
     tenant_id: str
-    patient_hash: str
+    patient_hash: str | None
     gender: str  # 男 / 女（供分诊规则人群过滤）
     age: int  # 年龄（供儿童/老年科室过滤）
 
@@ -68,4 +68,3 @@ class TriageState(TypedDict, total=False):
 
     # ---- 输出（覆盖） ----
     emr: dict  # SOAP 病历
-    pending_question: str  # 待患者回答的追问（interrupt 输出）

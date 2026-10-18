@@ -19,9 +19,10 @@ import logging
 import threading
 import zipfile
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Sequence
+from typing import Any
 
 import numpy as np
 
@@ -152,10 +153,10 @@ class LocalBgeM3Embedder(BaseEmbedder):
         self._use_fp16 = use_fp16
         self._sparse_top_k = sparse_top_k
 
-        self._session = None
-        self._tokenizer = None
-        self._sparse_w = None
-        self._sparse_b = None
+        self._session: Any = None
+        self._tokenizer: Any = None
+        self._sparse_w: Any = None
+        self._sparse_b: Any = None
         self._excluded_tokens: set[int] = set()
         self._load_lock = threading.Lock()
 
@@ -167,8 +168,9 @@ class LocalBgeM3Embedder(BaseEmbedder):
         if self._session is not None:
             return
         with self._load_lock:
+            # 双重检查锁定：mypy 只看到单线程路径，这里确实可能被其他线程赋值
             if self._session is not None:
-                return
+                return  # type: ignore[unreachable]
             import onnxruntime as ort
             from tokenizers import Tokenizer
 
@@ -229,7 +231,7 @@ class LocalBgeM3Embedder(BaseEmbedder):
         results: list[Embedding] = []
         for i, ids in enumerate(batch_ids):
             sparse: dict[int, float] = {}
-            for tid, score in zip(ids, scores[i].ravel()):
+            for tid, score in zip(ids, scores[i].ravel(), strict=True):
                 if tid in self._excluded_tokens:
                     continue
                 if score > 0:

@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     egress_policy: EgressPolicy = EgressPolicy.STRICT
     debug_endpoints: bool = False
 
+    # ---------------- HTTP / 可观测性 ----------------
+    # 逗号分隔的允许来源；生产由网关同源托管时可留空
+    cors_origins: str = "http://localhost:5173,http://localhost:5174,http://localhost:5175"
+    log_level: str = "INFO"
+
     # ---------------- 内容生成（OpenAI 兼容） ----------------
     llm_base_url: str
     llm_api_key: str = ""
@@ -123,10 +128,15 @@ class Settings(BaseSettings):
     def embedding_is_local(self) -> bool:
         return self.embedding_provider == "local"
 
+    @property
+    def cors_origin_list(self) -> list[str]:
+        """把逗号分隔的 CORS_ORIGINS 解析成列表。"""
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
     # ---------------- 启动校验 ----------------
 
     @model_validator(mode="after")
-    def _validate(self) -> "Settings":
+    def _validate(self) -> Settings:
         """院内网模式下，关键服务地址必须为内网地址。
 
         校验不通过则启动失败——宁可起不来，也不要带着数据外泄风险运行。
@@ -223,7 +233,7 @@ class Settings(BaseSettings):
 
 def load_settings() -> Settings:
     """显式加载配置。避免模块导入期就因为缺环境变量而崩溃，便于测试。"""
-    return Settings()  # type: ignore[call-arg]
+    return Settings()
 
 
 settings = load_settings()

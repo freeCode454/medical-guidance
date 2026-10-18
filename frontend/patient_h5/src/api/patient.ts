@@ -27,6 +27,24 @@ export interface ChatMessage {
   send_time: string | null
 }
 
+export interface SymptomSummary {
+  chief_complaint: string | null
+  duration: string | null
+  location: string | null
+  nature: string | null
+  accompanying: string[] | null
+  past_history: string[] | null
+  allergy: string[] | null
+}
+
+export interface EmergencyGuidance {
+  triggered: boolean
+  reason: string
+  advice: string
+  emergency_phone: string
+  recommended_dept: string
+}
+
 export interface TriageResult {
   triage_result_id: string
   route: string
@@ -37,7 +55,11 @@ export interface TriageResult {
     confidence: number
     is_primary: boolean
   }>
+  symptom_summary: SymptomSummary
+  inquiry_rounds: number
+  emergency_guidance: EmergencyGuidance | null
   disclaimer: string
+  generated_time: string
 }
 
 export interface EmrView {

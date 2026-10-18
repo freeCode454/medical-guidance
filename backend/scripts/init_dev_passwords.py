@@ -15,10 +15,10 @@ from pathlib import Path
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BACKEND_DIR))
 
-from sqlalchemy import text
+from sqlalchemy import text  # noqa: E402  (需先把 backend 加入 sys.path)
 
-from app.common.database import engine
-from app.common.security import hash_password
+from app.common.database import engine  # noqa: E402
+from app.common.security import hash_password  # noqa: E402
 
 # 与 init.sql 种子数据一致（账号 / 明文口令）
 DEV_ACCOUNTS = {

@@ -81,7 +81,9 @@ async def recall_depts(
     emb = (await embedder.embed([complaint]))[0]
     recall_k = max(limit * 2, 20)  # 先多召回，再精排收窄
 
-    dense_hits = store.dense_search(
+    # pymilvus 是同步客户端：直接调用会阻塞事件循环，全部放线程池
+    dense_hits = await asyncio.to_thread(
+        store.dense_search,
         KB_DEPT,
         dense=emb.dense,
         filter_expr=f'tenant_id == "{tenant_id}"',
@@ -90,7 +92,8 @@ async def recall_depts(
 
     sparse_hits: list[dict] = []
     if emb.has_sparse and mode != "DENSE":
-        sparse_hits = store.sparse_search(
+        sparse_hits = await asyncio.to_thread(
+            store.sparse_search,
             KB_DEPT,
             sparse=emb.sparse or {},
             filter_expr=f'tenant_id == "{tenant_id}"',
@@ -169,7 +172,8 @@ async def recall_depts(
         from app.services.kg_service import get_kg
 
         kg = get_kg()
-        kg_map = {r["dept_code"]: r for r in kg.infer_depts(complaint, limit=20)}
+        kg_rows = await asyncio.to_thread(kg.infer_depts, complaint, 20)
+        kg_map = {r["dept_code"]: r for r in kg_rows}
         for r in result:
             hit = kg_map.get(r["dept_code"])
             if hit:

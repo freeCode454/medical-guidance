@@ -51,7 +51,7 @@ def _build_specialist_prompt(state: TriageState) -> str:
     entities = state.get("entities", {})
     dept_name = state.get("specialist_dept_name", "") or state.get("specialist_dept", "")
     # 会诊参与科室清单（供专科角色约束建议范围）
-    depts = [d for d in state.get("triage_result", {}).get("recommended_depts", [])]
+    depts = list(state.get("triage_result", {}).get("recommended_depts", []))
     dept_lines = "\n".join(
         f"- {d.get('dept_code')} {d.get('dept_name', '')}" for d in depts
     )
@@ -152,7 +152,7 @@ def _aggregate(opinions: list[dict]) -> dict:
 
     # 投票：按建议科室计票
     votes: Counter = Counter(o.get("suggested_dept", "") for o in valid)
-    top_dept, top_count = votes.most_common(1)[0]
+    top_dept, _top_count = votes.most_common(1)[0]
 
     # 综合置信度 = 得票最多科室的平均置信度
     confs = [o.get("confidence", 0.0) for o in valid if o.get("suggested_dept") == top_dept]

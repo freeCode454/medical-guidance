@@ -8,15 +8,20 @@
 """
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from app.common.context import get_trace_id
 from app.common.error_codes import (
     BAD_REQUEST,
     INTERNAL_ERROR,
     ErrorCode,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class BizError(Exception):
@@ -58,7 +63,14 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def _unexpected(request: Request, exc: Exception) -> JSONResponse:
-        # 兜底：不泄露堆栈/SQL/内网地址（《04 文档》错误码约定第 3 条）
+        # 兜底：不泄露堆栈/SQL/内网地址（《04 文档》错误码约定第 3 条），
+        # 但服务端必须留下可检索的堆栈与 trace id，否则线上 500 无法定位。
+        logger.error(
+            "unhandled exception trace=%s path=%s",
+            get_trace_id(),
+            request.url.path,
+            exc_info=exc,
+        )
         return _response(
             INTERNAL_ERROR.code,
             INTERNAL_ERROR.message,
