@@ -66,21 +66,26 @@ class KnowledgeGraph:
         if not symptoms:
             return []
         cql = """
-        MATCH (s:Symptom:Mg)-[:INDICATES]->(d:Disease:Mg)-[:BELONGS_TO]->(dept:Department:Mg)
+        MATCH (s:Symptom:Mg)-[ind:INDICATES]->(d:Disease:Mg)-[:BELONGS_TO]->(dept:Department:Mg)
         WHERE s.name IN $symptoms
         RETURN dept.code AS dept_code, dept.name AS dept_name,
+               max(coalesce(ind.weight, 0.6)) AS max_weight,
                count(DISTINCT d) AS disease_hits,
                collect(DISTINCT s.name + '→' + d.name + '→' + dept.name)[..3] AS paths
-        ORDER BY disease_hits DESC
+        ORDER BY max_weight DESC, disease_hits DESC
         LIMIT $limit
         """
         with self._driver.session(database="neo4j") as s:
             rows = s.run(cql, symptoms=symptoms, limit=limit).data()
 
-        max_hits = max((r["disease_hits"] for r in rows), default=1) or 1
+        # 打分：以科室内的最高关系权重为主（体现「核心症状 vs 伴随症状」），
+        # 多疾病命中给小幅加成，再归一化到 0~1。
         for r in rows:
-            r["score"] = round(r["disease_hits"] / max_hits, 4)
+            r["score"] = round(r["max_weight"] * (1 + 0.1 * (r["disease_hits"] - 1)), 4)
             r["symptom_hits"] = len(symptoms)
+        top = max((r["score"] for r in rows), default=0) or 1
+        for r in rows:
+            r["score"] = round(r["score"] / top, 4)
         return rows
 
     def explain(self, complaint: str, dept_code: str) -> list[str]:

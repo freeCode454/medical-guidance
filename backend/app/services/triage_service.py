@@ -1,6 +1,7 @@
 """分诊服务：候选科室召回 + 分诊结论生成。"""
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 
@@ -129,6 +130,17 @@ async def recall_depts(
         except Exception as exc:  # 精排失败降级，不影响可用性
             logger.warning("rerank 失败，降级为向量+规则：%s", exc)
 
+    # 知识图谱信号：症状→疾病→科室的加权得分（Neo4j 不可用时降级为 0）
+    kg_scores: dict[str, float] = {}
+    try:
+        from app.services.kg_service import get_kg
+
+        # Neo4j 驱动是同步的，放线程池避免阻塞事件循环
+        kg_rows = await asyncio.to_thread(get_kg().infer_depts, complaint, 30)
+        kg_scores = {r["dept_code"]: float(r["score"]) for r in kg_rows}
+    except Exception as exc:
+        logger.warning("图谱打分跳过（分诊降级为向量+精排+规则）：%s", exc)
+
     # 各分量归一化到 0~1
     max_vec = max((c["vec"] for c in candidates), default=0) or 1.0
     max_rr = max(rerank_scores.values(), default=0) or 1.0
@@ -138,8 +150,9 @@ async def recall_depts(
         vec_n = c["vec"] / max_vec
         rr_n = rerank_scores.get(c["dept_code"], 0) / max_rr if rerank_scores else 0.0
         rule_n = bonus.get(c["dept_code"], 0) / max_rule
-        # 权重：精排为主，向量次之，规则作确定性补充
-        c["final"] = 0.55 * rr_n + 0.30 * vec_n + 0.15 * rule_n
+        kg_n = kg_scores.get(c["dept_code"], 0.0)
+        # 权重：精排为主，向量次之，图谱（临床关系）与规则（确定性补充）
+        c["final"] = 0.46 * rr_n + 0.27 * vec_n + 0.12 * rule_n + 0.15 * kg_n
 
     candidates.sort(key=lambda x: x["final"], reverse=True)
     result = [

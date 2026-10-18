@@ -67,10 +67,12 @@ def build() -> dict[str, list[dict]]:
 
     # ---- 关系 ----
     belongs_to = [{"disease": d[0], "dept_code": d[1]} for d in diseases]
+    # 症状字段按「核心症状在前」排列：首个记 1.0，其余记 0.6（伴随症状）。
+    # 用于区分「胸痛之于心绞痛」（核心）与「胸痛之于肺癌」（伴随）。
     indicates = [
-        {"symptom": sym, "disease": d[0]}
+        {"symptom": sym, "disease": d[0], "weight": 1.0 if idx == 0 else 0.6}
         for d in diseases
-        for sym in _split(d[2])
+        for idx, sym in enumerate(_split(d[2]))
     ]
     suggests_dept = [
         {"symptom": sym, "dept_code": t[1], "priority": int(float(t[5] or 8))}
@@ -175,7 +177,7 @@ def write(session, data: dict[str, list[dict]]) -> None:
         session.run(
             "UNWIND $rows AS r "
             "MATCH (s:Symptom:Mg {name: r.symptom}), (d:Disease:Mg {name: r.disease}) "
-            "MERGE (s)-[:INDICATES]->(d)",
+            "MERGE (s)-[rel:INDICATES]->(d) SET rel.weight = r.weight",
             rows=batch,
         )
     for batch in _chunks(data["suggests_dept"]):
