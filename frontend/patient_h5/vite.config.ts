@@ -12,6 +12,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Windows 下编辑器/工具做原子写入时会短暂生成 `.xxx.tmpdir` 临时目录，
+    // chokidar 去 watch 它会 EBUSY 并把 dev server 带崩，这里直接忽略。
+    watch: {
+      ignored: ['**/.*.tmpdir/**', '**/*.tmp'],
+    },
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',

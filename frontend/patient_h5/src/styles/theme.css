@@ -1,38 +1,115 @@
 /*
- * 诊室暖光 · 设计系统
+ * 诊室暖光 · 设计系统 v2
  *
  * 定位：医疗智能导诊，要「可信」而非「冰冷」。
- * 深青绿传达医疗的专业与信任，暖白底模拟诊室柔和光线，暖琥珀是唯一的高亮——
- * 只用在「开始问诊」这类需要引导动作的地方，避免满屏都是强调。
+ * 深青绿传达医疗的专业与信任，暖纸白底模拟诊室柔和光线，暖琥珀是唯一的高亮——
+ * 只用在「开始问诊」这类需要引导动作的地方。
+ *
+ * v2 相对 v1 的变化：
+ * - 建完整的 token（色阶 / 字阶 / 间距 / 圆角 / 阴影 / 缓动），页面只引用 token，不再到处写魔法值
+ * - 增加「纸感」层次：暖白底 + 极淡的青绿/琥珀光晕，卡片用双层阴影浮起
+ * - 补齐可访问性：可见 focus ring、selection、reduced-motion、tab 数字对齐
  */
 
 :root {
-  /* 色板 */
-  --c-bg: #fbf7f1;          /* 暖白底（诊室墙面） */
-  --c-surface: #ffffff;     /* 卡片面 */
-  --c-primary: #17504e;     /* 深青绿（主色：信任 / 专业） */
-  --c-primary-soft: #e8f0ee;/* 浅青绿（AI 气泡 / 分区底） */
-  --c-accent: #c97b3d;      /* 暖琥珀（唯一强调：引导动作） */
-  --c-ink: #22302e;         /* 正文深墨绿 */
-  --c-muted: #7a8580;       /* 次要文字 */
-  --c-line: #e6e0d6;        /* 分隔线 */
+  /* ---------- 色板 ---------- */
+  --c-bg: #f6f1e8;            /* 暖纸白（诊室墙面） */
+  --c-bg-deep: #efe7d9;       /* 更深的暖色，用作分区/描边 */
+  --c-surface: #fffdf9;       /* 卡片面 */
+  --c-surface-soft: #fbf6ec;  /* 卡片内的次级面 */
 
-  /* 字体 */
-  --font-display: 'Noto Serif SC', 'Songti SC', 'STSong', serif; /* 标题：书卷感 */
-  --font-body: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  --c-primary: #144b47;       /* 深青绿（信任 / 专业） */
+  --c-primary-strong: #0c3734;
+  --c-primary-soft: #e3ede9;  /* 浅青绿（AI 气泡 / 标签底） */
+  --c-primary-line: #c9dbd5;
 
-  /* 圆角与阴影 */
-  --radius: 14px;
-  --shadow: 0 2px 12px rgba(34, 48, 46, 0.06);
+  --c-accent: #bf6a34;        /* 暖琥珀（唯一强调：引导动作） */
+  --c-accent-strong: #a55726;
+  --c-accent-text: #a55726;   /* 小字号琥珀文字（对暖白底 ≥ 4.5:1） */
+  --c-accent-soft: #f7e7d9;
+
+  --c-ink: #1d2a28;           /* 正文深墨绿 */
+  --c-ink-soft: #44514d;      /* 次级正文 */
+  --c-muted: #646e68;         /* 辅助文字（对暖白底 4.7:1） */
+  --c-faint: #7d8780;         /* 占位符 / 极弱信息 */
+
+  --c-line: #e6ddcd;          /* 分隔线 */
+  --c-line-soft: #f0e9dd;
+  --c-danger: #b4432f;
+
+  /* ---------- 字体 ---------- */
+  --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', serif;
+  --font-body: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+
+  /* 字阶（移动优先，桌面用 clamp 放大） */
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 15px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 22px;
+  --fs-display: clamp(32px, 4.4vw, 52px);
+
+  /* ---------- 圆角 / 间距 ---------- */
+  --r-xs: 10px;
+  --r-sm: 14px;
+  --r-md: 20px;
+  --r-lg: 28px;
+  --r-pill: 999px;
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* ---------- 阴影 ---------- */
+  --shadow-xs: 0 1px 2px rgba(29, 42, 40, 0.05);
+  --shadow-sm: 0 1px 2px rgba(29, 42, 40, 0.04), 0 6px 16px -8px rgba(29, 42, 40, 0.16);
+  --shadow-md: 0 2px 4px rgba(29, 42, 40, 0.04), 0 18px 36px -18px rgba(29, 42, 40, 0.24);
+  --shadow-lg: 0 4px 8px rgba(29, 42, 40, 0.04), 0 40px 72px -32px rgba(20, 75, 71, 0.3);
+  --shadow-accent: 0 2px 4px rgba(165, 87, 38, 0.14), 0 16px 30px -14px rgba(191, 106, 52, 0.55);
+
+  /* ---------- 缓动 ---------- */
+  --ease-out: cubic-bezier(0.22, 0.8, 0.28, 1);
+  --ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --dur-fast: 140ms;
+  --dur: 240ms;
+  --dur-slow: 640ms;
+
+  --ring: 0 0 0 4px rgba(20, 75, 71, 0.12);
+  --ring-accent: 0 0 0 4px rgba(191, 106, 52, 0.14);
 
   /* Vant 主题覆盖 */
   --van-primary-color: var(--c-primary);
   --van-text-color: var(--c-ink);
   --van-background: var(--c-bg);
+  --van-toast-background: rgba(29, 42, 40, 0.88);
+  --van-overlay-background: rgba(20, 40, 38, 0.45);
+  --van-dialog-radius: 22px;
+  --van-dialog-background: var(--c-surface);
+  --van-dialog-header-font-weight: 600;
+  --van-dialog-message-color: var(--c-muted);
+  --van-dialog-confirm-text-color: var(--c-primary);
+  --van-dialog-cancel-text-color: var(--c-muted);
+  --van-dialog-button-height: 52px;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 html,
@@ -42,21 +119,138 @@ body {
   background: var(--c-bg);
   color: var(--c-ink);
   font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
+  font-size: var(--fs-base);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* 页面级环境光：避免各页各自画背景时在窄栏边缘出现色块接缝 */
+  background:
+    radial-gradient(1000px 620px at 92% -10%, rgba(191, 106, 52, 0.075), transparent 62%),
+    radial-gradient(880px 560px at 0% -6%, rgba(20, 75, 71, 0.07), transparent 60%),
+    var(--c-bg);
+}
+
+@media (min-width: 900px) {
+  body {
+    background-attachment: fixed;
+  }
+}
+
+/* 函数式弹层（Toast / Dialog）跟随品牌字体与圆角 */
+.van-dialog {
+  border-radius: var(--van-dialog-radius);
+  overflow: hidden;
+}
+
+.van-dialog__header {
+  font-family: var(--font-display);
+  font-size: 19px;
+  letter-spacing: 0.02em;
+  color: var(--c-ink);
+  padding-top: 24px;
+}
+
+.van-dialog__message {
+  line-height: 1.75;
+  padding: 8px 22px 4px;
+}
+
+.van-dialog__confirm,
+.van-dialog__cancel {
+  font-size: 15px;
+}
+
+.van-toast {
+  border-radius: 14px;
+  font-size: 14px;
 }
 
 #app {
-  max-width: 520px;
-  margin: 0 auto;
   min-height: 100vh;
 }
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--c-primary);
   margin: 0;
+  text-wrap: balance;
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: rgba(191, 106, 52, 0.22);
+  color: var(--c-primary-strong);
+}
+
+::placeholder {
+  color: var(--c-faint);
+  opacity: 1;
+}
+
+/* 键盘可见焦点：鼠标点击不出现，键盘 Tab 才出现 */
+:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 3px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 数字等宽，避免计数器/进度跳动 */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
