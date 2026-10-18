@@ -190,6 +190,9 @@ async def get_session_detail(
     triage = await db.scalar(
         select(TriageResult).where(TriageResult.session_id == session_id)
     )
+    consent_ok = await has_active_consent(
+        db, tenant_id=tenant_id, patient_id=session.patient_id
+    )
 
     return {
         "session_id": session.id,
@@ -211,8 +214,8 @@ async def get_session_detail(
             "doctor_confirmed": triage.doctor_confirmed == "1" if triage else False,
         },
         "symptom_timeline": [],
-        "consent_granted": False,
-        "consent_scope_label": None,
+        "consent_granted": consent_ok,
+        "consent_scope_label": "历史病历调阅" if consent_ok else None,
         "started_time": session.started_time.isoformat() if session.started_time else None,
         "finished_time": session.finished_time.isoformat() if session.finished_time else None,
     }

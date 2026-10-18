@@ -374,6 +374,8 @@ async def list_model_providers(db: AsyncSession, *, tenant_id: str) -> dict:
                 "is_default": p.is_default == "1",
                 "is_on_prem": p.is_on_prem == "1",
                 "status": p.status,
+                # 只下发"是否已配置"，绝不返回密钥本身或可逆密文
+                "api_key_configured": bool(p.api_key_enc),
             }
             for p in rows
         ],

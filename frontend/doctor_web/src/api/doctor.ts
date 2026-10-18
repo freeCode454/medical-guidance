@@ -39,19 +39,49 @@ export interface SessionDetail {
   risk_flag: boolean
   chief_complaint: string | null
   inquiry_rounds: number
-  patient: { patient_display: string; age: number | null; gender: string | null }
+  patient: {
+    patient_id: string
+    patient_display: string
+    age: number | null
+    gender: string | null
+  }
   triage_status: { has_result: boolean; route: string | null; doctor_confirmed: boolean }
+  consent_granted: boolean
+  consent_scope_label: string | null
+  started_time: string | null
+  finished_time: string | null
 }
 
 export interface EmrDoc {
   emr_record_id: string
   generate_status: string
   completeness_rate: number
-  subjective: { chief_complaint: string; present_illness: string; past_history: any[]; allergy: any[] }
+  subjective: {
+    chief_complaint: string
+    present_illness: string
+    past_history: string[]
+    allergy: string[]
+  }
   objective: { note: string }
   assessment: { differential_directions: any[]; note: string } | null
   plan: { recommended_depts: string[]; suggested_workup: string[]; note: string }
   disclaimer: string
+  generated_time?: string
+}
+
+export interface PatientHistoryRecord {
+  emr_record_id: string
+  session_id: string
+  chief_complaint: string
+  generate_status: string
+  created_time: string | null
+}
+
+export interface PatientHistory {
+  patient_id: string
+  patient_display: string
+  consent_required: boolean
+  records: PatientHistoryRecord[]
 }
 
 export interface Diagnosis {
@@ -97,6 +127,10 @@ export function getEmr(sessionId: string) {
 
 export function getDiagnosis(sessionId: string) {
   return http.get<Diagnosis>(`/doctor/sessions/${sessionId}/diagnosis`)
+}
+
+export function getPatientEmr(patientId: string) {
+  return http.get<PatientHistory>(`/doctor/patients/${patientId}/emr`)
 }
 
 export function confirmTriage(sessionId: string, note?: string) {

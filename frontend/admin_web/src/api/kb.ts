@@ -15,6 +15,14 @@ export interface KbEntry {
 
 export interface PageData<T> { total: number; page: number; size: number; items: T[] }
 
+export interface KbPublish {
+  publish_id: string
+  version_tag: string
+  entry_count: number
+  published_by: string
+  published_time: string | null
+}
+
 export const kb = {
   list: (q: Record<string, any> = {}) => http.get<PageData<KbEntry>>(`/admin/kb/entries?${new URLSearchParams(Object.entries(q).filter(([, v]) => v != null && v !== '') as any)}`),
   create: (b: any) => http.post('/admin/kb/entries', b),
@@ -24,5 +32,6 @@ export const kb = {
   history: (id: string) => http.get(`/admin/kb/entries/${id}/history`),
   retrievalTest: (b: any) => http.post<{ candidates: Array<{ dept_code: string; dept_name: string; score: number }> }>('/admin/kb/retrieval-test', b),
   publish: () => http.post<{ publish_id: string; version_tag: string; entry_count: number }>('/admin/kb/publish', {}),
+  publishes: () => http.get<{ total: number; items: KbPublish[] }>('/admin/kb/publishes'),
   ingest: () => http.post('/admin/kb/ingest'),
 }

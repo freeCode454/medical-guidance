@@ -2,7 +2,7 @@
 import { http } from './client'
 
 export interface PageData<T> { total: number; page: number; size: number; items: T[] }
-export interface User { user_id: string; account: string; real_name: string; role: string; role_label: string; title: string | null; dept_code: string | null; dept_name: string | null; status: string }
+export interface User { user_id: string; account: string; real_name: string; role: string; role_label: string; title: string | null; dept_code: string | null; dept_name: string | null; status: string; last_login_time?: string | null; create_time?: string | null }
 export interface Dept { dept_id: string; dept_code: string; dept_name: string; sort_no: number; status: string }
 export interface AuditItem { audit_id: string; actor_role: string; action_type: string; target_type: string; result: string; detail: any; action_time: string }
 

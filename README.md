@@ -71,13 +71,25 @@
 
 ## 界面
 
-| 患者端（四页 + 急诊） | 医生端 |
-|---|---|
-| ![患者端移动端](docs/assets/patient-mobile-overview.png) | ![医生端](docs/assets/doctor-encounters.png) |
+### 患者端
 
-| 危重症引导 | 管理后台 |
+![患者端移动端四页](docs/assets/patient-mobile-overview.png)
+
+### 医生端
+
+| 会话工作台（SOAP / 鉴别 / 授权） | 今日接诊 |
 |---|---|
-| ![急诊引导](docs/assets/patient-emergency.png) | ![管理后台](docs/assets/admin-users.png) |
+| ![医生会话工作台](docs/assets/doctor-session.png) | ![医生接诊列表](docs/assets/doctor-encounters.png) |
+
+### 管理后台
+
+| 用户与角色 | 知识图谱 |
+|---|---|
+| ![用户管理](docs/assets/admin-users.png) | ![知识图谱](docs/assets/admin-kg.png) |
+
+| 审计日志 | 系统设置 |
+|---|---|
+| ![审计日志](docs/assets/admin-audit.png) | ![系统设置](docs/assets/admin-settings.png) |
 
 ## 技术栈
 
@@ -188,8 +200,7 @@ CI 见 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端 lint/type
 
 不藏着掖着，这些问题正在按优先级处理，明细见 [工程质量报告 §4](docs/05-工程质量报告.md#4-仍未解决按优先级)：
 
-- 匿名身份使用「高熵设备密钥 + 服务端只存指纹」，但密钥仍保存在 localStorage，存在 XSS 读取风险，高风险操作也未做二次校验；
-- 病史授权模型与强制校验已落地，但医生端历史病历列表 UI 还未接入该接口；
+- 设备密钥保存在 localStorage，存在 XSS 读取风险；高风险操作尚未二次校验；
 - 检查点已落 PostgreSQL，但使用单条连接（无池化/自动重连），且历史检查点尚未做 TTL 清理；
 - 接管/确认/修正已加条件更新与行锁，但还缺基于真实 PG 的并发回归测试；
 - 知识库发布/入库链路还没有真正的 worker 与向量库同步；
