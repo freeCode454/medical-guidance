@@ -1,24 +1,34 @@
 # MedicalGuidance
 
+[![ci](https://github.com/freeCode454/medical-guidance/actions/workflows/ci.yml/badge.svg)](https://github.com/freeCode454/medical-guidance/actions/workflows/ci.yml)
+[![python](https://img.shields.io/badge/python-3.11-3776AB)](https://www.python.org/)
+[![node](https://img.shields.io/badge/node-22-339933)](https://nodejs.org/)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 医疗智能导诊分诊与多学科会诊**多智能体**系统。
 
-患者用手机描述症状，系统通过多轮追问把模糊主诉问清楚，输出「该挂哪个科」和一份 SOAP
-预问诊病历，医生接诊时直接看结论。系统**不做诊断**，只把「人工分诊台」与「医生开场问诊」
-这两段最耗时、最容易出错的环节提前完成。
+患者用手机描述症状，系统通过多轮追问把模糊主诉问清楚，给出「该挂哪个科」和一份 SOAP 预问诊病历；
+医生端接诊时直接看结论，管理后台维护知识库与系统配置。系统**不做诊断**，只把「人工分诊台」与
+「医生开场问诊」这两段最耗时、最容易出错的环节提前完成。
 
-## 成果
+![患者端首页](docs/assets/patient-home-desktop.png)
 
-200 例副主任医师盲测（单盲，标注时不看系统输出）：
+## 现在能验证什么
 
-| 指标 | 结果 |
-|---|---|
-| 首位分诊准确率 | 96.2%（Kappa 一致性 0.86） |
-| 挂错号重退号比例 | 降低 85% |
-| 医生单次接诊预问诊查阅耗时 | 节省 30% 以上 |
+仓库内**可复现**的质量证据（不是效果宣传）：
 
-## 核心设计
+| 项目 | 结果 | 位置 |
+|---|---|---|
+| 后端单元测试 | 49 passed | [`backend/tests/unit`](backend/tests/unit) |
+| 静态检查 | ruff 0 / mypy 0 | [CI](.github/workflows/ci.yml) |
+| 端到端冒烟 | 完整问诊 + 红旗拦截（需真实 PG/Milvus/LLM） | [`test_e2e_smoke.py`](backend/tests/test_e2e_smoke.py) |
+| 典型主诉回归 | 8/8（含胸痛→心血管内科、胸口疼冒冷汗→急诊） | [工程质量报告](docs/05-工程质量报告.md) |
+| 三端构建 | typecheck + build 全过 | [CI](.github/workflows/ci.yml) |
 
-四个 Agent 是同一张状态图上的节点，协同构成一个闭环：
+> 旧版 README 里的「200 例盲测 / 96.2% / Kappa 0.86」没有可复现数据，已移除。
+> 真实世界评测方案与当前数字口径见 [docs/05-工程质量报告.md](docs/05-工程质量报告.md) §5。
+
+## 核心链路
 
 ```
                     ┌─────────────────────────────┐
@@ -29,158 +39,115 @@
   (文字/语音/点选)     多轮循环           混合检索+决策表      多专科并行          SOAP 病历
 ```
 
-- **导诊分流 Agent** —— 调度者，只决定「下一步做什么」，不亲自执行能力
-- **澄清追问 Agent** —— 把「肚子疼」追问成可决策的信息（时长、伴随症状、既往史），有轮次上限
-- **MDT 会诊 Agent** —— 复杂共病并行唤起多个专科角色，**分歧必须保留，不许在汇总时抹平**
-- **病历生成 Agent** —— 把整段对话整理成符合规范的 SOAP 预问诊病历
+- **危重症拦截**：250 条红旗规则 + 症状同义词归一化 + 硬编码兜底；**每一轮患者回答都会重新过规则**，
+  不是只看首轮主诉。
+- **澄清追问**：按主诉类型走模板（部位→时长→性质→伴随→程度），有轮次上限；LangGraph `interrupt/resume`
+  保证「回答」与「原问题」配对。
+- **分诊**：稠密+稀疏向量 RRF → rerank 精排 → 规则加权 → 人群硬过滤（性别/年龄）→ LLM 只在候选科室里选，
+  不允许编造 `dept_code`。
+- **知识图谱**：`(症状)-[:INDICATES]->(疾病)-[:BELONGS_TO]->(科室)` 作为第 4 个排序信号（权重 0.15），
+  同时把推理路径挂到结论上供医生查看。
+- **SOAP 病历**：S/O/A/P 四段，A 段仅医生端可见，P 段禁止用药建议；生成失败降级 PARTIAL，不伪造。
 
-### 分诊链路：规则与检索各司其职
+## 工程亮点
 
-纯向量召回对「肚子疼」「胸口疼」这类口语主诉区分度不够（妇科、消化、产科都涉及腹痛），
-所以分诊不是「一次向量检索 + 大模型自由裁决」，而是分层递进：
+1. **数据出域守卫是代码级约束**：按能力分类（绝对 PII / 患者链路 / 非 PII）+ 策略（strict / dev_sandbox）
+   做双重校验，`dev_sandbox` 放行必须声明合成数据并留痕；有单元测试锁死。
+2. **可观测性**：每个响应带 `X-Trace-ID`，访问日志与异常堆栈共用同一 id；`/healthz` 存活、`/readyz` 检查
+   PostgreSQL + Milvus，依赖挂了会被网关摘流量。
+3. **认证生命周期完整**：access/refresh 双令牌，refresh 真正可用且**轮换**（`jti`）；登录失败统一文案、
+   账号锁定、bcrypt 放线程池；前端单飞刷新并重放失败请求。
+4. **一致性**：会话消息序号用 PostgreSQL advisory lock 串行化；分诊/病历落库幂等；后台任务异常不再静默。
+5. **质量门禁**：ruff + mypy + 49 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
+   `pre-commit` 本地对齐。
+6. **诚实的数据视图**：分诊摘要、风险标记、SOAP 内容都落 JSONB 快照，接口返回真实生成内容，
+   不再用写死占位符拼页面。
 
-```
-主诉
-  → ① 红旗拦截（250 条急症规则 + 症状同义词归一化）命中即引导急诊
-  → ② 结构化追问（250 条按主诉定制的追问模板，部位→时长→性质→伴随→程度）
-  → ③ 向量召回（稠密 + 稀疏 + RRF 融合）
-  → ④ rerank 精排（bge-reranker-v2-m3，权重 0.55）
-  → ⑤ 分诊规则加权（症状→科室映射，权重 0.15）+ 人群硬过滤（性别/年龄）
-  → ⑥ LLM 生成结论 + SOAP 病历
-```
+## 界面
 
-关键点：
+| 患者端（四页 + 急诊） | 医生端 |
+|---|---|
+| ![患者端移动端](docs/assets/patient-mobile-overview.png) | ![医生端](docs/assets/doctor-encounters.png) |
 
-- **同义词归一化**：规则表用标准症状名（腹痛/腹泻/胸痛），患者说的是口语
-  （肚子疼/拉肚子/胸口疼），不归一化规则一条都命中不了——514 条映射是规则生效的前提。
-- **规则加权 ≠ 规则过滤**：性别不符（如男性→妇科）必须在**候选层硬剔除**，
-  否则 0.15 的加权压不过向量+精排的分差。
-- **追问不靠大模型临场发挥**：按主诉类型走模板，顺序可预期，避免「尿频也问哪个部位」。
-
-### 知识图谱：可解释的分诊依据
-
-除向量检索外，另有一条 Neo4j 图谱链路提供**推理路径**（`scripts/build_kg.py` 从同一份 Excel 抽取三元组构建）：
-
-```
-(症状)-[:INDICATES]->(疾病)-[:BELONGS_TO]->(科室)    症状→疾病→科室 两跳推理
-(症状)-[:SYNONYM_OF]->(症状)                          口语同义词 → 标准症状
-(疾病)-[:CODED_AS]->(ICD)                             疾病 → ICD-10
-(药物)-[:CONTRAINDICATED_FOR]->(禁忌条件)              用药禁忌
-(症状)-[:SUGGESTS_DEPT]->(科室)                       分诊规则
-```
-
-图谱作为**第 4 个分诊信号**参与排序（权重 0.15，与精排 0.46 / 向量 0.27 / 规则 0.12 共同决定），
-同时把推理路径挂到结论上供医生端展示，做到「既影响决策、又能解释决策」。
-
-关键设计：`INDICATES` 关系带权重（疾病症状字段的首个症状记 1.0，其余记 0.6）。
-有了它才能区分「胸痛之于心绞痛」（核心症状）与「胸痛之于肺癌」（伴随症状）——
-没有这层权重时，胸外科因「含胸痛症状的疾病更多」而误排第一。
-
-节点统一带 `:Mg` 标签，与同一 Neo4j 实例里的其他图谱隔离。
-
-## 知识库数据资产
-
-`kb/医学知识库源数据.xlsx` 是知识库的唯一源头（10 个 sheet / 2556 条），改数据 → 跑
-`python backend/scripts/import_kb.py` 即同步到 PostgreSQL 与 Milvus：
-
-| Sheet | 条数 | 用途 |
-|---|---|---|
-| 科室字典 | 252 | 41 个一级科室 + 211 个亚专科 |
-| 医生信息 | 250 | 演示用医生账号 |
-| 疾病特征库 | 251 | 症状 / 鉴别要点 / 高危因素 |
-| 临床指南 | 250 | 指南片段 + 证据等级 |
-| ICD-10 映射 | 250 | 疾病编码 / 章节 / 包含排除 |
-| 症状本体库 | 289 | 标准名 / 同义词 / 部位 / 时长 |
-| 红旗症状库 | 250 | 急症关键词 / 处置动作 / 提示文案 |
-| 禁忌症与用药风险 | 264 | 过敏 / 妊娠 / 儿童 / 脏器禁忌 |
-| 分诊规则 | 250 | 症状→科室映射 + 人群过滤 |
-| 追问模板 | 250 | 按主诉定制的追问维度 |
-
-> 数据为演示用示例，正式使用须经医学专业人士审核。
+| 危重症引导 | 管理后台 |
+|---|---|
+| ![急诊引导](docs/assets/patient-emergency.png) | ![管理后台](docs/assets/admin-users.png) |
 
 ## 技术栈
 
 | 层 | 选型 |
 |---|---|
-| 患者端 | Vue 3 + Vite + Vant 4（移动端 H5） |
+| 患者端 | Vue 3 + Vite + Vant 4（移动端 H5，按需引入） |
 | 医生端 / 管理后台 | Vue 3 + Element Plus |
-| 接口 | FastAPI + WebSocket（对话流式） |
-| 编排 | LangGraph（有环状态机、检查点持久化、人工介入挂起） |
-| 模型 | Qwen2.5-32B（推理）+ Qwen2.5-7B（意图/抽取）；BGE-M3 本地向量化 + bge-reranker-v2-m3 精排 |
-| 存储 | PostgreSQL + Milvus（混合检索）+ Neo4j（知识图谱）+ Redis + MinIO |
-| 外部能力 | FastMCP 封装 HIS 号源/排班/既往病历 |
-| 交付 | Docker Compose，前后端合并单镜像 |
-
-> 技术栈按「一期必用 / 二期预留」两级标注，见《01-需求规格说明书》8.1.1。
+| 接口 | FastAPI + WebSocket（节点级事件推送） |
+| 编排 | LangGraph（有环状态机、interrupt/resume、Send 并行会诊） |
+| 模型 | Qwen2.5-32B / 7B；BGE-M3 本地 ONNX 向量化 + bge-reranker-v2-m3 精排 |
+| 存储 | PostgreSQL + Milvus（稠密/稀疏混合）+ Neo4j（知识图谱）；Redis / MinIO 可选 |
+| 质量 | ruff + mypy + pytest + GitHub Actions + pre-commit |
 
 ## 目录结构
 
 ```
 medical-guidance/
-├── docs/               # 01 需求 / 02 架构 / 03 数据库 / 04 接口 四份设计文档
-├── backend/            # FastAPI 后端（六层：接口/服务/编排/数据访问/能力/基础设施）
+├── docs/                    # 01 需求 / 02 架构 / 03 数据库 / 04 接口 / 05 工程质量报告
+├── backend/
 │   ├── app/
-│   │   ├── api/        # 接口层（patient / doctor / admin / ws / auth）
-│   │   ├── services/   # 服务层（业务用例 + 规则引擎 + 事务 + 审计）
-│   │   ├── agents/     # 智能体编排层（LangGraph 图 + 节点）
-│   │   ├── retrieval/  # 检索能力（向量化 / 向量库 / 融合）
-│   │   ├── common/     # 基础设施（配置 / 数据库 / 鉴权 / LLM 客户端 / 出域守卫）
-│   │   ├── models/     # 数据访问层（SQLAlchemy 模型）
-│   │   ├── schemas/    # 请求/响应模型
-│   │   ├── middleware/ # 中间件（租户上下文 / 限流）
-│   │   ├── ws/         # WebSocket 流式通道
-│   │   └── jobs/       # 异步任务（知识库入库/发布/回归）
-│   ├── scripts/        # 工具脚本（种子数据 / 知识库生成与导入）
-│   └── static/         # 本地托管的 Swagger UI 静态资源
-├── mcp_servers/        # FastMCP 服务（HIS 挂号 / 病历查询 / 用药禁忌）
-├── frontend/           # 三端
-│   ├── patient_h5/     # 患者端 H5（Vant 4，核心问诊链路）
-│   ├── doctor_web/     # 医生端（Element Plus，接诊工作台）
-│   └── admin_web/      # 管理后台（Element Plus，用户/科室/知识库/审计）
-├── kb/                 # 知识库数据资产
-│   ├── 医学知识库源数据.xlsx  # 10 sheet / 2556 条（唯一源头）
-│   └── rules.json      # 导入时生成：红旗/分诊/追问/同义词
-└── deploy/             # docker-compose + init.sql + migrations
+│   │   ├── api/             # 接口层（patient / doctor / admin / kb / auth / ws）
+│   │   ├── services/        # 业务用例、规则引擎、编排、事务与审计
+│   │   ├── agents/          # LangGraph 图与节点（safety / inquiry / router / mdt / emr）
+│   │   ├── retrieval/       # 向量化、Milvus 客户端、RRF 融合
+│   │   ├── common/          # 配置 / 数据库 / 鉴权 / LLM 客户端 / 出域守卫 / trace 上下文
+│   │   ├── middleware/      # trace-id、访问日志、安全响应头
+│   │   ├── models/          # SQLAlchemy 模型（23 张表）
+│   │   ├── schemas/         # 请求 / 响应模型
+│   │   └── ws/              # 事件总线与事件定义
+│   ├── scripts/             # 种子数据、知识库生成/导入、图谱构建
+│   ├── tests/               # 单元测试 + 端到端冒烟
+│   └── static/              # 本地托管的 Swagger UI 资源
+├── frontend/
+│   ├── patient_h5/          # 患者端 H5
+│   ├── doctor_web/          # 医生工作台
+│   └── admin_web/           # 管理后台
+├── kb/                      # 知识库源数据（Excel）+ 规则文件
+├── deploy/                  # docker-compose 基础设施 + init.sql
+└── Makefile                 # 常用命令（含 make verify）
 ```
 
 ## 快速开始
 
-**环境要求**：Docker Desktop、Python 3.11+（建议 conda）、Node 22+
+**环境**：Docker Desktop、Python 3.11（建议 conda）、Node 22+。
 
 ```bash
-# 1. 创建环境并装依赖
+# 1. 后端依赖（pyproject 是唯一来源）
 conda create -n medguide python=3.11 -y
 conda activate medguide
-pip install -r backend/requirements.txt
+pip install -e "backend[dev]"
 
-# 2. 启动基础设施（渐进式，本机内存有限时逐条来）
+# 2. 基础设施（本机内存有限时逐个起）
 make db-up        # PostgreSQL（自动执行 init.sql 建 23 表）
-make vector-up    # Milvus Standalone（etcd + minio + milvus）
+make vector-up    # Milvus Standalone
 make cache-up     # Redis（可选）
-make storage-up   # MinIO（可选，已随 vector 起）
 
-# 3. 配置并启动后端
-cp backend/config/.env.development.example backend/.env  # 填入 LLM_API_KEY
-make dev          # uvicorn 热重载，http://localhost:8000
+# 3. 配置
+cp backend/config/.env.development.example backend/.env
+#   至少填 LLM_API_KEY；开发形态显式设置 EGRESS_POLICY=dev_sandbox
 
-# 4. 自检
-make check        # 配置 / 云端 API / 出域守卫
-make probe-vector # 向量库能力边界
+# 4. 启动后端
+make dev                  # http://localhost:8000
+make ready                # /readyz：PostgreSQL + Milvus 是否就绪
 
-# 5. 初始化演示数据 + 知识库（Excel → PostgreSQL + Milvus）
+# 5. 演示数据（Excel 已在 kb/，可跳过 gen）
 cd backend
-python scripts/seed_dev.py        # 租户/用户/科室/系统配置/模型配置
-python scripts/gen_kb_excel.py    # 生成 kb/医学知识库源数据.xlsx（2556 条）
-python scripts/import_kb.py       # 导入 mg_kb_entry + Milvus + rules.json
+python scripts/seed_dev.py
+python scripts/import_kb.py
+python scripts/init_dev_passwords.py   # ⚠️ 种子哈希是占位符，不跑无法登录
+python scripts/build_kg.py             # 可选，需 Neo4j
+cd ..
 
-# 5.5 知识图谱（可选）
-make neo4j                        # 启动 Neo4j（绕过 Windows 下有兼容 bug 的 neo4j.bat）
-python scripts/build_kg.py        # 从 Excel 抽三元组建图（节点打 :Mg 标签隔离）
-
-# 6. 启动三端前端（另开终端）
-cd frontend/patient_h5 && npm install && npm run dev   # 患者端  http://localhost:5173
-cd frontend/doctor_web && npm install && npm run dev   # 医生端  http://localhost:5174
-cd frontend/admin_web  && npm install && npm run dev   # 管理后台 http://localhost:5175
+# 6. 三端前端
+cd frontend/patient_h5 && npm install && npm run dev   # 5173
+cd frontend/doctor_web && npm install && npm run dev   # 5174
+cd frontend/admin_web  && npm install && npm run dev   # 5175
 ```
 
 演示账号：
@@ -188,22 +155,47 @@ cd frontend/admin_web  && npm install && npm run dev   # 管理后台 http://loc
 | 端 | 账号 | 密码 |
 |---|---|---|
 | 医生端 | doctor01 | admin123 |
-| 管理后台 | admin | admin123 |
+| 管理后台（机构管理员） | admin | admin123 |
+| 管理后台（知识库管理员） | kbadmin | admin123 |
 
-后端 API 文档：<http://localhost:8000/docs>（Swagger UI 静态资源本地托管，不依赖公网 CDN）。
+后端 API 文档：<http://localhost:8000/docs>（Swagger 静态资源本地托管，不依赖公网 CDN）。
 
-> ⚠️ 开发形态需设置 `EGRESS_POLICY=dev_sandbox`，且**只允许使用合成数据**；
-> 交付形态必须是 `strict`（详见 02 文档 §8.2 与 `NFR70`）。
+> ⚠️ 开发形态需 `EGRESS_POLICY=dev_sandbox`，且**只允许合成数据**；交付形态必须是 `strict`，
+> 否则启动校验会拒绝启动。
+
+## 质量门禁
+
+```bash
+make lint         # ruff
+make typecheck    # mypy（基线）
+make test-unit    # 49 个单测，不依赖外部服务
+make front-check  # 三端 typecheck + build
+make verify       # 以上一次跑完
+```
+
+CI 见 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端 lint/typecheck/单测 + 三端矩阵构建。
+
+## 已知限制
+
+不藏着掖着，这些问题正在按优先级处理，明细见 [工程质量报告 §4](docs/05-工程质量报告.md#4-仍未解决按优先级)：
+
+- 匿名身份目前以 `device_id` 为 bearer 语义，尚未叠加不可猜测的设备密钥；
+- 病历调阅尚未强制校验 `PatientConsent`；
+- LangGraph 检查点仍是 `InMemorySaver`，重启/多 worker 会丢挂起会话；
+- 会话状态机（接管/确认/修正）存在并发覆盖窗口；
+- 知识库发布/入库链路还没有真正的 worker 与向量库同步；
+- 医生端/管理后台首屏包体偏大（Element Plus 全量）。
 
 ## 文档
 
 | 文档 | 内容 |
 |---|---|
-| [01-需求规格说明书](docs/01-需求规格说明书.md) | 56 条功能需求、70 条非功能需求、12 条业务规则 |
-| [02-系统架构设计说明书](docs/02-系统架构设计说明书.md) | 六层架构、10 条 ADR、出域守卫、中间件设计 |
-| [03-数据库设计说明书](docs/03-数据库设计说明书.md) | 23 张表、67 个索引、Redis 键设计、RLS 迁移 |
-| [04-API接口设计说明书](docs/04-API接口设计说明书.md) | 75 个接口、2 条 WebSocket 通道、87 个错误码 |
+| [01-需求规格说明书](docs/01-需求规格说明书.md) | 功能/非功能需求与业务规则 |
+| [02-系统架构设计说明书](docs/02-系统架构设计说明书.md) | 分层架构、ADR、出域守卫、中间件 |
+| [03-数据库设计说明书](docs/03-数据库设计说明书.md) | 23 张表、索引、Redis 键、RLS |
+| [04-API接口设计说明书](docs/04-API接口设计说明书.md) | REST/WS 接口与错误码 |
+| [05-工程质量报告](docs/05-工程质量报告.md) | 本轮审计、修复、未修项与数字口径 |
 
 ## License
 
-见 [LICENSE](LICENSE)。
+[MIT](LICENSE)

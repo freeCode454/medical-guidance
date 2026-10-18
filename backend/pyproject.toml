@@ -3,7 +3,7 @@ name = "medical-guidance"
 version = "0.1.0"
 description = "医疗智能导诊分诊与多学科会诊多智能体系统"
 requires-python = ">=3.11"
-license = { text = "Proprietary" }
+license = { text = "MIT" }
 
 # ── 一期必用依赖 ────────────────────────────────────────────────────────
 # 原则：只引入让业务闭环跑起来的必需项。算力、运维、可观测类组件
