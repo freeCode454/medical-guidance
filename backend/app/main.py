@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from contextlib import asynccontextmanager
+import sys
+from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Response
@@ -54,12 +55,55 @@ async def lifespan(app: FastAPI):
     # 挂到 app.state，供接口与后台任务复用
     app.state.model_client = _client
     app.state.milvus_store = milvus_store
+
+    # 编排检查点：PostgreSQL 让挂起会话跨重启/多 worker 恢复；内存仅开发兜底
+    checkpoint_stack = AsyncExitStack()
+    checkpointer = None
+    if settings.checkpoint_backend == "postgres":
+        proactor_cls = getattr(asyncio, "ProactorEventLoop", None)
+        unsupported = (
+            sys.platform == "win32"
+            and proactor_cls is not None
+            and isinstance(asyncio.get_running_loop(), proactor_cls)
+        )
+        if unsupported:
+            message = (
+                "Windows ProactorEventLoop 不支持 psycopg 异步连接，"
+                "请用 `python -m app` 启动（SelectorEventLoop）"
+            )
+            if settings.deploy_mode == "prod":
+                raise RuntimeError(message)
+            logger.error("%s；已回退内存检查点，重启会丢失挂起会话", message)
+        else:
+            try:
+                from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
+                checkpointer = await checkpoint_stack.enter_async_context(
+                    AsyncPostgresSaver.from_conn_string(settings.checkpoint_dsn)
+                )
+                await checkpointer.setup()
+                app.state.checkpoint_saver = checkpointer
+                logger.info("编排检查点：PostgreSQL")
+            except Exception:
+                await checkpoint_stack.aclose()
+                checkpointer = None
+                if settings.deploy_mode == "prod":
+                    raise
+                logger.exception(
+                    "PostgreSQL 检查点初始化失败，回退内存（服务重启会丢失挂起会话）"
+                )
+    else:
+        logger.warning("编排检查点：memory（服务重启会丢失挂起会话）")
+
     # 构建分诊编排器（LangGraph 图 + 多轮状态管理）
-    app.state.orchestrator = init_orchestrator(_client, _client.embedder, milvus_store)
+    app.state.orchestrator = init_orchestrator(
+        _client, _client.embedder, milvus_store, checkpointer
+    )
     logger.info(
-        "启动完成 deploy_mode=%s egress_policy=%s llm=%s",
+        "启动完成 deploy_mode=%s egress_policy=%s checkpoint=%s llm=%s",
         settings.deploy_mode,
         settings.egress_policy.value,
+        settings.checkpoint_backend,
         settings.llm_model,
     )
     yield
@@ -67,6 +111,7 @@ async def lifespan(app: FastAPI):
         await _client.aclose()
     _client = None
     milvus_store.close()
+    await checkpoint_stack.aclose()
 
 
 # docs_url=None 禁用默认 /docs（其模板引用 jsdelivr CDN，国内不可达会白屏），

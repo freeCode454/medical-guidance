@@ -67,8 +67,11 @@ db-reset:  ## ⚠️ 删除数据卷并重建（会丢失所有数据）
 install:  ## 安装后端依赖（pyproject 为唯一来源）
 	cd backend && $(PY) -m pip install -e ".[dev]"
 
-dev:  ## 启动后端（热重载）
-	cd backend && $(PY) -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+dev:  ## 启动后端（Windows 下自动使用 SelectorEventLoop，支持 PG 检查点）
+	cd backend && $(PY) -m app
+
+dev-reload:  ## 热重载开发（仅内存检查点；改代码自动重启）
+	cd backend && CHECKPOINT_BACKEND=memory $(PY) -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 check:  ## 环境自检（需 DEBUG_ENDPOINTS=true）
 	@echo "── 配置 ──"
@@ -124,6 +127,6 @@ verify:  ## 提交前一次跑完：lint + 单测 + 三端构建
 	$(MAKE) front-check
 
 .PHONY: help db-up vector-up cache-up storage-up infra-down infra-logs \
-        db-verify db-tables db-reset install dev check ready \
+        db-verify db-tables db-reset install dev dev-reload check ready \
         kb-gen kb-import kg-build kg-dept-network neo4j \
         lint fmt typecheck test-unit test-e2e front-check verify

@@ -82,6 +82,13 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://medguide:medguide@localhost:5434/medguide"
     redis_url: str = "redis://localhost:6379/0"
 
+    # ---------------- 编排检查点 ----------------
+    # postgres：挂起会话落库，服务重启/多 worker 后可恢复（交付形态必须）
+    # memory  ：进程内存，仅用于单测或临时演示
+    checkpoint_backend: Literal["memory", "postgres"] = "postgres"
+    # 留空表示复用 database_url（psycopg 需要去掉 SQLAlchemy 的 +asyncpg 驱动后缀）
+    checkpoint_database_url: str = ""
+
     # 对象存储（MinIO，S3 兼容）
     object_storage_endpoint: str = "localhost:9000"
     object_storage_access_key: str = "minioadmin"
@@ -132,6 +139,19 @@ class Settings(BaseSettings):
     def cors_origin_list(self) -> list[str]:
         """把逗号分隔的 CORS_ORIGINS 解析成列表。"""
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def checkpoint_dsn(self) -> str:
+        """psycopg 使用的连接串（去掉 SQLAlchemy 的 +asyncpg 后缀）。
+
+        本地 ``localhost`` 在 Windows 上可能先解析到 ::1，而 Docker PostgreSQL
+        只监听 IPv4，psycopg 会等到连接超时；这里统一收敛到 127.0.0.1。
+        """
+        raw = self.checkpoint_database_url or self.database_url
+        dsn = raw.replace("postgresql+asyncpg://", "postgresql://").replace(
+            "postgresql+psycopg://", "postgresql://"
+        )
+        return dsn.replace("@localhost:", "@127.0.0.1:")
 
     # ---------------- 启动校验 ----------------
 
@@ -185,6 +205,13 @@ class Settings(BaseSettings):
                 "deploy_mode=prod 时不允许 egress_policy=dev_sandbox。\n"
                 "dev_sandbox 会放行患者链路能力（内容生成、精排、知识库检索）的院外调用，"
                 "仅适用于无本地推理算力的开发环境。"
+            )
+
+        # ---- 交付形态必须使用持久化检查点 ----
+        if self.deploy_mode == "prod" and self.checkpoint_backend == "memory":
+            raise ValueError(
+                "deploy_mode=prod 时 checkpoint_backend 不得为 memory："
+                "进程重启会丢失问诊挂起态。请配置 PostgreSQL 检查点。"
             )
 
         # ---- 交付形态不得使用默认凭证 ----

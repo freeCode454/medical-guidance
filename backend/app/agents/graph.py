@@ -15,6 +15,8 @@
 """
 from __future__ import annotations
 
+from typing import Any
+
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 
@@ -34,9 +36,15 @@ from app.retrieval import MilvusStore
 
 
 def build_triage_graph(
-    client: ModelClient, embedder: BaseEmbedder, store: MilvusStore
+    client: ModelClient,
+    embedder: BaseEmbedder,
+    store: MilvusStore,
+    checkpointer: Any = None,
 ):
-    """构建并编译分诊编排图。"""
+    """构建并编译分诊编排图。
+
+    ``checkpointer`` 由应用生命周期注入（PostgreSQL 或内存）；单测传 None 走内存。
+    """
     g = StateGraph(TriageState)
 
     mdt_fanout = build_mdt_fanout_node()
@@ -85,4 +93,4 @@ def build_triage_graph(
 
     g.add_edge("emr_writer", END)
 
-    return g.compile(checkpointer=InMemorySaver())
+    return g.compile(checkpointer=checkpointer or InMemorySaver())

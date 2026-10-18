@@ -19,7 +19,7 @@
 
 | 项目 | 结果 | 位置 |
 |---|---|---|
-| 后端单元测试 | 61 passed | [`backend/tests/unit`](backend/tests/unit) |
+| 后端单元测试 | 62 passed | [`backend/tests/unit`](backend/tests/unit) |
 | 静态检查 | ruff 0 / mypy 0 | [CI](.github/workflows/ci.yml) |
 | 端到端冒烟 | 完整问诊 + 红旗拦截（需真实 PG/Milvus/LLM） | [`test_e2e_smoke.py`](backend/tests/test_e2e_smoke.py) |
 | 典型主诉回归 | 8/8（含胸痛→心血管内科、胸口疼冒冷汗→急诊） | [工程质量报告](docs/05-工程质量报告.md) |
@@ -59,11 +59,13 @@
 3. **认证生命周期完整**：access/refresh 双令牌，refresh 真正可用且**轮换**（`jti`）；登录失败统一文案、
    账号锁定、bcrypt 放线程池；前端单飞刷新并重放失败请求。
 4. **一致性**：会话消息序号用 PostgreSQL advisory lock 串行化；分诊/病历落库幂等；后台任务异常不再静默。
-5. **质量门禁**：ruff + mypy + 61 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
+5. **检查点持久化**：LangGraph 挂起态落 PostgreSQL（`AsyncPostgresSaver`），服务重启/多 worker 后患者回答仍能继续追问；
+   Windows 用 `python -m app` 启动以避开 Proactor 事件循环限制。
+6. **质量门禁**：ruff + mypy + 62 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
    `pre-commit` 本地对齐。
-6. **隐私授权**：患者显式授权（scope / 有效期 / 撤回），医生调阅历史病历前强制校验；
+7. **隐私授权**：患者显式授权（scope / 有效期 / 撤回），医生调阅历史病历前强制校验；
    无授权返回空列表并写审计，不泄露"有无病历"。
-7. **诚实的数据视图**：分诊摘要、风险标记、SOAP 内容都落 JSONB 快照，接口返回真实生成内容，
+8. **诚实的数据视图**：分诊摘要、风险标记、SOAP 内容都落 JSONB 快照，接口返回真实生成内容，
    不再用写死占位符拼页面。
 
 ## 界面
@@ -136,7 +138,7 @@ cp backend/config/.env.development.example backend/.env
 #   至少填 LLM_API_KEY；开发形态显式设置 EGRESS_POLICY=dev_sandbox
 
 # 4. 启动后端
-make dev                  # http://localhost:8000
+make dev                  # python -m app：Windows 下自动用 SelectorEventLoop，支持 PG 检查点
 make ready                # /readyz：PostgreSQL + Milvus 是否就绪
 
 # 5. 演示数据（Excel 已在 kb/，可跳过 gen）
@@ -171,9 +173,12 @@ cd frontend/admin_web  && npm install && npm run dev   # 5175
 ```bash
 make lint         # ruff
 make typecheck    # mypy（基线）
-make test-unit    # 61 个单测，不依赖外部服务
+make test-unit    # 62 个单测，不依赖外部服务
 make front-check  # 三端 typecheck + build
 make verify       # 以上一次跑完
+
+# 需要真实 PostgreSQL 的检查点测试（模拟重启后恢复挂起会话）
+cd backend && pytest tests/integration -m integration -q
 ```
 
 CI 见 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端 lint/typecheck/单测 + 三端矩阵构建。
@@ -184,7 +189,7 @@ CI 见 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端 lint/type
 
 - 匿名身份使用「高熵设备密钥 + 服务端只存指纹」，但密钥仍保存在 localStorage，存在 XSS 读取风险，高风险操作也未做二次校验；
 - 病史授权模型与强制校验已落地，但医生端历史病历列表 UI 还未接入该接口；
-- LangGraph 检查点仍是 `InMemorySaver`，重启/多 worker 会丢挂起会话；
+- 检查点已落 PostgreSQL，但使用单条连接（无池化/自动重连），且历史检查点尚未做 TTL 清理；
 - 接管/确认/修正已加条件更新与行锁，但还缺基于真实 PG 的并发回归测试；
 - 知识库发布/入库链路还没有真正的 worker 与向量库同步；
 - 医生端/管理后台首屏包体偏大（Element Plus 全量）。

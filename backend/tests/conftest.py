@@ -5,7 +5,13 @@
 """
 from __future__ import annotations
 
+import asyncio
 import os
+import sys
+
+# psycopg 异步连接不支持 Windows 默认的 ProactorEventLoop（检查点集成测试需要）
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 os.environ.setdefault("LLM_BASE_URL", "http://127.0.0.1:9999/v1")
 os.environ.setdefault("EGRESS_POLICY", "strict")

@@ -19,6 +19,8 @@ dependencies = [
     # 智能体编排
     "langgraph>=0.2.50",
     "langchain-core>=0.3.20",
+    # 检查点持久化：挂起会话跨重启/多 worker 恢复（生产必须）
+    "langgraph-checkpoint-postgres>=3.0",
 
     # 数据访问
     "sqlalchemy[asyncio]>=2.0.36",

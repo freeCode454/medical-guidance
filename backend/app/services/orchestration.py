@@ -7,15 +7,16 @@
 - 图结果落库：分诊结论 → mg_triage_result；SOAP → mg_emr_record；
   MDT → mg_mdt_council；追问 → mg_session_message（AI 角色）；会话状态更新
 
-多轮状态管理：checkpointer 用 InMemorySaver（thread_id = session_id），
-``_pending`` 集合记录处于 interrupt 挂起的会话，用于区分 start / resume。
-两者生命周期一致（都在进程内存），服务重启后需重新发起会话——开发期可接受，
-交付期切换 PostgresSaver 后由检查点状态替代。
+多轮状态管理：checkpointer 由应用生命周期注入（PostgreSQL 为交付默认，
+内存仅用于单测）；thread_id = session_id。``_pending`` 只是进程内加速提示，
+真正判定是否处于挂起态以检查点快照（``interrupts`` / ``next``）为准，
+因此服务重启后仍能恢复追问。
 """
 from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
+from typing import Any
 
 from langgraph.types import Command
 from sqlalchemy import func, select
@@ -70,12 +71,33 @@ def _build_evidence(result: dict) -> dict:
 class TriageOrchestrator:
     """分诊编排器：持有编译后的图，管理多轮交互与结果落库。"""
 
-    def __init__(self, client: ModelClient, embedder: BaseEmbedder, store: MilvusStore):
-        self.graph = build_triage_graph(client, embedder, store)
+    def __init__(
+        self,
+        client: ModelClient,
+        embedder: BaseEmbedder,
+        store: MilvusStore,
+        checkpointer: Any = None,
+    ):
+        self.graph = build_triage_graph(client, embedder, store, checkpointer)
         self._pending: set[str] = set()
 
     def _config(self, session_id: str) -> dict:
         return {"configurable": {"thread_id": session_id}}
+
+    async def _has_pending(self, session_id: str) -> bool:
+        """是否处于挂起态。
+
+        以检查点快照为准（``interrupts`` 或 ``next`` 非空），而不是只看进程内集合，
+        这样服务重启/多 worker 后仍能正确 resume。
+        """
+        if session_id in self._pending:
+            return True
+        try:
+            snapshot = await self.graph.aget_state(self._config(session_id))
+        except Exception:
+            logger.warning("读取检查点失败 session=%s", session_id, exc_info=True)
+            return False
+        return bool(snapshot.interrupts) or bool(snapshot.next)
 
     # ---- 对外入口 ---------------------------------------------------------
 
@@ -124,8 +146,8 @@ class TriageOrchestrator:
         patient_id: str,
         answer: str,
     ) -> None:
-        """患者回答追问后恢复图。会话不在挂起态则忽略。"""
-        if session_id not in self._pending:
+        """患者回答追问后恢复图。会话不处于挂起态则忽略。"""
+        if not await self._has_pending(session_id):
             logger.info("会话 %s 不在挂起态，忽略 resume", session_id)
             return
 
@@ -385,8 +407,13 @@ def get_orchestrator() -> TriageOrchestrator:
     return _orchestrator
 
 
-def init_orchestrator(client: ModelClient, embedder: BaseEmbedder, store: MilvusStore) -> TriageOrchestrator:
+def init_orchestrator(
+    client: ModelClient,
+    embedder: BaseEmbedder,
+    store: MilvusStore,
+    checkpointer: Any = None,
+) -> TriageOrchestrator:
     """构建全局编排器。"""
     global _orchestrator
-    _orchestrator = TriageOrchestrator(client, embedder, store)
+    _orchestrator = TriageOrchestrator(client, embedder, store, checkpointer)
     return _orchestrator

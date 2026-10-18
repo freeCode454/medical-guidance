@@ -37,6 +37,20 @@ def test_prod_rejects_default_jwt_secret() -> None:
         )
 
 
+def test_prod_rejects_memory_checkpoint() -> None:
+    with pytest.raises(ValidationError, match="checkpoint_backend"):
+        Settings(
+            _env_file=None,
+            deploy_mode="prod",
+            egress_policy=EgressPolicy.STRICT,
+            llm_base_url="http://10.0.0.5:8000/v1",
+            jwt_secret="x" * 40,
+            object_storage_access_key="real-key",
+            object_storage_secret_key="real-secret",
+            checkpoint_backend="memory",
+        )
+
+
 def test_dev_sandbox_allows_public_endpoint() -> None:
     settings = Settings(
         _env_file=None,
