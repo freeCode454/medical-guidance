@@ -90,6 +90,27 @@ def build_inquiry_node(client: ModelClient):
             )
             return {"sufficient": True}
 
+        # 重放确定性：LangGraph resume 会重放整个节点。若 pending_question 已在
+        # state（_after_run 挂起时写入），直接复用并提前返回，不重跑 LLM，
+        # 保证 interrupt 的 resume 值（用户回答）与原问题正确配对。
+        pending = state.get("pending_question") or ""
+        if pending:
+            asked = state.get("asked", [])
+            round_now = state.get("inquiry_rounds", 0)
+            answer = interrupt({
+                "pending_question": pending,
+                "asked": [asked[-1]] if asked else [],
+                "inquiry_rounds": round_now,
+            })
+            return {
+                "messages": [
+                    {"role": "assistant", "content": pending},
+                    {"role": "patient", "content": answer},
+                ],
+                "pending_question": "",
+                "inquiry_rounds": round_now,
+            }
+
         prompt = _build_prompt(state)
         reply = await client.chat(
             [{"role": "user", "content": prompt}],
@@ -183,12 +204,14 @@ def build_inquiry_node(client: ModelClient):
             )
             return {"sufficient": True, "entities": entities, "inquiry_rounds": round_now}
 
-        events.emit_node_complete(
-            session_id,
-            events.NODE_INQUIRY,
-            {"sufficient": False, "content": question, "asked": missing, "inquiry_rounds": round_now},
-        )
-        answer = interrupt({"pending_question": question, "asked": missing})
+        # 不在这里 emit：LangGraph resume 重放节点会导致重复推送。
+        # 问题推送统一收敛到 orchestration._after_run（interrupt 挂起时推送一次）。
+        # interrupt 的 value 里带上轮次，供 _after_run 组装事件。
+        answer = interrupt({
+            "pending_question": question,
+            "asked": missing,
+            "inquiry_rounds": round_now,
+        })
         # 患者回答后恢复：追问 + 回答都追加进对话，图循环回本节点
         return {
             "messages": [

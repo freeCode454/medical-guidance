@@ -112,17 +112,25 @@ class TriageOrchestrator:
             intr = result["__interrupt__"][0].value or {}
             question = intr.get("pending_question", "")
             asked = intr.get("asked") or []
+            rounds = intr.get("inquiry_rounds", 0)
             await self._persist_question(session_id, tenant_id, question)
-            # 关键：把本轮追问的 slot 立刻写入 state。
-            # LangGraph 的 interrupt 在恢复时会重放整个节点，节点 return 里的 asked
-            # 在重放场景下不可靠，容易导致下一轮重复问同一个维度。
-            if asked:
-                try:
-                    await self.graph.aupdate_state(
-                        self._config(session_id), {"asked": asked}
-                    )
-                except Exception as exc:
-                    logger.warning("更新 asked 状态失败 session=%s: %s", session_id, exc)
+            # 把本轮追问的 slot 与问题立刻写入 state。
+            # LangGraph resume 会重放整个节点，重放时节点从 state 读 pending_question
+            # （不再重新生成），保证「用户回答」与「原问题」正确配对。
+            try:
+                await self.graph.aupdate_state(
+                    self._config(session_id),
+                    {"asked": asked, "pending_question": question},
+                )
+            except Exception as exc:
+                logger.warning("更新追问状态失败 session=%s: %s", session_id, exc)
+            # 问题推送统一收敛在这里：节点内 emit 会因 LangGraph 重放而重复，
+            # 导致患者端一次收到两条 AI 消息。
+            events.emit_node_complete(
+                session_id,
+                events.NODE_INQUIRY,
+                {"sufficient": False, "content": question, "inquiry_rounds": rounds},
+            )
         else:
             self._pending.discard(session_id)
             await self._persist_result(session_id, tenant_id, patient_id, result)

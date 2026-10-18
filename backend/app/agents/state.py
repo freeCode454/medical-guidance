@@ -48,6 +48,9 @@ class TriageState(TypedDict, total=False):
 
     # ---- 澄清追问（合并） ----
     asked: Annotated[list, _merge_list]  # 已问过的信息项
+    # 当前挂起的问题：_after_run 在 interrupt 时写入。LangGraph resume 会重放
+    # 整个节点，重放时从这里读问题（而不是重新生成），保证与 resume 值配对。
+    pending_question: str
     inquiry_rounds: int
 
     # ---- 决策点（覆盖） ----
