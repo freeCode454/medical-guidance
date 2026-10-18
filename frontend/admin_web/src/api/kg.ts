@@ -25,11 +25,23 @@ export interface KgNetwork {
   paths: number
 }
 
+export interface KgDeptNetwork {
+  dept_code: string
+  dept_name: string
+  nodes: KgNode[]
+  edges: KgEdge[]
+  diseases: number
+}
+
 export const kg = {
   stats: () => http.get<KgStats>('/admin/kg/stats'),
   symptoms: () => http.get<{ items: string[] }>('/admin/kg/symptoms'),
   network: (symptom: string, limit = 30) =>
     http.get<KgNetwork>(
       `/admin/kg/network?symptom=${encodeURIComponent(symptom)}&limit=${limit}`,
+    ),
+  deptNetwork: (deptCode: string, limit = 30) =>
+    http.get<KgDeptNetwork>(
+      `/admin/kg/dept-network?dept_code=${encodeURIComponent(deptCode)}&limit=${limit}`,
     ),
 }

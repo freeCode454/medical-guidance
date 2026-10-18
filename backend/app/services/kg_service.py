@@ -156,6 +156,52 @@ class KnowledgeGraph:
             "paths": len(rows),
         }
 
+    def dept_network(self, dept_code: str, limit: int = 30) -> dict:
+        """科室 → 疾病 → 症状 的反向子图（科室视角）。"""
+        cql = """
+        MATCH (d:Disease:Mg)-[:BELONGS_TO]->(dept:Department:Mg {code: $dept})
+        OPTIONAL MATCH (s:Symptom:Mg)-[ind:INDICATES]->(d)
+        RETURN dept.code AS dept_code, dept.name AS dept_name,
+               d.name AS disease, collect(DISTINCT s.name)[..8] AS symptoms
+        LIMIT $limit
+        """
+        with self._driver.session(database="neo4j") as s:
+            rows = s.run(cql, dept=dept_code, limit=limit).data()
+
+        if not rows:
+            return {
+                "dept_code": dept_code,
+                "dept_name": "",
+                "nodes": [],
+                "edges": [],
+                "diseases": 0,
+            }
+
+        nodes: dict[str, dict] = {}
+        edges: list[dict] = []
+        seen: set[tuple[str, str]] = set()
+        dept_id = f"dept::{rows[0]['dept_code']}"
+        nodes[dept_id] = {"id": dept_id, "name": rows[0]["dept_name"], "category": 2}
+        for r in rows:
+            did = f"disease::{r['disease']}"
+            nodes[did] = {"id": did, "name": r["disease"], "category": 1}
+            if (did, dept_id) not in seen:
+                seen.add((did, dept_id))
+                edges.append({"source": did, "target": dept_id, "label": "归属"})
+            for sym in r["symptoms"][:6]:
+                sid = f"symptom::{sym}"
+                nodes[sid] = {"id": sid, "name": sym, "category": 0}
+                if (sid, did) not in seen:
+                    seen.add((sid, did))
+                    edges.append({"source": sid, "target": did, "label": "提示"})
+        return {
+            "dept_code": rows[0]["dept_code"],
+            "dept_name": rows[0]["dept_name"],
+            "nodes": list(nodes.values()),
+            "edges": edges,
+            "diseases": len({r["disease"] for r in rows}),
+        }
+
 
 _kg: KnowledgeGraph | None = None
 

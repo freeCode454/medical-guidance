@@ -320,3 +320,16 @@ async def kg_network(
 
     data = await asyncio.to_thread(get_kg().network, symptom, limit)
     return ApiResponse(data=data)
+
+
+@router.get("/kg/dept-network", response_model=ApiResponse[dict])
+async def kg_dept_network(
+    admin: CurrentKbAdmin,
+    dept_code: str = Query(..., min_length=1, description="科室编码"),
+    limit: int = Query(30, ge=5, le=100),
+) -> ApiResponse[dict]:
+    """科室 → 疾病 → 症状 的反向子图（科室视角）。"""
+    from app.services.kg_service import get_kg
+
+    data = await asyncio.to_thread(get_kg().dept_network, dept_code, limit)
+    return ApiResponse(data=data)
