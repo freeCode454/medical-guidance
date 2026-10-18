@@ -96,8 +96,13 @@ export const useSessionStore = defineStore('session', () => {
     phase.value = 'done'
   }
 
+  // 病史调阅授权（默认不授权，由患者在首页显式勾选）
+  async function grantEmrConsent() {
+    await api.grantConsent(sessionId.value || undefined)
+  }
+
   return {
     deviceId, patientId, sessionId, sessionNo, messages, route, triage, phase,
-    ensureAuth, startSession, send, refreshMessages, appendAi, loadTriage,
+    ensureAuth, startSession, send, refreshMessages, appendAi, loadTriage, grantEmrConsent,
   }
 })

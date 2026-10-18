@@ -72,6 +72,15 @@ export interface EmrView {
   disclaimer: string
 }
 
+export interface ConsentItem {
+  consent_id: string
+  scope: string
+  consent_time: string
+  expire_time: string | null
+  revoke_time: string | null
+  channel: string | null
+}
+
 // 创建匿名会话（拿患者 token）
 export function createAnonymousSession(deviceId: string) {
   return http.post<PatientSession>('/auth/patient/session', {
@@ -79,6 +88,23 @@ export function createAnonymousSession(deviceId: string) {
     client_type: 'H5',
     channel: 'DIRECT',
   })
+}
+
+// 病史调阅授权
+export function grantConsent(sessionId?: string, expireDays = 180) {
+  return http.post<ConsentItem>('/patient/consents', {
+    scope: 'EMR_READ',
+    session_id: sessionId ?? null,
+    expire_days: expireDays,
+  })
+}
+
+export function listConsents() {
+  return http.get<{ items: ConsentItem[] }>('/patient/consents')
+}
+
+export function revokeConsent(consentId: string) {
+  return http.post<ConsentItem>(`/patient/consents/${consentId}/revoke`)
 }
 
 // 创建预问诊会话

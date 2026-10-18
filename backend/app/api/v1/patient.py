@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import CurrentPatient
 from app.common.database import get_db
 from app.schemas.common import ApiResponse
+from app.schemas.consent import ConsentCreateRequest, ConsentItem, ConsentListResponse
 from app.schemas.session import (
     MessageSendRequest,
     MessageSendResponse,
@@ -19,7 +20,7 @@ from app.schemas.session import (
     SessionCreateResponse,
 )
 from app.schemas.triage import TriageResultResponse
-from app.services import session_service
+from app.services import consent_service, session_service
 
 router = APIRouter(prefix="/api/v1/patient", tags=["患者端"])
 
@@ -119,3 +120,45 @@ async def get_emr(session_id: str, db: DbSession, patient: CurrentPatient) -> Ap
     """查询预问诊病历（患者视图，12.3.2）。"""
     data = await session_service.get_emr(db, session_id, patient)
     return ApiResponse(data=data)
+
+
+# ---------------- 病史调阅授权 ----------------
+
+
+@router.get("/consents", response_model=ApiResponse[ConsentListResponse])
+async def list_consents(db: DbSession, patient: CurrentPatient) -> ApiResponse[ConsentListResponse]:
+    """查看自己的病史调阅授权记录（含已撤回/过期）。"""
+    items = await consent_service.list_consents(
+        db, tenant_id=patient["tenant_id"], patient_id=patient["sub"]
+    )
+    return ApiResponse(data=ConsentListResponse(items=[ConsentItem(**item) for item in items]))
+
+
+@router.post("/consents", response_model=ApiResponse[ConsentItem])
+async def grant_consent(
+    req: ConsentCreateRequest, db: DbSession, patient: CurrentPatient
+) -> ApiResponse[ConsentItem]:
+    """授权接诊医生调阅历史预问诊病历。"""
+    data = await consent_service.grant_consent(
+        db,
+        tenant_id=patient["tenant_id"],
+        patient_id=patient["sub"],
+        scope=req.scope,
+        session_id=req.session_id,
+        expire_days=req.expire_days,
+    )
+    return ApiResponse(data=ConsentItem(**data), message="已授权")
+
+
+@router.post("/consents/{consent_id}/revoke", response_model=ApiResponse[ConsentItem])
+async def revoke_consent(
+    consent_id: str, db: DbSession, patient: CurrentPatient
+) -> ApiResponse[ConsentItem]:
+    """撤回授权。"""
+    data = await consent_service.revoke_consent(
+        db,
+        tenant_id=patient["tenant_id"],
+        patient_id=patient["sub"],
+        consent_id=consent_id,
+    )
+    return ApiResponse(data=ConsentItem(**data), message="已撤回")

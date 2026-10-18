@@ -13,6 +13,7 @@ const age = ref<number | string | null>(null)
 const loading = ref(false)
 const focused = ref(false)
 const shaking = ref(false)
+const consent = ref(false)
 const textareaEl = ref<HTMLTextAreaElement | null>(null)
 
 const LIMIT = 300
@@ -75,6 +76,13 @@ async function start() {
       gender: gender.value ?? undefined,
       age: ageNum,
     })
+    if (consent.value) {
+      try {
+        await store.grantEmrConsent()
+      } catch {
+        // 授权失败不阻断问诊，患者可在病历页再次授权
+      }
+    }
     router.push('/chat')
   } catch (e) {
     showToast((e as Error).message || '启动问诊失败，请重试')
@@ -242,6 +250,14 @@ async function start() {
               </div>
             </div>
           </div>
+
+          <label class="consent">
+            <input v-model="consent" type="checkbox" class="consent__box" />
+            <span class="consent__text">
+              允许接诊医生调阅我的历史预问诊病历
+              <em>可随时撤回</em>
+            </span>
+          </label>
 
           <button class="cta" type="submit" :disabled="loading" :aria-busy="loading">
             <span v-if="!loading" class="cta__label">
@@ -736,6 +752,33 @@ h1 {
   font-size: 12px;
   color: var(--c-faint);
   pointer-events: none;
+}
+
+/* ---------- 授权 ---------- */
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--c-muted);
+  cursor: pointer;
+}
+
+.consent__box {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin: 1px 0 0;
+  accent-color: var(--c-primary);
+  cursor: pointer;
+}
+
+.consent__text em {
+  font-style: normal;
+  color: var(--c-faint);
+  margin-left: 4px;
 }
 
 /* ---------- 主行动 ---------- */

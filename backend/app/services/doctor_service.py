@@ -37,6 +37,7 @@ from app.models import (
     TriageResult,
     User,
 )
+from app.services.consent_service import has_active_consent
 
 # 排序字段白名单（防对未索引字段排序）
 _SORT_WHITELIST = {"started_time", "inquiry_rounds"}
@@ -65,6 +66,7 @@ async def _write_audit(
     session_id: str | None,
     patient_hash: str | None = None,
     detail: dict | None = None,
+    result: AuditResult = AuditResult.SUCCESS,
 ) -> None:
     """写审计日志（只追加）。"""
     db.add(
@@ -77,7 +79,7 @@ async def _write_audit(
             target_id=target_id,
             session_id=session_id,
             patient_hash=patient_hash,
-            result=AuditResult.SUCCESS.value,
+            result=result.value,
             detail_json=detail,
         )
     )
@@ -718,7 +720,9 @@ async def get_patient_emr(
     if patient is None:
         raise BizError(NOT_FOUND)
 
-    # 医生查看患者病历需有授权（简化：当前租户内医生均可查看，后续接 consent 校验）
+    consent_ok = await has_active_consent(
+        db, tenant_id=tenant_id, patient_id=patient_id
+    )
     await _write_audit(
         db,
         tenant_id=tenant_id,
@@ -729,8 +733,19 @@ async def get_patient_emr(
         target_id=patient_id,
         session_id=None,
         patient_hash=patient.patient_hash,
+        detail=None if consent_ok else {"reason": "consent_required"},
+        result=AuditResult.SUCCESS if consent_ok else AuditResult.FAILURE,
     )
     await db.commit()
+
+    if not consent_ok:
+        # 无授权不报错、不泄露有无病历：返回空列表并显式告知前端
+        return {
+            "patient_id": patient_id,
+            "patient_display": _patient_display(patient),
+            "consent_required": True,
+            "records": [],
+        }
 
     emrs = (
         await db.scalars(
@@ -743,6 +758,7 @@ async def get_patient_emr(
     return {
         "patient_id": patient_id,
         "patient_display": _patient_display(patient),
+        "consent_required": False,
         "records": [
             {
                 "emr_record_id": e.id,
@@ -766,6 +782,35 @@ async def list_patient_summaries(
     if patient is None:
         raise BizError(NOT_FOUND)
 
+    consent_ok = await has_active_consent(
+        db, tenant_id=tenant_id, patient_id=patient_id
+    )
+    await _write_audit(
+        db,
+        tenant_id=tenant_id,
+        actor_id=doctor_id,
+        actor_role="DOCTOR",
+        action_type=AuditActionType.EMR_READ.value,
+        target_type="patient",
+        target_id=patient_id,
+        session_id=None,
+        patient_hash=patient.patient_hash,
+        detail=None if consent_ok else {"reason": "consent_required"},
+        result=AuditResult.SUCCESS if consent_ok else AuditResult.FAILURE,
+    )
+    await db.commit()
+
+    if not consent_ok:
+        return {
+            "patient_id": patient_id,
+            "patient_display": _patient_display(patient),
+            "consent_required": True,
+            "total": 0,
+            "page": page,
+            "size": size,
+            "items": [],
+        }
+
     conds = [
         TriageResult.tenant_id == tenant_id,
     ]
@@ -778,7 +823,15 @@ async def list_patient_summaries(
         )
     ).all()
     if not session_ids:
-        return {"total": 0, "page": page, "size": size, "items": []}
+        return {
+            "patient_id": patient_id,
+            "patient_display": _patient_display(patient),
+            "consent_required": False,
+            "total": 0,
+            "page": page,
+            "size": size,
+            "items": [],
+        }
 
     conds.append(TriageResult.session_id.in_(session_ids))
     total = await db.scalar(select(func.count()).select_from(TriageResult).where(*conds))
@@ -805,7 +858,15 @@ async def list_patient_summaries(
         }
         for t in rows
     ]
-    return {"total": total, "page": page, "size": size, "items": items}
+    return {
+        "patient_id": patient_id,
+        "patient_display": _patient_display(patient),
+        "consent_required": False,
+        "total": total,
+        "page": page,
+        "size": size,
+        "items": items,
+    }
 
 
 async def list_depts(db: AsyncSession, *, tenant_id: str) -> list[dict]:
