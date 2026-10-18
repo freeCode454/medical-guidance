@@ -65,6 +65,10 @@ onMounted(async () => {
       typing.value = false
       showToast(data.message || '请立即前往急诊')
     },
+    onServerError(_code, message) {
+      typing.value = false
+      showToast(message || '消息处理失败，请重试')
+    },
     onError() {
       typing.value = false
     },

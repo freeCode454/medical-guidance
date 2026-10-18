@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, time, timedelta
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.enums import AuditActionType, AuditResult, SessionStatus
@@ -483,28 +483,42 @@ async def confirm_triage(
             "snapshot_saved": True,
         }
 
-    triage.doctor_confirmed = "1"
-    triage.confirmed_time = datetime.now(UTC)
-
-    await _write_audit(
-        db,
-        tenant_id=tenant_id,
-        actor_id=doctor_id,
-        actor_role="DOCTOR",
-        action_type=AuditActionType.TRIAGE_CONFIRM.value,
-        target_type="triage_result",
-        target_id=triage.id,
-        session_id=session_id,
-        detail={"note": note},
+    # 并发安全：两个医生同时点确认时，只有第一个 UPDATE 能命中 doctor_confirmed='0'
+    now = datetime.now(UTC)
+    updated = await db.execute(
+        update(TriageResult)
+        .where(
+            TriageResult.id == triage.id,
+            TriageResult.tenant_id == tenant_id,
+            TriageResult.doctor_confirmed == "0",
+        )
+        .values(doctor_confirmed="1", confirmed_time=now)
     )
-    await db.commit()
+    if getattr(updated, "rowcount", 0) == 1:
+        triage.doctor_confirmed = "1"
+        triage.confirmed_time = now
+        await _write_audit(
+            db,
+            tenant_id=tenant_id,
+            actor_id=doctor_id,
+            actor_role="DOCTOR",
+            action_type=AuditActionType.TRIAGE_CONFIRM.value,
+            target_type="triage_result",
+            target_id=triage.id,
+            session_id=session_id,
+            detail={"note": note},
+        )
+        await db.commit()
+    else:
+        # 已被并发请求确认：回读结果，保持幂等语义
+        await db.refresh(triage)
 
     top = (triage.candidates_json or [{}])[0]
     return {
         "session_id": session_id,
         "triage_result_id": triage.id,
         "doctor_confirmed": True,
-        "confirmed_time": triage.confirmed_time.isoformat(),
+        "confirmed_time": triage.confirmed_time.isoformat() if triage.confirmed_time else None,
         "dept_code": top.get("dept_code"),
         "dept_name": top.get("dept_name"),
         "snapshot_saved": True,
@@ -522,6 +536,15 @@ async def correct_triage(
 ) -> dict:
     """修正分诊建议，留存为评测样本。"""
     session = await _get_doctor_session(db, session_id, doctor_id, tenant_id)
+    # 锁住会话行：修正与后台落库/他人确认并发时，以先到者为准
+    session = (
+        await db.scalar(
+            select(Session)
+            .where(Session.id == session_id, Session.tenant_id == tenant_id)
+            .with_for_update()
+        )
+        or session
+    )
 
     if session.doctor_id != doctor_id:
         raise BizError(SESSION_TAKEN_BY_OTHER)
@@ -529,7 +552,12 @@ async def correct_triage(
         raise BizError(SESSION_CORRECTION_REASON)
 
     triage = await db.scalar(
-        select(TriageResult).where(TriageResult.session_id == session_id)
+        select(TriageResult)
+        .where(
+            TriageResult.session_id == session_id,
+            TriageResult.tenant_id == tenant_id,
+        )
+        .with_for_update()
     )
     if triage is None:
         raise BizError(SESSION_TRIAGE_NOT_READY)
@@ -634,17 +662,43 @@ async def list_takeover_queue(
 async def takeover_session(
     db: AsyncSession, *, session_id: str, doctor_id: str, tenant_id: str
 ) -> dict:
-    """医生接管会话。"""
+    """医生接管会话（并发安全）。"""
     session = await db.scalar(
         select(Session).where(Session.id == session_id, Session.tenant_id == tenant_id)
     )
     if session is None:
         raise BizError(NOT_FOUND)
+
+    # 本人重复接管：幂等返回
+    if session.doctor_id == doctor_id and session.status == SessionStatus.TAKEN_OVER.value:
+        return {
+            "session_id": session_id,
+            "doctor_id": doctor_id,
+            "status": SessionStatus.TAKEN_OVER.value,
+        }
     if session.status != SessionStatus.PENDING_TAKEOVER.value:
         raise BizError(SESSION_NOT_TAKEOVER)
 
-    session.doctor_id = doctor_id
-    session.status = SessionStatus.TAKEN_OVER.value
+    # 条件 UPDATE：doctor_id 为空且仍处于待接管时才生效，避免两个医生同时接管成功
+    result = await db.execute(
+        update(Session)
+        .where(
+            Session.id == session_id,
+            Session.tenant_id == tenant_id,
+            Session.status == SessionStatus.PENDING_TAKEOVER.value,
+            Session.doctor_id.is_(None),
+        )
+        .values(doctor_id=doctor_id, status=SessionStatus.TAKEN_OVER.value)
+    )
+    if getattr(result, "rowcount", 0) != 1:
+        # 区分「已被别人接管」与「状态已变化」，便于前端提示
+        current_doctor = await db.scalar(
+            select(Session.doctor_id).where(Session.id == session_id)
+        )
+        if current_doctor:
+            raise BizError(SESSION_TAKEN_BY_OTHER)
+        raise BizError(SESSION_NOT_TAKEOVER)
+
     await db.commit()
 
     return {

@@ -14,6 +14,8 @@ export interface WsHandlers {
   onNodeComplete?: (node: string, output: Record<string, any>) => void
   onTaskComplete?: (data: Record<string, any>) => void
   onEmergency?: (data: Record<string, any>) => void
+  /** 服务端返回的业务错误帧（会话已关闭、消息落库失败等） */
+  onServerError?: (code: number, message: string) => void
   onError?: (err: Error) => void
 }
 
@@ -58,6 +60,12 @@ export function connectWs(sessionId: string, handlers: WsHandlers): () => void {
               break
             case 'emergency':
               handlers.onEmergency?.(event.data)
+              break
+            case 'error':
+              handlers.onServerError?.(
+                Number(event.data?.code ?? 0),
+                String(event.data?.message ?? '消息处理失败'),
+              )
               break
           }
         } catch {

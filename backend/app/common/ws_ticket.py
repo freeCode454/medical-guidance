@@ -31,6 +31,7 @@ class TicketStore:
         resource_id: str,
     ) -> str:
         """签发票据，返回 ``wt_`` 前缀的随机串。"""
+        self._purge_expired()
         ticket = "wt_" + secrets.token_hex(16)
         self._tickets[ticket] = {
             "tenant_id": tenant_id,
@@ -40,6 +41,13 @@ class TicketStore:
             "expires_at": time.time() + self._ttl,
         }
         return ticket
+
+    def _purge_expired(self) -> None:
+        """清理过期票据，避免只换票不校验导致内存无限增长。"""
+        now = time.time()
+        expired = [key for key, info in self._tickets.items() if info["expires_at"] <= now]
+        for key in expired:
+            self._tickets.pop(key, None)
 
     def verify(
         self, ticket: str, *, resource_type: str, resource_id: str

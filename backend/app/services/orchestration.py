@@ -246,7 +246,9 @@ class TriageOrchestrator:
         final_status = (
             SessionStatus.EMERGENCY.value
             if route == "EMERGENCY" or risk_flag
-            else SessionStatus.FINISHED.value
+            # 非急诊会话进入「待接管」：任何同租户医生可认领，
+            # 否则 doctor_id 为空时医生端永远看不到该患者。
+            else SessionStatus.PENDING_TAKEOVER.value
         )
         triage_result_id: str | None = None
         emr_record_id: str | None = None
@@ -328,12 +330,15 @@ class TriageOrchestrator:
             # 会话状态更新
             session = await db.get(Session, session_id)
             if session is not None:
-                session.status = final_status
                 session.inquiry_rounds = result.get("inquiry_rounds", 0)
                 session.risk_flag = "1" if risk_flag else "0"
-                if final_status == SessionStatus.FINISHED.value:
-                    session.finished_time = datetime.now(UTC)
-                if triage.get("recommended_depts"):
+                # 只推进仍处于问诊中的会话：医生已接管/已关闭的会话不能被后台覆盖
+                if session.status == SessionStatus.IN_PROGRESS.value:
+                    session.status = final_status
+                    if final_status == SessionStatus.FINISHED.value:
+                        session.finished_time = datetime.now(UTC)
+                # 已有人工接管时不覆盖科室（医生可能已修正）
+                if session.doctor_id is None and triage.get("recommended_depts"):
                     session.dept_code = triage["recommended_depts"][0].get("dept_code")
 
             await db.commit()

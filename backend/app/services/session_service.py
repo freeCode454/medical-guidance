@@ -44,6 +44,7 @@ def _gen_session_no() -> str:
 def _is_terminal(status: str) -> bool:
     return status in {
         SessionStatus.FINISHED.value,
+        SessionStatus.PENDING_TAKEOVER.value,
         SessionStatus.TAKEN_OVER.value,
         SessionStatus.CLOSED.value,
         SessionStatus.EMERGENCY.value,

@@ -14,15 +14,19 @@ from __future__ import annotations
 import asyncio
 import itertools
 import json
+import logging
 import time
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.common.database import AsyncSessionFactory
 from app.common.enums import MessageType
+from app.common.exceptions import BizError
 from app.common.ws_ticket import ticket_store
 from app.services import session_service
 from app.ws.event_bus import event_bus
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -75,24 +79,43 @@ async def ws_session(websocket: WebSocket, session_id: str, token: str = "") -> 
         except ValueError:
             msg_type = MessageType.TEXT
 
-        # 落库患者消息
-        async with AsyncSessionFactory() as db:
-            await session_service.send_message(
-                db,
-                session_id,
-                {"sub": info["sub"], "tenant_id": info["tenant_id"]},
-                content,
-                msg_type,
-                {},
+        # 落库患者消息并触发编排队列；业务异常回错误帧而不是直接断连
+        try:
+            async with AsyncSessionFactory() as db:
+                await session_service.send_message(
+                    db,
+                    session_id,
+                    {"sub": info["sub"], "tenant_id": info["tenant_id"]},
+                    content,
+                    msg_type,
+                    {},
+                )
+            orchestrator = websocket.app.state.orchestrator
+            await orchestrator.resume(
+                session_id=session_id,
+                tenant_id=info["tenant_id"],
+                patient_id=info["sub"],
+                answer=content,
             )
-        # 触发编排图 resume
-        orchestrator = websocket.app.state.orchestrator
-        await orchestrator.resume(
-            session_id=session_id,
-            tenant_id=info["tenant_id"],
-            patient_id=info["sub"],
-            answer=content,
-        )
+        except BizError as exc:
+            await send(
+                "error",
+                {
+                    "code": exc.code.code,
+                    "message": exc.message,
+                    "recoverable": True,
+                },
+            )
+        except Exception:
+            logger.exception("WebSocket 消息处理失败 session=%s", session_id)
+            await send(
+                "error",
+                {
+                    "code": 60000,
+                    "message": "消息处理失败，请稍后重试",
+                    "recoverable": True,
+                },
+            )
 
     async def receiver() -> None:
         """接收客户端消息（心跳 / 用户消息），维护超时。"""
