@@ -28,6 +28,10 @@ onMounted(async () => {
   }
 
   closeWs = connectWs(store.sessionId, {
+    // 首次连接与断线重连成功都会触发：补拉错过的消息（幂等）
+    onConnected() {
+      void store.refreshMessages().then(scrollBottom)
+    },
     onNodeComplete(node, output) {
       if (node === 'INQUIRY' && output.content) {
         // AI 追问上屏
