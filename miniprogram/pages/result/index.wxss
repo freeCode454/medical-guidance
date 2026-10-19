@@ -29,6 +29,21 @@
   color: #66716b;
 }
 
+.confidence-bar {
+  width: 100%;
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: #e7dfd2;
+  margin-top: 12rpx;
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6fa39b, #17504e);
+}
+
 .emergency {
   background: #fff2ee;
   border: 2rpx solid #e7b3a6;
@@ -76,14 +91,36 @@
   border-bottom: none;
 }
 
+.dept-main {
+  flex: 1;
+  min-width: 0;
+}
+
 .dept-name {
   font-size: 28rpx;
   color: #22302e;
 }
 
+.dept-bar {
+  height: 6rpx;
+  width: 100%;
+  background: #f0e9dd;
+  border-radius: 999rpx;
+  margin-top: 8rpx;
+  overflow: hidden;
+}
+
+.dept-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #bf6a34;
+}
+
 .dept-score {
   font-size: 24rpx;
   color: #17504e;
+  width: 80rpx;
+  text-align: right;
 }
 
 .kv {

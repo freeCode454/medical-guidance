@@ -10,9 +10,40 @@ page {
   box-sizing: border-box;
 }
 
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 30rpx;
+  background: #fffdfa;
+  border-bottom: 2rpx solid #e7dfd2;
+}
+
+.chat-status {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: #17504e;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #3f8a6f;
+  box-shadow: 0 0 0 6rpx rgba(63, 138, 111, 0.12);
+}
+
+.chat-rounds {
+  color: #8a938d;
+  font-size: 22rpx;
+}
+
 .chat-scroll {
   flex: 1;
-  padding: 28rpx 28rpx 20rpx;
+  padding: 26rpx 26rpx 20rpx;
   box-sizing: border-box;
 }
 
@@ -24,25 +55,56 @@ page {
 }
 
 .msg {
-  margin-bottom: 26rpx;
+  display: flex;
+  align-items: flex-start;
+  gap: 14rpx;
+  margin-bottom: 28rpx;
+}
+
+.msg.patient {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  width: 58rpx;
+  height: 58rpx;
+  flex: none;
+  border-radius: 18rpx;
+  background: #e6efec;
+  border: 2rpx solid #c9dbd6;
+  color: #17504e;
+  font-size: 22rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msg.patient .avatar {
+  background: #f7e7d9;
+  border-color: #e6cdb5;
+  color: #a55726;
+}
+
+.msg-body {
+  max-width: 78%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
-.msg.patient {
+.msg.patient .msg-body {
   align-items: flex-end;
 }
 
 .role {
-  font-size: 22rpx;
+  font-size: 21rpx;
   color: #8a938d;
-  margin-bottom: 8rpx;
+  margin-bottom: 7rpx;
   padding: 0 4rpx;
 }
 
 .bubble {
-  max-width: 82%;
   padding: 18rpx 22rpx;
   border-radius: 20rpx;
   background: #fffdfa;
@@ -54,6 +116,10 @@ page {
   white-space: pre-wrap;
 }
 
+.msg.ai .bubble {
+  border-top-left-radius: 6rpx;
+}
+
 .msg.patient .bubble {
   background: #17504e;
   border-color: #17504e;
@@ -61,8 +127,8 @@ page {
   border-top-right-radius: 6rpx;
 }
 
-.msg.ai .bubble {
-  border-top-left-radius: 6rpx;
+.typing {
+  color: #8a938d;
 }
 
 .composer {

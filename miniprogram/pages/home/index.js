@@ -11,6 +11,10 @@ Page({
     this.setData({ complaint: e.detail.value })
   },
 
+  onQuick(e) {
+    this.setData({ complaint: e.currentTarget.dataset.value })
+  },
+
   onAge(e) {
     this.setData({ age: e.detail.value })
   },
@@ -33,6 +37,7 @@ Page({
 
     this.setData({ loading: true })
     wx.showLoading({ title: '正在建立问诊', mask: true })
+    let loadingVisible = true
     try {
       const { ensureAuth, getDeviceId } = require('../../utils/auth')
       const { request } = require('../../utils/api')
@@ -49,11 +54,13 @@ Page({
           age: ageNumber
         }
       })
+      wx.hideLoading()
+      loadingVisible = false
       wx.navigateTo({ url: `/pages/chat/index?sessionId=${session.session_id}` })
     } catch (e) {
       wx.showToast({ title: e.message || '创建会话失败', icon: 'none', duration: 3000 })
     } finally {
-      wx.hideLoading()
+      if (loadingVisible) wx.hideLoading()
       this.setData({ loading: false })
     }
   }

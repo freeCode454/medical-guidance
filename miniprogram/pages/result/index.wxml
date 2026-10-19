@@ -12,6 +12,9 @@
       <view class="eyebrow">{{routeLabel}}</view>
       <view class="result-title">{{primary.dept_name || '待医生确认'}}</view>
       <view class="confidence">匹配度 {{confidencePct}}%</view>
+      <view class="confidence-bar">
+        <view class="confidence-fill" style="width: {{confidencePct}}%"></view>
+      </view>
     </view>
 
     <view wx:if="{{triage.emergency_guidance && triage.emergency_guidance.triggered}}" class="emergency">
@@ -23,7 +26,10 @@
     <view class="card" wx:if="{{recommended.length}}">
       <view class="section">其他可能相关</view>
       <view class="dept-row" wx:for="{{recommended}}" wx:key="dept_code">
-        <view class="dept-name">{{item.dept_name}}</view>
+        <view class="dept-main">
+          <view class="dept-name">{{item.dept_name}}</view>
+          <view class="dept-bar"><view class="dept-fill" style="width: {{item.pct}}%"></view></view>
+        </view>
         <view class="dept-score">{{item.pct}}%</view>
       </view>
     </view>

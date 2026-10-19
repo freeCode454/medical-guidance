@@ -22,6 +22,9 @@ logger = logging.getLogger(__name__)
 
 # 追问轮次上限（与 mg_sys_config 的 inquiry.max_rounds 默认一致）
 MAX_ROUNDS = 8
+# 普通问诊至少完成两轮追问（inquiry_rounds 是“评估轮次”，
+# 第 1 轮追问后为 1，因此门槛设为 3 才能保证患者至少回答两次）。
+MIN_ROUNDS = 3
 
 _SCHEMA = {
     "name": "inquiry",
@@ -62,15 +65,18 @@ def _build_prompt(state: TriageState) -> str:
         f"患者主诉：{state.get('chief_complaint', '')}\n\n"
         f"对话历史：\n{history}\n\n"
         f"已采集信息：{json.dumps(entities, ensure_ascii=False)}\n"
-        f"已问过：{asked}\n\n"
+        f"已问过：{asked}\n"
+        f"当前已追问轮次：{state.get('inquiry_rounds', 0)}\n\n"
         "已采集判定标准（关键）：主诉或对话里【已经提到】的信息就算已采集，"
         "不要因为「不够具体」而重复追问。例如：\n"
         "- 提到「三天了」= 时长已采集\n"
         "- 提到「肚脐周围」= 部位已采集\n"
         "- 提到「绞痛」「一阵一阵」= 性质已采集\n"
         "- 提到「拉肚子」= 伴随症状已采集\n\n"
-        "充分度门槛：只要具备「主诉 + 时长 + 部位」，就判定 sufficient=true。\n"
-        "仅当完全缺失时长或部位时才追问，且一轮只问 1 个最关键的缺失项。\n"
+        "充分度门槛：主诉 + 时长 + 具体部位（上腹/下腹/脐周/左右侧之一）+ "
+        "性质或伴随症状至少一项，才判定 sufficient=true。\n"
+        "普通问诊至少完成两轮追问；即使信息看起来足够，也优先补齐尚未覆盖的维度，"
+        "不要在第一轮就收敛。急症/红旗情况由安全节点处理，不在这里判断。\n"
         "collected 字段填入从对话中提取到的信息（未提到为 null 或空数组）。"
     )
 
@@ -135,6 +141,17 @@ def build_inquiry_node(client: ModelClient):
 
         round_now = state.get("inquiry_rounds", 0) + 1
 
+        # 强制最低追问轮次：避免一句信息量较大的主诉直接收敛。
+        # 急症已在 safety 节点分流，不会进入这里。
+        if result.get("sufficient") and round_now < MIN_ROUNDS:
+            logger.info(
+                "信息充分但未达最低追问轮次，继续追问 session=%s round=%s",
+                session_id,
+                round_now,
+            )
+            result["sufficient"] = False
+            result["missing"] = result.get("missing") or ["follow_up"]
+
         if result.get("sufficient"):
             events.emit_node_complete(
                 session_id, events.NODE_INQUIRY, {"sufficient": True, "inquiry_rounds": round_now}
@@ -169,8 +186,14 @@ def build_inquiry_node(client: ModelClient):
             for tpl in templates:
                 slot = tpl.get("target_slot")
                 q = tpl.get("question") or ""
-                # 双重判断：slot 没问过，且问题原文也没出现过
-                if slot and slot not in asked_slots and q not in asked_questions:
+                already_collected = bool(entities.get(slot))
+                # 三重判断：slot 没问过、问题原文没出现、且已经采集到就不重复问
+                if (
+                    slot
+                    and slot not in asked_slots
+                    and q not in asked_questions
+                    and not already_collected
+                ):
                     question = q or question
                     missing = [slot]
                     logger.info("模板选中追问 slot=%s session=%s", slot, session_id)
@@ -188,6 +211,11 @@ def build_inquiry_node(client: ModelClient):
                 {"sufficient": True, "reason": "template_exhausted", "inquiry_rounds": round_now},
             )
             return {"sufficient": True, "entities": entities, "inquiry_rounds": round_now}
+
+        # 强制最低轮次时，LLM 可能返回空问题；给一个通用兜底，避免发空消息。
+        if not question.strip():
+            question = "为了更准确分诊，请再补充一下症状的具体位置、性质和伴随情况？"
+            missing = missing or ["follow_up"]
 
         # 双保险：LLM 生成的问题若与历史 AI 追问重复，同样判定充分
         asked_before = {

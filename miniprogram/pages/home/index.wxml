@@ -1,4 +1,12 @@
-<view class="page">
+<view class="page home-page">
+  <view class="steps">
+    <view class="step active"><text class="step-no">1</text>描述不适</view>
+    <view class="step-line"></view>
+    <view class="step"><text class="step-no">2</text>智能追问</view>
+    <view class="step-line"></view>
+    <view class="step"><text class="step-no">3</text>分诊结果</view>
+  </view>
+
   <view class="brand">
     <view class="brand-mark">诊</view>
     <view>
@@ -24,6 +32,14 @@
       bindinput="onInput"
     />
     <view class="counter">{{complaint.length}}/300</view>
+
+    <view class="quick-title">常见症状，点一下快速填入</view>
+    <view class="quick-row">
+      <view class="chip" data-value="头痛，一阵一阵的" bindtap="onQuick">头痛</view>
+      <view class="chip" data-value="肚子疼，还拉肚子" bindtap="onQuick">肚子疼</view>
+      <view class="chip" data-value="咳嗽，有点发热" bindtap="onQuick">咳嗽发热</view>
+      <view class="chip" data-value="胸口疼，有点闷" bindtap="onQuick">胸闷心慌</view>
+    </view>
   </view>
 
   <view class="row">
@@ -39,6 +55,14 @@
     </view>
   </view>
 
-  <button class="btn" loading="{{loading}}" disabled="{{loading}}" bindtap="onStart">开始问诊</button>
+  <button class="btn" loading="{{loading}}" disabled="{{loading}}" bindtap="onStart">
+    开始问诊
+  </button>
+
+  <view class="privacy">
+    <text class="privacy-icon">锁</text>
+    <text>匿名问诊 · 设备身份只存指纹 · 不收集姓名和手机号</text>
+  </view>
   <view class="tip">本系统仅提供分诊建议，不构成医学诊断。急危重症请立即拨打 120。</view>
 </view>
+

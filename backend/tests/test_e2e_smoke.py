@@ -62,6 +62,18 @@ def test_anonymous_session(client):
     assert token
 
 
+def _answer_for(question: str) -> str:
+    if "部位" in question or "哪里" in question:
+        return "肚脐周围"
+    if "多久" in question or "时间" in question or "几天" in question:
+        return "三天了"
+    if "性质" in question or "怎么疼" in question or "持续" in question or "阵" in question:
+        return "一阵一阵的绞痛"
+    if "伴随" in question or "恶心" in question or "发热" in question or "呕吐" in question:
+        return "有点恶心，没有发热"
+    return "肚脐周围，一阵一阵的绞痛，有点恶心，没有发热"
+
+
 def test_full_consultation(client):
     """主诉 → 追问 → 回答 → 分诊 → 病历。"""
     token = _patient_token(client)
@@ -88,14 +100,31 @@ def test_full_consultation(client):
     assert ai_msgs, "应至少有一条 AI 回复"
     print(f"\n  首轮 AI 回复：{ai_msgs[0]['content'][:50]}")
 
-    # 若仍在追问，补答一条（给出部位 + 性质）
-    if any("？" in m["content"] for m in ai_msgs):
+    # 信息充分也要至少两轮追问；按问题内容作答，最多补答 3 轮
+    answered_questions: set[str] = set()
+    for _ in range(4):
+        msgs = client.get(
+            f"/api/v1/patient/sessions/{sid}/messages", headers=h
+        ).json()["data"]["items"]
+        ai_msgs = [m for m in msgs if m["role"] == "AI"]
+        if not ai_msgs:
+            break
+        question = ai_msgs[-1]["content"]
+        if question in answered_questions:
+            time.sleep(3)
+            continue
+        if "？" not in question and "?" not in question:
+            break
+        print(f"  追问 {len(answered_questions) + 1}：{question[:50]}")
         client.post(
             f"/api/v1/patient/sessions/{sid}/messages",
             headers=h,
-            json={"content": "肚脐周围，一阵一阵的绞痛", "msg_type": "TEXT"},
+            json={"content": _answer_for(question), "msg_type": "TEXT"},
         )
-        _wait_messages(client, h, sid, len(msgs) + 1)
+        answered_questions.add(question)
+        time.sleep(6)
+        if len(answered_questions) >= 3:
+            break
 
     # 等分诊结论（LLM 较慢，最多 2 分钟）
     deadline = time.time() + 120

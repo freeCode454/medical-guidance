@@ -77,3 +77,6 @@ Thumbs.db
 
 # 知识库原始工作簿备份（保留在本地，避免二进制入库）
 kb/archive/
+
+# 微信开发者工具的个人本地配置
+miniprogram/project.private.config.json

@@ -14,6 +14,7 @@ Page({
     input: '',
     hasTriage: false,
     status: '',
+    rounds: 0,
     loading: true,
     sending: false,
     scrollId: ''
@@ -91,6 +92,7 @@ Page({
       messages,
       hasTriage: !!session.has_triage,
       status: session.status || '',
+      rounds: session.inquiry_rounds || 0,
       scrollId: last
     })
   },
