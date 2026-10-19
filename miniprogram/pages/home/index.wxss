@@ -127,7 +127,7 @@
 .welcome__cta {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 6rpx;
   margin-top: 18rpx;
   padding-top: 16rpx;
