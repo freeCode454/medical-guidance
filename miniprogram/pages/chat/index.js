@@ -18,6 +18,7 @@ Page({
     rounds: 0,
     loading: true,
     sending: false,
+    awaitingReply: false,
     scrollTop: 0
   },
 
@@ -41,7 +42,7 @@ Page({
 
   startPolling() {
     this.stopPolling()
-    this.timer = setInterval(() => this.loadMessages(), 2500)
+    this.timer = setInterval(() => this.loadMessages(), 1500)
   },
 
   stopPolling() {
@@ -89,11 +90,14 @@ Page({
       isPatient: m.role === 'PATIENT',
       isAi: m.role !== 'PATIENT'
     }))
+    const last = messages.length ? messages[messages.length - 1] : null
+    const awaitingReply = Boolean(last && last.isPatient && !session.has_triage)
     this.setData({
       messages,
       hasTriage: !!session.has_triage,
       status: session.status || '',
       rounds: session.inquiry_rounds || 0,
+      awaitingReply,
       scrollTop: this.data.scrollTop + 10000
     })
   },
@@ -109,7 +113,7 @@ Page({
   async sendContent(raw) {
     const content = String(raw || '').trim()
     if (!content || this.data.sending) return
-    this.setData({ sending: true, input: '' })
+    this.setData({ sending: true, awaitingReply: true, input: '' })
     try {
       await request(`/patient/sessions/${this.data.sessionId}/messages`, {
         method: 'POST',
@@ -117,7 +121,7 @@ Page({
       })
       await this.loadMessages()
     } catch (e) {
-      this.setData({ input: content })
+      this.setData({ input: content, awaitingReply: false })
       wx.showToast({ title: e.message || '发送失败', icon: 'none' })
     } finally {
       this.setData({ sending: false })

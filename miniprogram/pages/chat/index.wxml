@@ -5,8 +5,8 @@
       <view class="assistant-meta">
         <text class="assistant-name">智能导诊助手</text>
         <view class="assistant-status">
-          <text class="status-dot"></text>
-          <text>正在了解您的症状</text>
+          <text class="status-dot {{awaitingReply ? 'is-thinking' : ''}}"></text>
+          <text>{{awaitingReply ? 'AI 正在思考…' : '正在了解您的症状'}}</text>
         </view>
       </view>
       <text wx:if="{{rounds}}" class="rounds">{{rounds}} 轮</text>
@@ -38,13 +38,13 @@
       </view>
     </view>
 
-    <view wx:if="{{sending}}" class="msg msg--ai">
+    <view wx:if="{{awaitingReply}}" class="msg msg--ai">
       <view class="msg-avatar">AI</view>
       <view class="msg-body">
         <text class="msg-role">智能助手</text>
         <view class="bubble bubble--typing">
           <view class="typing-dots"><text class="typing-dot"></text><text class="typing-dot"></text><text class="typing-dot"></text></view>
-          <text>正在整理问题</text>
+          <text>正在思考</text>
         </view>
       </view>
     </view>
