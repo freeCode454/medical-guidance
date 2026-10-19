@@ -2,6 +2,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { users, depts, type User, type Dept } from '@/api/admin'
+import EntityDetailDialog from '@/components/EntityDetailDialog.vue'
+import type { DetailField } from '@/components/detail'
 import { fmtDateTime } from '@/utils/format'
 
 const loading = ref(false)
@@ -52,6 +54,24 @@ const roleOptions = [
 
 const roleLabels = Object.fromEntries(roleOptions.map((r) => [r.value, r.label]))
 const isDoctor = computed(() => form.role === 'DOCTOR')
+const detailVisible = ref(false)
+const detail = ref<User | null>(null)
+
+const detailFields = computed<DetailField[]>(() => {
+  const row = detail.value
+  if (!row) return []
+  return [
+    { label: '登录账号', value: row.account, mono: true },
+    { label: '姓名', value: row.real_name || '未填写' },
+    { label: '角色', value: roleLabels[row.role] || row.role_label },
+    { label: '职称', value: row.title || '—' },
+    { label: '所属科室', value: row.dept_name || row.dept_code || '—' },
+    { label: '账号状态', value: row.status === '1' ? '启用' : '停用' },
+    { label: '最近登录', value: row.last_login_time ? fmtDateTime(row.last_login_time) : '从未登录' },
+    { label: '创建时间', value: row.create_time ? fmtDateTime(row.create_time) : '—' },
+    { label: '用户 ID', value: row.user_id, mono: true },
+  ]
+})
 
 async function load() {
   loading.value = true
@@ -96,6 +116,11 @@ function onSizeChange(s: number) {
   size.value = s
   page.value = 1
   void load()
+}
+
+function onView(row: User) {
+  detail.value = row
+  detailVisible.value = true
 }
 
 function resetForm() {
@@ -231,7 +256,7 @@ onMounted(load)
     </div>
 
     <section class="table-card" v-loading="loading">
-      <el-table :data="items" row-key="user_id">
+      <el-table :data="items" row-key="user_id" @row-click="onView">
         <el-table-column label="用户" min-width="220">
           <template #default="{ row }">
             <div class="user-cell">
@@ -268,10 +293,11 @@ onMounted(load)
             <span class="muted">{{ row.last_login_time ? fmtDateTime(row.last_login_time) : '从未登录' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="openEdit(row)">编辑</el-button>
-            <el-button link :type="row.status === '1' ? 'danger' : 'success'" size="small" @click="onToggle(row)">
+            <el-button link type="primary" size="small" @click.stop="onView(row)">查看</el-button>
+            <el-button link type="primary" size="small" @click.stop="openEdit(row)">编辑</el-button>
+            <el-button link :type="row.status === '1' ? 'danger' : 'success'" size="small" @click.stop="onToggle(row)">
               {{ row.status === '1' ? '停用' : '启用' }}
             </el-button>
           </template>
@@ -298,6 +324,14 @@ onMounted(load)
         />
       </div>
     </section>
+
+    <EntityDetailDialog
+      v-model="detailVisible"
+      :title="detail ? (detail.real_name || detail.account) : '用户详情'"
+      :subtitle="detail ? detail.account : ''"
+      :badge="detail ? (detail.real_name || detail.account).slice(0, 1) : '用'"
+      :fields="detailFields"
+    />
 
     <el-dialog
       v-model="dialog"
@@ -344,6 +378,14 @@ onMounted(load)
 </template>
 
 <style scoped>
+.table-card :deep(.el-table__row) {
+  cursor: pointer;
+}
+
+.table-card :deep(.el-table__row:hover > td) {
+  background: var(--c-surface-soft) !important;
+}
+
 .filter-bar {
   display: flex;
   align-items: center;

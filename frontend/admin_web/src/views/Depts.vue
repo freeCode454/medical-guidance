@@ -2,6 +2,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { depts, type Dept } from '@/api/admin'
+import EntityDetailDialog from '@/components/EntityDetailDialog.vue'
+import type { DetailField } from '@/components/detail'
 
 const loading = ref(false)
 const items = ref<Dept[]>([])
@@ -16,6 +18,20 @@ const keyword = ref('')
 const statusFilter = ref('')
 
 const form = reactive({ dept_code: '', dept_name: '', sort_no: 0 })
+const detailVisible = ref(false)
+const detail = ref<Dept | null>(null)
+
+const detailFields = computed<DetailField[]>(() => {
+  const row = detail.value
+  if (!row) return []
+  return [
+    { label: '科室编码', value: row.dept_code, mono: true },
+    { label: '科室名称', value: row.dept_name },
+    { label: '排序号', value: row.sort_no },
+    { label: '状态', value: row.status === '1' ? '启用' : '停用' },
+    { label: '科室 ID', value: row.dept_id, mono: true },
+  ]
+})
 
 const rules = computed<FormRules>(() => ({
   dept_code: [{ required: true, message: '请输入科室编码', trigger: 'blur' }],
@@ -61,6 +77,11 @@ function onSizeChange(s: number) {
   size.value = s
   page.value = 1
   void load()
+}
+
+function onView(row: Dept) {
+  detail.value = row
+  detailVisible.value = true
 }
 
 function resetForm() {
@@ -163,7 +184,7 @@ onMounted(load)
     </div>
 
     <section class="table-card" v-loading="loading">
-      <el-table :data="items" row-key="dept_id">
+      <el-table :data="items" row-key="dept_id" @row-click="onView">
         <el-table-column label="科室" min-width="220">
           <template #default="{ row }">
             <div class="dept-cell">
@@ -183,10 +204,11 @@ onMounted(load)
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="openEdit(row)">编辑</el-button>
-            <el-button link :type="row.status === '1' ? 'danger' : 'success'" size="small" @click="onToggle(row)">
+            <el-button link type="primary" size="small" @click.stop="onView(row)">查看</el-button>
+            <el-button link type="primary" size="small" @click.stop="openEdit(row)">编辑</el-button>
+            <el-button link :type="row.status === '1' ? 'danger' : 'success'" size="small" @click.stop="onToggle(row)">
               {{ row.status === '1' ? '停用' : '启用' }}
             </el-button>
           </template>
@@ -214,6 +236,14 @@ onMounted(load)
       </div>
     </section>
 
+    <EntityDetailDialog
+      v-model="detailVisible"
+      :title="detail ? detail.dept_name : '科室详情'"
+      :subtitle="detail ? detail.dept_code : ''"
+      :badge="detail ? detail.dept_name.slice(0, 1) : '科'"
+      :fields="detailFields"
+    />
+
     <el-dialog v-model="dialog" :title="editingId ? '编辑科室' : '新增科室'" width="440px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <el-form-item label="科室编码" prop="dept_code">
@@ -237,6 +267,14 @@ onMounted(load)
 </template>
 
 <style scoped>
+.table-card :deep(.el-table__row) {
+  cursor: pointer;
+}
+
+.table-card :deep(.el-table__row:hover > td) {
+  background: var(--c-surface-soft) !important;
+}
+
 .filter-bar {
   display: flex;
   align-items: center;

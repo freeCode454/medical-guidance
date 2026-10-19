@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { patients, type Patient } from '@/api/admin'
+import EntityDetailDialog from '@/components/EntityDetailDialog.vue'
+import type { DetailField } from '@/components/detail'
 import { fmtDateTime } from '@/utils/format'
 
 const loading = ref(false)
@@ -11,6 +13,26 @@ const size = ref(10)
 const total = ref(0)
 const keyword = ref('')
 const registeredFilter = ref('true')
+const detailVisible = ref(false)
+const detail = ref<Patient | null>(null)
+
+const detailFields = computed<DetailField[]>(() => {
+  const row = detail.value
+  if (!row) return []
+  return [
+    { label: '患者编号', value: row.patient_no || '—', mono: true },
+    { label: '登录账号', value: row.account || '匿名患者' },
+    { label: '患者类型', value: row.registered ? '已注册' : '匿名患者' },
+    { label: '性别', value: row.gender_label },
+    { label: '年龄', value: row.age == null ? '—' : `${row.age} 岁` },
+    { label: '账号状态', value: row.status === '1' ? '正常' : '停用' },
+    { label: '问诊次数', value: row.session_count },
+    { label: '预约次数', value: row.appointment_count },
+    { label: '注册时间', value: row.create_time ? fmtDateTime(row.create_time) : '—' },
+    { label: '最近登录', value: row.last_login_time ? fmtDateTime(row.last_login_time) : '从未登录' },
+    { label: '患者 ID', value: row.patient_id, mono: true },
+  ]
+})
 
 async function load() {
   loading.value = true
@@ -50,6 +72,11 @@ function onSizeChange(s: number) {
   size.value = s
   page.value = 1
   void load()
+}
+
+function onView(row: Patient) {
+  detail.value = row
+  detailVisible.value = true
 }
 
 async function onDelete(row: Patient) {
@@ -113,7 +140,7 @@ onMounted(load)
     </div>
 
     <section class="table-card" v-loading="loading">
-      <el-table :data="items" row-key="patient_id">
+      <el-table :data="items" row-key="patient_id" @row-click="onView">
         <el-table-column label="患者" min-width="220">
           <template #default="{ row }">
             <div class="patient-cell">
@@ -146,9 +173,10 @@ onMounted(load)
             <span class="muted">{{ row.last_login_time ? fmtDateTime(row.last_login_time) : '从未登录' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100" fixed="right">
+        <el-table-column label="操作" width="130" fixed="right">
           <template #default="{ row }">
-            <el-button link type="danger" size="small" @click="onDelete(row)">删除</el-button>
+            <el-button link type="primary" size="small" @click.stop="onView(row)">查看</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)">删除</el-button>
           </template>
         </el-table-column>
 
@@ -173,10 +201,26 @@ onMounted(load)
         />
       </div>
     </section>
+
+    <EntityDetailDialog
+      v-model="detailVisible"
+      :title="detail ? (detail.account || '患者详情') : '患者详情'"
+      :subtitle="detail ? (detail.patient_no || detail.patient_id) : ''"
+      badge="患"
+      :fields="detailFields"
+    />
   </div>
 </template>
 
 <style scoped>
+.table-card :deep(.el-table__row) {
+  cursor: pointer;
+}
+
+.table-card :deep(.el-table__row:hover > td) {
+  background: var(--c-surface-soft) !important;
+}
+
 .filter-bar {
   display: flex;
   align-items: center;
