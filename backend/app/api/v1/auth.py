@@ -11,6 +11,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.database import get_db
 from app.schemas.auth import (
+    PatientAuthResponse,
+    PatientLoginRequest,
+    PatientRegisterRequest,
     PatientSessionCreateRequest,
     PatientSessionCreateResponse,
     StaffLoginRequest,
@@ -34,6 +37,33 @@ async def create_patient_session(
         db, req.device_id, req.client_type, req.channel
     )
     return ApiResponse(data=data)
+
+
+@router.post("/patient/register", response_model=ApiResponse[PatientAuthResponse])
+async def patient_register(
+    req: PatientRegisterRequest, db: DbSession
+) -> ApiResponse[PatientAuthResponse]:
+    """患者自助注册（仅患者；医生/管理员账号由机构开通）。"""
+    data = await auth_service.register_patient(db, req.account, req.password)
+    return ApiResponse(data=data, message="注册成功")
+
+
+@router.post("/patient/login", response_model=ApiResponse[PatientAuthResponse])
+async def patient_login(
+    req: PatientLoginRequest, db: DbSession
+) -> ApiResponse[PatientAuthResponse]:
+    """患者账号登录。"""
+    data = await auth_service.patient_login(db, req.account, req.password)
+    return ApiResponse(data=data, message="登录成功")
+
+
+@router.post("/patient/refresh", response_model=ApiResponse[PatientAuthResponse])
+async def patient_refresh(
+    req: StaffRefreshRequest, db: DbSession
+) -> ApiResponse[PatientAuthResponse]:
+    """患者刷新令牌轮换。"""
+    data = await auth_service.refresh_patient_session(db, req.refresh_token)
+    return ApiResponse(data=data, message="续期成功")
 
 
 @router.post("/staff/login", response_model=ApiResponse[StaffLoginResponse])

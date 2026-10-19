@@ -2,6 +2,7 @@
 // 开发期走 Vite 代理（/api → 127.0.0.1:8000），业务错误（10xxx~60xxx）HTTP 200 + code 非 200
 
 const BASE = '/api/v1'
+const TOKEN_KEY = 'mg_patient_token'
 
 export interface ApiEnvelope<T = unknown> {
   code: number
@@ -9,10 +10,24 @@ export interface ApiEnvelope<T = unknown> {
   data: T
 }
 
-let token: string | null = null
+function readStoredToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY)
+  } catch {
+    return null
+  }
+}
+
+let token: string | null = readStoredToken()
 
 export function setToken(t: string | null) {
   token = t
+  try {
+    if (t) localStorage.setItem(TOKEN_KEY, t)
+    else localStorage.removeItem(TOKEN_KEY)
+  } catch {
+    // 隐私模式下 localStorage 不可用时，仅保留内存令牌
+  }
 }
 
 export function getToken() {
@@ -37,6 +52,14 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   }
 
   if (json.code !== 200) {
+    // 登录态失效：清掉本地令牌并回登录页（保留当前路径便于登录后返回）
+    if (json.code === 10004 || json.code === 10005) {
+      setToken(null)
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        const next = encodeURIComponent(window.location.pathname + window.location.search)
+        window.location.assign(`/login?expired=1&redirect=${next}`)
+      }
+    }
     const err = new Error(json.message || `请求失败（${json.code}）`) as Error & { code: number }
     err.code = json.code
     throw err

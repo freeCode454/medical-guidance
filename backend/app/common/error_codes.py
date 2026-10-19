@@ -56,6 +56,7 @@ AUTH_CAPTCHA_INVALID = ErrorCode(10007, "验证码错误或已过期")
 AUTH_PHONE_INVALID = ErrorCode(10008, "手机号格式不正确")
 AUTH_ROLE_NOT_ALLOWED = ErrorCode(10009, "角色不允许访问该端")
 AUTH_OLD_PASSWORD_WRONG = ErrorCode(10010, "原口令不正确")
+AUTH_ACCOUNT_EXISTS = ErrorCode(10011, "账号已存在")
 
 
 # --- 会话与分诊（20xxx） --------------------------------------------------
@@ -163,6 +164,7 @@ __all__ = [
     "ASR_UNAVAILABLE",
     "AUDIT_WRITE_FAILED",
     "AUTH_ACCOUNT_DISABLED",
+    "AUTH_ACCOUNT_EXISTS",
     "AUTH_ACCOUNT_LOCKED",
     "AUTH_CAPTCHA_INVALID",
     "AUTH_CREDENTIAL_INVALID",

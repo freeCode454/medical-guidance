@@ -40,6 +40,33 @@ class PatientSessionCreateResponse(BaseModel):
     need_verify_before: list[str] = Field(default_factory=list, description="需实名验证才能执行的操作")
 
 
+class PatientRegisterRequest(BaseModel):
+    """患者注册：账号 + 口令。"""
+
+    account: str = Field(min_length=4, max_length=64, pattern=r"^[A-Za-z0-9_]+$")
+    password: str = Field(min_length=8, max_length=64)
+
+
+class PatientLoginRequest(BaseModel):
+    """患者账号登录。"""
+
+    account: str = Field(min_length=4, max_length=64)
+    password: str = Field(min_length=8, max_length=64)
+
+
+class PatientAuthResponse(BaseModel):
+    """患者登录/注册后的账号令牌。"""
+
+    access_token: str = Field(description="访问令牌，有效期 30 分钟")
+    refresh_token: str = Field(description="刷新令牌")
+    token_type: str = Field(default="Bearer")
+    expires_in: int = Field(default=1800)
+    patient_id: str = Field(description="患者标识")
+    account: str = Field(description="登录账号")
+    scope: list[str] = Field(default_factory=lambda: ["session:create", "session:read", "session:write"])
+    need_verify_before: list[str] = Field(default_factory=lambda: ["APPOINTMENT", "EMR_ACCESS"])
+
+
 # --- 院内用户登录（12.1.4） ---------------------------------------------
 
 

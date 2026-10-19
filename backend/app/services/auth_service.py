@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.common.enums import UserRole
 from app.common.error_codes import (
     AUTH_ACCOUNT_DISABLED,
+    AUTH_ACCOUNT_EXISTS,
     AUTH_ACCOUNT_LOCKED,
     AUTH_CREDENTIAL_INVALID,
     AUTH_ROLE_NOT_ALLOWED,
@@ -36,6 +37,7 @@ from app.common.security import (
 from app.config import settings
 from app.models import Dept, Patient, Tenant, User
 from app.schemas.auth import (
+    PatientAuthResponse,
     PatientSessionCreateResponse,
     StaffLoginResponse,
     UserInfo,
@@ -203,3 +205,99 @@ async def create_patient_session(
         scope=["session:create", "session:read", "session:write"],
         need_verify_before=["APPOINTMENT", "EMR_ACCESS"],
     )
+
+
+async def register_patient(
+    db: AsyncSession, account: str, password: str
+) -> PatientAuthResponse:
+    """患者自助注册：账号 + 口令，创建正式患者身份。"""
+    tenant_id = settings.default_tenant_id
+    account = account.strip()
+    exists = await db.scalar(
+        select(Patient).where(
+            Patient.tenant_id == tenant_id, Patient.account == account
+        )
+    )
+    if exists is not None:
+        raise BizError(AUTH_ACCOUNT_EXISTS)
+
+    credential_hash = await asyncio.to_thread(hash_password, password)
+    patient_hash = hashlib.sha256(
+        f"account:{tenant_id}:{account}".encode()
+    ).hexdigest()
+    patient = Patient(
+        tenant_id=tenant_id,
+        patient_hash=patient_hash,
+        account=account,
+        credential_hash=credential_hash,
+        status="1",
+    )
+    db.add(patient)
+    await db.commit()
+    return _build_patient_auth(patient, tenant_id)
+
+
+async def patient_login(
+    db: AsyncSession, account: str, password: str
+) -> PatientAuthResponse:
+    """患者账号登录：失败锁定、统一错误文案。"""
+    tenant_id = settings.default_tenant_id
+    patient = await db.scalar(
+        select(Patient).where(
+            Patient.tenant_id == tenant_id,
+            Patient.account == account.strip(),
+            Patient.del_flag == "0",
+        )
+    )
+    if patient is None or not patient.credential_hash:
+        await asyncio.to_thread(verify_password, password, _DUMMY_HASH)
+        raise BizError(AUTH_CREDENTIAL_INVALID, "账号或口令错误")
+
+    now = datetime.now(UTC)
+    if patient.lock_until and patient.lock_until > now:
+        raise BizError(AUTH_ACCOUNT_LOCKED, "登录失败次数过多，请稍后重试")
+    if patient.lock_until and patient.lock_until <= now:
+        patient.fail_count = 0
+        patient.lock_until = None
+
+    if not await asyncio.to_thread(verify_password, password, patient.credential_hash):
+        patient.fail_count += 1
+        if patient.fail_count >= LOGIN_FAIL_LIMIT:
+            patient.lock_until = now + timedelta(minutes=LOCK_MINUTES)
+        await db.commit()
+        raise BizError(AUTH_CREDENTIAL_INVALID, "账号或口令错误")
+
+    if patient.status == "0":
+        raise BizError(AUTH_ACCOUNT_DISABLED)
+    patient.fail_count = 0
+    patient.lock_until = None
+    patient.last_login_time = now
+    await db.commit()
+    return _build_patient_auth(patient, tenant_id)
+
+
+def _build_patient_auth(patient: Patient, tenant_id: str) -> PatientAuthResponse:
+    return PatientAuthResponse(
+        access_token=issue_patient_token(patient.id, tenant_id),
+        refresh_token=issue_refresh_token(patient.id, "PATIENT", tenant_id),
+        patient_id=patient.id,
+        account=patient.account or "",
+    )
+
+
+async def refresh_patient_session(
+    db: AsyncSession, refresh_token: str
+) -> PatientAuthResponse:
+    payload = decode_token(refresh_token, expected_type="refresh")
+    if payload.get("role") != "PATIENT":
+        raise BizError(AUTH_CREDENTIAL_INVALID, "登录状态已失效，请重新登录")
+    patient = await db.scalar(
+        select(Patient).where(
+            Patient.id == payload.get("sub"),
+            Patient.tenant_id == payload.get("tenant_id"),
+            Patient.del_flag == "0",
+        )
+    )
+    if patient is None or patient.status == "0":
+        raise BizError(AUTH_CREDENTIAL_INVALID, "登录状态已失效，请重新登录")
+    return _build_patient_auth(patient, patient.tenant_id)

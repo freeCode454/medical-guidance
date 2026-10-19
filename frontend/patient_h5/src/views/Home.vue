@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { useSessionStore } from '@/stores/session'
@@ -19,6 +19,10 @@ const textareaEl = ref<HTMLTextAreaElement | null>(null)
 const LIMIT = 300
 const count = computed(() => complaint.value.length)
 const nearLimit = computed(() => count.value >= LIMIT - 20)
+
+onMounted(() => {
+  if (!store.hydrateAuth()) router.replace('/login')
+})
 
 // 常见主诉：点一下填入一句完整描述，降低「不知道怎么写」的门槛
 const chips = [
@@ -55,6 +59,11 @@ function shake() {
     shaking.value = true
     window.setTimeout(() => (shaking.value = false), 480)
   })
+}
+
+function logout() {
+  store.logout()
+  router.push('/login')
 }
 
 async function start() {
@@ -119,8 +128,12 @@ async function start() {
           <rect x="5" y="10" width="14" height="10" rx="3" stroke="currentColor" stroke-width="1.6" />
           <path d="M8.5 10V7.5a3.5 3.5 0 017 0V10" stroke="currentColor" stroke-width="1.6" />
         </svg>
-        匿名问诊
+        隐私保护
       </span>
+      <div class="account">
+        <span>{{ store.account || '已登录' }}</span>
+        <button type="button" @click="logout">退出</button>
+      </div>
     </header>
 
     <main class="layout">
@@ -279,7 +292,7 @@ async function start() {
               <path d="M12 3l7 3v5.2c0 4.6-2.9 7.9-7 9.8-4.1-1.9-7-5.2-7-9.8V6l7-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
               <path d="M9 12l2.2 2.2L15.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            全程匿名，信息仅用于分诊建议
+            账号加密保护，信息仅用于本次分诊建议
           </p>
         </form>
       </section>
@@ -379,6 +392,41 @@ async function start() {
   width: 13px;
   height: 13px;
   color: var(--c-primary);
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  background: var(--c-surface);
+  font-size: 11.5px;
+  color: var(--c-muted);
+}
+
+.account span {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account button {
+  border: 0;
+  border-radius: var(--r-pill);
+  padding: 4px 8px;
+  background: var(--c-surface-soft);
+  color: var(--c-primary);
+  font-size: 10.5px;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .privacy {
+    display: none;
+  }
 }
 
 /* ---------- 布局 ---------- */

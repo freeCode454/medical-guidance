@@ -7,6 +7,26 @@ export interface PatientSession {
   device_id: string
 }
 
+export interface PatientAuth {
+  access_token: string
+  refresh_token: string
+  patient_id: string
+  account: string
+  expires_in: number
+}
+
+export function patientRegister(account: string, password: string) {
+  return http.post<PatientAuth>('/auth/patient/register', { account, password })
+}
+
+export function patientLogin(account: string, password: string) {
+  return http.post<PatientAuth>('/auth/patient/login', { account, password })
+}
+
+export function refreshPatient(refreshToken: string) {
+  return http.post<PatientAuth>('/auth/patient/refresh', { refresh_token: refreshToken })
+}
+
 export interface SessionInfo {
   session_id: string
   session_no: string

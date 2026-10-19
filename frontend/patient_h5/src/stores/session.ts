@@ -1,8 +1,8 @@
-// 会话状态：匿名 token、当前会话、消息列表、问诊状态
+// 会话状态：患者账号 token、当前会话、消息列表、问诊状态
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import * as api from '@/api/patient'
-import { setToken } from '@/api/client'
+import { getToken, setToken } from '@/api/client'
 
 // 设备密钥：等价于匿名身份凭证，必须是高熵随机串（服务端只存指纹）。
 // 旧版本生成了可猜测的 dev_xxx，检测到长度不足时直接换成新的。
@@ -27,19 +27,65 @@ function genDeviceId(): string {
 export const useSessionStore = defineStore('session', () => {
   const deviceId = ref(genDeviceId())
   const patientId = ref('')
+  const account = ref('')
   const sessionId = ref('')
   const sessionNo = ref('')
   const messages = ref<api.ChatMessage[]>([])
   const route = ref<string | null>(null)
   const triage = ref<api.TriageResult | null>(null)
   const phase = ref<'idle' | 'chatting' | 'done'>('idle') // 空闲 / 问诊中 / 已出结论
+  const isAuthenticated = computed(() => Boolean(getToken() && patientId.value))
 
-  // 初始化匿名身份
-  async function ensureAuth() {
-    if (patientId.value) return
-    const d = await api.createAnonymousSession(deviceId.value)
+  function saveAuth(d: api.PatientAuth) {
     setToken(d.access_token)
     patientId.value = d.patient_id
+    account.value = d.account
+    localStorage.setItem('mg_patient_id', d.patient_id)
+    localStorage.setItem('mg_patient_account', d.account)
+  }
+
+  // 从本地恢复登录态；令牌与患者 ID 必须同时存在
+  function hydrateAuth() {
+    const token = getToken()
+    const pid = localStorage.getItem('mg_patient_id') || ''
+    const acc = localStorage.getItem('mg_patient_account') || ''
+    if (!token || !pid) {
+      if (token && !pid) setToken(null)
+      patientId.value = ''
+      account.value = ''
+      return false
+    }
+    patientId.value = pid
+    account.value = acc
+    return true
+  }
+
+  async function login(accountValue: string, password: string) {
+    const d = await api.patientLogin(accountValue, password)
+    saveAuth(d)
+  }
+
+  async function register(accountValue: string, password: string) {
+    const d = await api.patientRegister(accountValue, password)
+    saveAuth(d)
+  }
+
+  function logout() {
+    setToken(null)
+    patientId.value = ''
+    account.value = ''
+    sessionId.value = ''
+    messages.value = []
+    triage.value = null
+    route.value = null
+    phase.value = 'idle'
+    localStorage.removeItem('mg_patient_id')
+    localStorage.removeItem('mg_patient_account')
+  }
+
+  // 登录后才能发起问诊
+  async function ensureAuth() {
+    if (!hydrateAuth()) throw new Error('请先登录患者账号')
   }
 
   // 开始一次问诊
@@ -103,7 +149,8 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   return {
-    deviceId, patientId, sessionId, sessionNo, messages, route, triage, phase,
-    ensureAuth, startSession, send, refreshMessages, appendAi, loadTriage, grantEmrConsent,
+    deviceId, patientId, account, isAuthenticated, sessionId, sessionNo, messages, route, triage, phase,
+    hydrateAuth, login, register, logout, ensureAuth,
+    startSession, send, refreshMessages, appendAi, loadTriage, grantEmrConsent,
   }
 })

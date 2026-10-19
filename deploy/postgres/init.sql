@@ -194,6 +194,11 @@ CREATE TABLE IF NOT EXISTS mg_patient (
     tenant_id       varchar(32)  NOT NULL,
     patient_hash    varchar(64)  NOT NULL,
     patient_no      varchar(64),
+    account         varchar(64),
+    credential_hash varchar(255),
+    fail_count      integer      NOT NULL DEFAULT 0,
+    lock_until      timestamptz,
+    last_login_time timestamptz,
     age             integer,
     gender          char(1),
     phone_masked    varchar(32),
@@ -227,6 +232,7 @@ COMMENT ON COLUMN mg_patient.del_flag       IS '软删除标记，本表不实�
 COMMENT ON COLUMN mg_patient.remark         IS '备注';
 
 CREATE UNIQUE INDEX IF NOT EXISTS uk_mg_patient_tenant_hash  ON mg_patient (tenant_id, patient_hash);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_mg_patient_tenant_account ON mg_patient (tenant_id, account);
 CREATE INDEX IF NOT EXISTS idx_mg_patient_tenant_phone       ON mg_patient (tenant_id, phone_hash);
 CREATE INDEX IF NOT EXISTS idx_mg_patient_tenant_device      ON mg_patient (tenant_id, device_id);
 COMMENT ON INDEX uk_mg_patient_tenant_hash IS '租户内患者标识哈希唯一';

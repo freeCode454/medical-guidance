@@ -21,6 +21,13 @@ class Patient(Base, PKMixin, TenantMixin, AuditMixin):
 
     patient_hash: Mapped[str] = mapped_column(String(64), nullable=False, comment="患者标识哈希，加盐后计算")
     patient_no: Mapped[str | None] = mapped_column(String(64), comment="院内患者编号，用于脱敏展示")
+    account: Mapped[str | None] = mapped_column(String(64), comment="患者登录账号，租户内唯一")
+    credential_hash: Mapped[str | None] = mapped_column(String(255), comment="患者口令哈希，可空表示匿名患者")
+    fail_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0", comment="连续登录失败次数"
+    )
+    lock_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), comment="锁定截止时间")
+    last_login_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), comment="最后登录时间")
     age: Mapped[int | None] = mapped_column(Integer, comment="年龄")
     gender: Mapped[str | None] = mapped_column(String(1), comment="性别：1 男 / 2 女 / 0 未知")
     phone_masked: Mapped[str | None] = mapped_column(String(32), comment="手机号脱敏形式")
@@ -32,6 +39,7 @@ class Patient(Base, PKMixin, TenantMixin, AuditMixin):
 
     __table_args__ = (
         UniqueConstraint("tenant_id", "patient_hash", name="uk_mg_patient_tenant_hash"),
+        UniqueConstraint("tenant_id", "account", name="uk_mg_patient_tenant_account"),
         Index("idx_mg_patient_tenant_phone", "tenant_id", "phone_hash"),
         Index("idx_mg_patient_tenant_device", "tenant_id", "device_id"),
     )
