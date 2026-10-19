@@ -17,7 +17,6 @@ const size = ref(10)
 const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' | 'primary' }> = {
   IN_PROGRESS: { label: '问诊中', type: 'info' },
   FINISHED: { label: '已出结论', type: 'success' },
-  PENDING_TAKEOVER: { label: '待接管', type: 'warning' },
   TAKEN_OVER: { label: '已接管', type: 'primary' },
   CLOSED: { label: '已结束', type: 'info' },
   EMERGENCY: { label: '急诊', type: 'danger' },
@@ -26,7 +25,6 @@ const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'war
 const filters = [
   { value: '', label: '全部' },
   { value: 'TAKEN_OVER', label: '已接管' },
-  { value: 'PENDING_TAKEOVER', label: '待接管' },
   { value: 'IN_PROGRESS', label: '问诊中' },
   { value: 'EMERGENCY', label: '急诊' },
 ]
@@ -41,7 +39,7 @@ const today = new Intl.DateTimeFormat('zh-CN', {
 const riskCount = computed(() => items.value.filter((item) => item.risk_flag).length)
 
 const emptyDescription = computed(() =>
-  status.value ? '当前筛选下没有接诊记录' : '今天还没有接诊记录，去待接管队列认领患者',
+  status.value ? '当前筛选下没有预约患者' : '今天还没有预约您号源的患者',
 )
 
 async function load() {
@@ -85,12 +83,11 @@ onMounted(load)
     <div class="page-head">
       <div class="page-title">
         <h1>今日接诊</h1>
-        <p>{{ today }} · 只显示您已接管或问诊中的患者</p>
+        <p>{{ today }} · 只显示预约您号源的患者</p>
       </div>
       <div class="page-actions">
         <span class="total-chip">共 <b>{{ total }}</b> 位</span>
         <el-button @click="load">刷新</el-button>
-        <el-button type="primary" @click="router.push('/takeover')">待接管队列</el-button>
       </div>
     </div>
 
@@ -169,8 +166,7 @@ onMounted(load)
               </svg>
             </div>
             <p class="empty-block__title">{{ emptyDescription }}</p>
-            <p>接诊后患者会出现在这里，分诊结论与预问诊病历可直接查看。</p>
-            <el-button @click="router.push('/takeover')">去认领患者</el-button>
+            <p>患者预约您的号源后，会在这里出现；分诊结论与预问诊病历可直接查看。</p>
           </div>
         </template>
       </el-table>

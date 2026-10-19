@@ -146,31 +146,6 @@ async def correct_triage(
     return ApiResponse(data=data, message="修正已记录")
 
 
-@router.get("/takeover-queue", response_model=ApiResponse[dict])
-async def list_takeover_queue(
-    db: DbSession,
-    doctor: CurrentDoctor,
-    page: int = Query(1, ge=1),
-    size: int = Query(10, ge=1, le=100),
-) -> ApiResponse[dict]:
-    """查询待接管队列（F21）。"""
-    data = await doctor_service.list_takeover_queue(
-        db, tenant_id=doctor["tenant_id"], page=page, size=size
-    )
-    return ApiResponse(data=data)
-
-
-@router.post("/sessions/{session_id}/takeover", response_model=ApiResponse[dict])
-async def takeover_session(
-    session_id: str, db: DbSession, doctor: CurrentDoctor
-) -> ApiResponse[dict]:
-    """接管会话（F21）。"""
-    data = await doctor_service.takeover_session(
-        db, session_id=session_id, doctor_id=doctor["sub"], tenant_id=doctor["tenant_id"]
-    )
-    return ApiResponse(data=data, message="已接管会话")
-
-
 @router.get("/patients/{patient_id}/emr", response_model=ApiResponse[dict])
 async def get_patient_emr(
     patient_id: str, db: DbSession, doctor: CurrentDoctor

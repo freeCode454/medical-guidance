@@ -13,7 +13,6 @@ const router = createRouter({
     },
     { path: '/', name: 'encounters', component: () => import('@/views/Encounters.vue') },
     { path: '/session/:id', name: 'session', component: () => import('@/views/SessionDetail.vue') },
-    { path: '/takeover', name: 'takeover', component: () => import('@/views/TakeoverQueue.vue') },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })

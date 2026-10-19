@@ -41,13 +41,6 @@ function logout() {
         <router-link to="/" class="nav__item" :class="{ 'is-active': route.name === 'encounters' }">
           今日接诊
         </router-link>
-        <router-link
-          to="/takeover"
-          class="nav__item"
-          :class="{ 'is-active': route.name === 'takeover' }"
-        >
-          待接管队列
-        </router-link>
       </nav>
 
       <div class="right">

@@ -96,7 +96,7 @@ async def test_revoke_is_idempotent() -> None:
 @pytest.mark.asyncio
 async def test_doctor_history_requires_consent() -> None:
     db = AsyncMock()
-    db.scalar = AsyncMock(side_effect=[_patient(), None])
+    db.scalar = AsyncMock(side_effect=[_patient(), "appt1", None])
     db.add = MagicMock()
     db.commit = AsyncMock()
 
@@ -122,7 +122,7 @@ async def test_doctor_history_returns_records_with_consent() -> None:
         create_time=datetime.now(UTC),
     )
     db = AsyncMock()
-    db.scalar = AsyncMock(side_effect=[_patient(), _consent()])
+    db.scalar = AsyncMock(side_effect=[_patient(), "appt1", _consent()])
     db.scalars = _scalars([emr])
     db.add = MagicMock()
     db.commit = AsyncMock()
@@ -138,7 +138,7 @@ async def test_doctor_history_returns_records_with_consent() -> None:
 @pytest.mark.asyncio
 async def test_summaries_require_consent() -> None:
     db = AsyncMock()
-    db.scalar = AsyncMock(side_effect=[_patient(), None])
+    db.scalar = AsyncMock(side_effect=[_patient(), "appt1", None])
     db.add = MagicMock()
     db.commit = AsyncMock()
 

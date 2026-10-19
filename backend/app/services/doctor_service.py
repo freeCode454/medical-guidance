@@ -8,23 +8,23 @@
 """
 from __future__ import annotations
 
-from datetime import UTC, datetime, time, timedelta
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.common.enums import AuditActionType, AuditResult, SessionStatus
+from app.common.enums import AuditActionType, AuditResult
 from app.common.error_codes import (
     FORBIDDEN,
     NOT_FOUND,
     SESSION_CORRECTION_REASON,
     SESSION_CORRECTION_SAME,
-    SESSION_NOT_TAKEOVER,
     SESSION_TAKEN_BY_OTHER,
     SESSION_TRIAGE_NOT_READY,
 )
 from app.common.exceptions import BizError
 from app.models import (
+    Appointment,
     AuditLog,
     Dept,
     EmrRecord,
@@ -88,19 +88,38 @@ async def _write_audit(
 async def _get_doctor_session(
     db: AsyncSession, session_id: str, doctor_id: str, tenant_id: str
 ) -> Session:
-    """取会话并校验医生归属。
-
-    - 不存在 → 404
-    - 存在但非本人接诊且不在待接管队列 → 403（医生端明确区分无权限）
-    """
+    """取会话并校验：必须存在该医生名下的预约号源。"""
     session = await db.scalar(
         select(Session).where(Session.id == session_id, Session.tenant_id == tenant_id)
     )
     if session is None:
         raise BizError(NOT_FOUND)
-    if session.doctor_id != doctor_id and session.status != SessionStatus.PENDING_TAKEOVER.value:
-        raise BizError(FORBIDDEN, "该会话不属于当前医生")
+    appointment = await db.scalar(
+        select(Appointment.id).where(
+            Appointment.tenant_id == tenant_id,
+            Appointment.session_id == session_id,
+            Appointment.doctor_id == doctor_id,
+            Appointment.status.in_(["BOOKED", "COMPLETED", "NOSHOW"]),
+        )
+    )
+    if appointment is None:
+        raise BizError(FORBIDDEN, "该患者未预约当前医生的号源")
     return session
+
+
+async def _doctor_has_patient(
+    db: AsyncSession, *, tenant_id: str, doctor_id: str, patient_id: str
+) -> bool:
+    """医生是否拥有该患者的预约号源。"""
+    found = await db.scalar(
+        select(Appointment.id).where(
+            Appointment.tenant_id == tenant_id,
+            Appointment.patient_id == patient_id,
+            Appointment.doctor_id == doctor_id,
+            Appointment.status.in_(["BOOKED", "COMPLETED", "NOSHOW"]),
+        ).limit(1)
+    )
+    return found is not None
 
 
 async def list_encounters(
@@ -115,42 +134,45 @@ async def list_encounters(
     sort_by: str,
     sort_order: str,
 ) -> dict:
-    """今日接诊列表（只返回当前医生接诊的患者）。"""
+    """今日接诊列表：只返回预约了当前医生号源的患者。"""
     if sort_by not in _SORT_WHITELIST:
         sort_by = "started_time"
     order_col = getattr(Session, sort_by)
     order = order_col.desc() if sort_order == "desc" else order_col.asc()
 
-    # 就诊日期范围（默认今天）
     if encounter_date:
         day = datetime.strptime(encounter_date, "%Y-%m-%d").date()
     else:
         day = datetime.now(UTC).date()
-    day_start = datetime.combine(day, time.min, tzinfo=UTC)
-    day_end = day_start + timedelta(days=1)
 
     conds = [
-        Session.tenant_id == tenant_id,
-        Session.doctor_id == doctor_id,
-        Session.started_time >= day_start,
-        Session.started_time < day_end,
+        Appointment.tenant_id == tenant_id,
+        Appointment.doctor_id == doctor_id,
+        Appointment.schedule_date == day,
+        Appointment.session_id.is_not(None),
+        Appointment.status.in_(["BOOKED", "COMPLETED", "NOSHOW"]),
     ]
     if status:
         conds.append(Session.status == status)
 
-    total = await db.scalar(select(func.count()).select_from(Session).where(*conds))
-    rows = (
-        await db.scalars(
-            select(Session)
-            .where(*conds)
-            .order_by(order)
-            .offset((page - 1) * size)
-            .limit(size)
+    base = (
+        select(Appointment, Session)
+        .join(Session, Session.id == Appointment.session_id)
+        .where(*conds)
+    )
+    total = await db.scalar(
+        select(func.count(func.distinct(Appointment.id)))
+        .select_from(Appointment)
+        .join(Session, Session.id == Appointment.session_id)
+        .where(*conds)
+    )
+    pairs = (
+        await db.execute(
+            base.order_by(order).offset((page - 1) * size).limit(size)
         )
     ).all()
 
-    # 批量取患者脱敏信息
-    patient_ids = {s.patient_id for s in rows}
+    patient_ids = {s.patient_id for _, s in pairs}
     patients = {
         p.id: p
         for p in (
@@ -162,6 +184,9 @@ async def list_encounters(
         {
             "session_id": s.id,
             "session_no": s.session_no,
+            "appointment_id": a.id,
+            "schedule_date": a.schedule_date.isoformat(),
+            "time_slot": a.time_slot,
             "patient_display": _patient_display(patients.get(s.patient_id)),
             "patient_hash": (
                 patients[s.patient_id].patient_hash
@@ -174,9 +199,9 @@ async def list_encounters(
             "inquiry_rounds": s.inquiry_rounds,
             "started_time": s.started_time.isoformat() if s.started_time else None,
         }
-        for s in rows
+        for a, s in pairs
     ]
-    return {"total": total, "page": page, "size": size, "items": items}
+    return {"total": total or 0, "page": page, "size": size, "items": items}
 
 
 async def get_session_detail(
@@ -624,95 +649,6 @@ async def correct_triage(
     }
 
 
-async def list_takeover_queue(
-    db: AsyncSession, *, tenant_id: str, page: int, size: int
-) -> dict:
-    """待接管队列（所有待接管会话，供医生认领）。"""
-    conds = [
-        Session.tenant_id == tenant_id,
-        Session.status == SessionStatus.PENDING_TAKEOVER.value,
-    ]
-    total = await db.scalar(select(func.count()).select_from(Session).where(*conds))
-    rows = (
-        await db.scalars(
-            select(Session)
-            .where(*conds)
-            .order_by(Session.started_time.asc())
-            .offset((page - 1) * size)
-            .limit(size)
-        )
-    ).all()
-
-    patient_ids = {s.patient_id for s in rows}
-    patients = {
-        p.id: p
-        for p in (await db.scalars(select(Patient).where(Patient.id.in_(patient_ids)))).all()
-    }
-
-    items = [
-        {
-            "session_id": s.id,
-            "session_no": s.session_no,
-            "patient_display": _patient_display(patients.get(s.patient_id)),
-            "chief_complaint": s.chief_complaint,
-            "risk_flag": s.risk_flag == "1",
-            "inquiry_rounds": s.inquiry_rounds,
-            "started_time": s.started_time.isoformat() if s.started_time else None,
-        }
-        for s in rows
-    ]
-    return {"total": total, "page": page, "size": size, "items": items}
-
-
-async def takeover_session(
-    db: AsyncSession, *, session_id: str, doctor_id: str, tenant_id: str
-) -> dict:
-    """医生接管会话（并发安全）。"""
-    session = await db.scalar(
-        select(Session).where(Session.id == session_id, Session.tenant_id == tenant_id)
-    )
-    if session is None:
-        raise BizError(NOT_FOUND)
-
-    # 本人重复接管：幂等返回
-    if session.doctor_id == doctor_id and session.status == SessionStatus.TAKEN_OVER.value:
-        return {
-            "session_id": session_id,
-            "doctor_id": doctor_id,
-            "status": SessionStatus.TAKEN_OVER.value,
-        }
-    if session.status != SessionStatus.PENDING_TAKEOVER.value:
-        raise BizError(SESSION_NOT_TAKEOVER)
-
-    # 条件 UPDATE：doctor_id 为空且仍处于待接管时才生效，避免两个医生同时接管成功
-    result = await db.execute(
-        update(Session)
-        .where(
-            Session.id == session_id,
-            Session.tenant_id == tenant_id,
-            Session.status == SessionStatus.PENDING_TAKEOVER.value,
-            Session.doctor_id.is_(None),
-        )
-        .values(doctor_id=doctor_id, status=SessionStatus.TAKEN_OVER.value)
-    )
-    if getattr(result, "rowcount", 0) != 1:
-        # 区分「已被别人接管」与「状态已变化」，便于前端提示
-        current_doctor = await db.scalar(
-            select(Session.doctor_id).where(Session.id == session_id)
-        )
-        if current_doctor:
-            raise BizError(SESSION_TAKEN_BY_OTHER)
-        raise BizError(SESSION_NOT_TAKEOVER)
-
-    await db.commit()
-
-    return {
-        "session_id": session_id,
-        "doctor_id": doctor_id,
-        "status": SessionStatus.TAKEN_OVER.value,
-    }
-
-
 async def get_patient_emr(
     db: AsyncSession, *, patient_id: str, doctor_id: str, tenant_id: str
 ) -> dict:
@@ -722,6 +658,10 @@ async def get_patient_emr(
     )
     if patient is None:
         raise BizError(NOT_FOUND)
+    if not await _doctor_has_patient(
+        db, tenant_id=tenant_id, doctor_id=doctor_id, patient_id=patient_id
+    ):
+        raise BizError(FORBIDDEN, "该患者未预约当前医生的号源")
 
     consent_ok = await has_active_consent(
         db, tenant_id=tenant_id, patient_id=patient_id
@@ -784,6 +724,10 @@ async def list_patient_summaries(
     )
     if patient is None:
         raise BizError(NOT_FOUND)
+    if not await _doctor_has_patient(
+        db, tenant_id=tenant_id, doctor_id=doctor_id, patient_id=patient_id
+    ):
+        raise BizError(FORBIDDEN, "该患者未预约当前医生的号源")
 
     consent_ok = await has_active_consent(
         db, tenant_id=tenant_id, patient_id=patient_id

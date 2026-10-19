@@ -109,10 +109,6 @@ export function listEncounters(params: Record<string, any> = {}) {
   return http.get<PageData<EncounterItem>>(`/doctor/encounters${q ? '?' + q : ''}`)
 }
 
-export function listTakeoverQueue(page = 1, size = 10) {
-  return http.get<PageData<EncounterItem>>(`/doctor/takeover-queue?page=${page}&size=${size}`)
-}
-
 export function getSession(sessionId: string) {
   return http.get<SessionDetail>(`/doctor/sessions/${sessionId}`)
 }
@@ -139,10 +135,6 @@ export function confirmTriage(sessionId: string, note?: string) {
 
 export function correctTriage(sessionId: string, afterDept: string, reason: string) {
   return http.post(`/doctor/sessions/${sessionId}/correct`, { after_dept: afterDept, reason })
-}
-
-export function takeover(sessionId: string) {
-  return http.post(`/doctor/sessions/${sessionId}/takeover`)
 }
 
 export function listDepts() {
