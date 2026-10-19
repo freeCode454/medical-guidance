@@ -11,10 +11,14 @@ from typing import Annotated
 
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.common.error_codes import FORBIDDEN, UNAUTHORIZED
+from app.common.database import get_db
+from app.common.error_codes import AUTH_ACCOUNT_DISABLED, FORBIDDEN, UNAUTHORIZED
 from app.common.exceptions import BizError
 from app.common.security import decode_token
+from app.models import Patient
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -47,11 +51,21 @@ async def get_current_staff(
 
 async def get_current_patient(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
-    """获取当前匿名患者，拒绝院内用户令牌。"""
+    """获取当前患者；后台停用后即使旧令牌未过期也立即拒绝。"""
     payload = _require_payload(credentials)
     if payload.get("role") != "PATIENT":
         raise BizError(FORBIDDEN, "该接口需要患者身份")
+    status = await db.scalar(
+        select(Patient.status).where(
+            Patient.id == payload.get("sub"),
+            Patient.tenant_id == payload.get("tenant_id"),
+            Patient.del_flag == "0",
+        )
+    )
+    if status is None or status == "0":
+        raise BizError(AUTH_ACCOUNT_DISABLED)
     return payload
 
 

@@ -20,6 +20,12 @@ const groups: Array<{ label: string; items: MenuItem[] }> = [
     label: '工作台',
     items: [
       {
+        path: '/patients',
+        label: '患者管理',
+        roles: ['ORG_ADMIN'],
+        icon: 'M16 11a4 4 0 10-8 0 4 4 0 008 0zM4 20c0-3.4 3.6-5 8-5s8 1.6 8 5M12 7v4M10 9h4',
+      },
+      {
         path: '/users',
         label: '用户管理',
         roles: ['ORG_ADMIN'],

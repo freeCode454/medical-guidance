@@ -23,7 +23,17 @@ from app.common.error_codes import (
 )
 from app.common.exceptions import BizError
 from app.common.security import hash_password
-from app.models import AuditLog, Dept, ModelProvider, SysConfig, Tenant, User
+from app.models import (
+    Appointment,
+    AuditLog,
+    Dept,
+    ModelProvider,
+    Patient,
+    Session,
+    SysConfig,
+    Tenant,
+    User,
+)
 
 _ROLE_LABELS = {"DOCTOR": "医生", "KB_ADMIN": "知识库管理员", "ORG_ADMIN": "机构管理员"}
 
@@ -199,6 +209,134 @@ async def toggle_user(
     )
     await db.commit()
     return {"user_id": user_id, "status": user.status}
+
+
+# ---- 患者（普通用户） -----------------------------------------------------
+
+_GENDER_LABELS = {"1": "男", "2": "女", "0": "未知"}
+
+
+async def list_patients(
+    db: AsyncSession,
+    *,
+    tenant_id: str,
+    page: int,
+    size: int,
+    status: str | None,
+    registered: bool | None,
+    keyword: str | None,
+) -> dict:
+    conds = [Patient.tenant_id == tenant_id, Patient.del_flag == "0"]
+    if status:
+        conds.append(Patient.status == status)
+    if registered is True:
+        conds.append(Patient.account.is_not(None))
+    elif registered is False:
+        conds.append(Patient.account.is_(None))
+    if keyword:
+        conds.append(
+            or_(
+                Patient.account.ilike(f"%{keyword}%"),
+                Patient.patient_no.ilike(f"%{keyword}%"),
+            )
+        )
+
+    total = await db.scalar(select(func.count()).select_from(Patient).where(*conds))
+    rows = list(
+        (
+            await db.scalars(
+                select(Patient)
+                .where(*conds)
+                .order_by(Patient.create_time.desc())
+                .offset((page - 1) * size)
+                .limit(size)
+            )
+        ).all()
+    )
+
+    patient_ids = [p.id for p in rows]
+    session_counts: dict[str, int] = {}
+    appointment_counts: dict[str, int] = {}
+    if patient_ids:
+        session_counts = {
+            pid: int(count)
+            for pid, count in (
+                await db.execute(
+                    select(Session.patient_id, func.count())
+                    .where(
+                        Session.tenant_id == tenant_id,
+                        Session.patient_id.in_(patient_ids),
+                    )
+                    .group_by(Session.patient_id)
+                )
+            ).all()
+        }
+        appointment_counts = {
+            pid: int(count)
+            for pid, count in (
+                await db.execute(
+                    select(Appointment.patient_id, func.count())
+                    .where(
+                        Appointment.tenant_id == tenant_id,
+                        Appointment.patient_id.in_(patient_ids),
+                    )
+                    .group_by(Appointment.patient_id)
+                )
+            ).all()
+            if pid is not None
+        }
+
+    return {
+        "total": total or 0,
+        "page": page,
+        "size": size,
+        "items": [
+            {
+                "patient_id": p.id,
+                "account": p.account,
+                "patient_no": p.patient_no,
+                "registered": bool(p.account),
+                "gender": p.gender,
+                "gender_label": _GENDER_LABELS.get(p.gender or "0", "未知"),
+                "age": p.age,
+                "status": p.status,
+                "session_count": session_counts.get(p.id, 0),
+                "appointment_count": appointment_counts.get(p.id, 0),
+                "last_login_time": p.last_login_time.isoformat() if p.last_login_time else None,
+                "create_time": p.create_time.isoformat() if p.create_time else None,
+            }
+            for p in rows
+        ],
+    }
+
+
+async def toggle_patient(
+    db: AsyncSession, *, tenant_id: str, actor_id: str, actor_role: str, patient_id: str
+) -> dict:
+    patient = await db.scalar(
+        select(Patient).where(
+            Patient.id == patient_id,
+            Patient.tenant_id == tenant_id,
+            Patient.del_flag == "0",
+        )
+    )
+    if patient is None:
+        raise BizError(USER_NOT_FOUND, "患者不存在")
+    patient.status = "0" if patient.status == "1" else "1"
+    patient.update_by = actor_id
+    patient.update_time = datetime.now(UTC)
+    await _write_audit(
+        db,
+        tenant_id=tenant_id,
+        actor_id=actor_id,
+        actor_role=actor_role,
+        action_type=AuditActionType.PERM_CHANGE.value,
+        target_type="patient",
+        target_id=patient.id,
+        detail={"status": patient.status, "account": patient.account},
+    )
+    await db.commit()
+    return {"patient_id": patient_id, "status": patient.status}
 
 
 # ---- 科室 -----------------------------------------------------------------

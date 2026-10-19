@@ -142,6 +142,47 @@ async def toggle_user(user_id: str, db: DbSession, admin: CurrentOrgAdmin) -> Ap
     return ApiResponse(data=data)
 
 
+# ---- 患者（普通用户，ORG_ADMIN） -------------------------------------------
+
+
+@router.get("/patients", response_model=ApiResponse[dict])
+async def list_patients(
+    db: DbSession,
+    admin: CurrentOrgAdmin,
+    page: int = Query(1, ge=1),
+    size: int = Query(10, ge=1, le=100),
+    status: str | None = None,
+    registered: bool | None = None,
+    keyword: str | None = None,
+) -> ApiResponse[dict]:
+    """普通用户（患者）列表：账号、状态、问诊/预约次数。"""
+    data = await admin_service.list_patients(
+        db,
+        tenant_id=admin["tenant_id"],
+        page=page,
+        size=size,
+        status=status,
+        registered=registered,
+        keyword=keyword,
+    )
+    return ApiResponse(data=data)
+
+
+@router.post("/patients/{patient_id}/toggle", response_model=ApiResponse[dict])
+async def toggle_patient(
+    patient_id: str, db: DbSession, admin: CurrentOrgAdmin
+) -> ApiResponse[dict]:
+    """启用/停用患者账号；停用后无法登录，历史数据保留。"""
+    data = await admin_service.toggle_patient(
+        db,
+        tenant_id=admin["tenant_id"],
+        actor_id=admin["sub"],
+        actor_role=admin["role"],
+        patient_id=patient_id,
+    )
+    return ApiResponse(data=data)
+
+
 # ---- 科室（ORG_ADMIN） -----------------------------------------------------
 
 

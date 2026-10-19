@@ -13,6 +13,12 @@ const router = createRouter({
     },
     { path: '/', redirect: () => (getTokenRole() === 'KB_ADMIN' ? '/kb' : '/users') },
     {
+      path: '/patients',
+      name: 'patients',
+      component: () => import('@/views/Patients.vue'),
+      meta: { roles: ['ORG_ADMIN'] },
+    },
+    {
       path: '/users',
       name: 'users',
       component: () => import('@/views/Users.vue'),

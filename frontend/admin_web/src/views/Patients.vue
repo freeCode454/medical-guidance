@@ -1,0 +1,304 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { patients, type Patient } from '@/api/admin'
+import { fmtDateTime } from '@/utils/format'
+
+const loading = ref(false)
+const items = ref<Patient[]>([])
+const page = ref(1)
+const size = ref(10)
+const total = ref(0)
+const keyword = ref('')
+const statusFilter = ref('')
+const registeredFilter = ref('true')
+
+async function load() {
+  loading.value = true
+  try {
+    const d = await patients.list({
+      page: page.value,
+      size: size.value,
+      keyword: keyword.value || null,
+      status: statusFilter.value || null,
+      registered: registeredFilter.value || null,
+    })
+    items.value = d.items
+    total.value = d.total
+  } catch (e) {
+    ElMessage.error((e as Error).message || '加载患者失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+function search() {
+  page.value = 1
+  void load()
+}
+
+function resetFilters() {
+  keyword.value = ''
+  statusFilter.value = ''
+  registeredFilter.value = 'true'
+  search()
+}
+
+function onPageChange(p: number) {
+  page.value = p
+  void load()
+}
+
+function onSizeChange(s: number) {
+  size.value = s
+  page.value = 1
+  void load()
+}
+
+async function onToggle(row: Patient) {
+  const action = row.status === '1' ? '停用' : '启用'
+  const name = row.account || row.patient_no || row.patient_id
+  try {
+    await ElMessageBox.confirm(
+      `${action}后该患者${row.status === '1' ? '将无法登录，但问诊与预约记录保留' : '可以重新登录'}。确定${action}「${name}」？`,
+      `确认${action}`,
+      { type: 'warning', confirmButtonText: `确定${action}`, cancelButtonText: '取消' },
+    )
+  } catch {
+    return
+  }
+  try {
+    await patients.toggle(row.patient_id)
+    ElMessage.success(`已${action}`)
+    await load()
+  } catch (e) {
+    ElMessage.error((e as Error).message || '操作失败')
+  }
+}
+
+onMounted(load)
+</script>
+
+<template>
+  <div class="page">
+    <div class="page-head">
+      <div class="page-title">
+        <h1>患者管理</h1>
+        <p>查看普通患者账号、问诊与预约情况；停用后患者无法登录，历史数据保留。</p>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <el-input
+        v-model="keyword"
+        placeholder="搜索患者账号 / 患者编号"
+        clearable
+        style="width: 240px"
+        @keyup.enter="search"
+        @clear="search"
+      >
+        <template #prefix>
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6" />
+            <path d="M16 16l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+        </template>
+      </el-input>
+
+      <el-select v-model="registeredFilter" placeholder="患者类型" style="width: 140px" @change="search">
+        <el-option label="已注册患者" value="true" />
+        <el-option label="匿名患者" value="false" />
+        <el-option label="全部患者" value="" />
+      </el-select>
+
+      <el-select v-model="statusFilter" placeholder="全部状态" clearable style="width: 120px" @change="search">
+        <el-option label="启用" value="1" />
+        <el-option label="停用" value="0" />
+      </el-select>
+
+      <el-button @click="search">查询</el-button>
+      <el-button text @click="resetFilters">重置</el-button>
+      <span class="result-count">共 <b>{{ total }}</b> 位患者</span>
+    </div>
+
+    <section class="table-card" v-loading="loading">
+      <el-table :data="items" row-key="patient_id">
+        <el-table-column label="患者" min-width="220">
+          <template #default="{ row }">
+            <div class="patient-cell">
+              <span class="patient-avatar">{{ (row.account || '匿').slice(0, 1) }}</span>
+              <div class="patient-cell__text">
+                <b>{{ row.account || '匿名患者' }}</b>
+                <em class="mono">{{ row.patient_no || row.patient_id }}</em>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="性别 / 年龄" width="130">
+          <template #default="{ row }">
+            {{ row.gender_label }}<span v-if="row.age != null"> · {{ row.age }} 岁</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="问诊" width="90">
+          <template #default="{ row }"><span class="tnum">{{ row.session_count }}</span> 次</template>
+        </el-table-column>
+        <el-table-column label="预约" width="90">
+          <template #default="{ row }"><span class="tnum">{{ row.appointment_count }}</span> 次</template>
+        </el-table-column>
+        <el-table-column label="注册时间" width="160">
+          <template #default="{ row }">
+            <span class="muted">{{ row.create_time ? fmtDateTime(row.create_time) : '—' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="最近登录" width="160">
+          <template #default="{ row }">
+            <span class="muted">{{ row.last_login_time ? fmtDateTime(row.last_login_time) : '从未登录' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="90">
+          <template #default="{ row }">
+            <span class="status-dot" :class="{ 'is-off': row.status !== '1' }">
+              {{ row.status === '1' ? '启用' : '停用' }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="100" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              link
+              :type="row.status === '1' ? 'danger' : 'success'"
+              size="small"
+              @click="onToggle(row)"
+            >
+              {{ row.status === '1' ? '停用' : '启用' }}
+            </el-button>
+          </template>
+        </el-table-column>
+
+        <template #empty>
+          <div class="empty-block">
+            <p class="empty-block__title">没有匹配的患者</p>
+            <p>试试更换关键词，或切换“已注册 / 匿名 / 全部”。</p>
+            <el-button @click="resetFilters">重置筛选</el-button>
+          </div>
+        </template>
+      </el-table>
+
+      <div v-if="total > size" class="table-foot">
+        <el-pagination
+          v-model:current-page="page"
+          v-model:page-size="size"
+          :total="total"
+          :page-sizes="[10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next"
+          @current-change="onPageChange"
+          @size-change="onSizeChange"
+        />
+      </div>
+    </section>
+  </div>
+</template>
+
+<style scoped>
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.search-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--c-faint);
+}
+
+.result-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+.result-count b {
+  color: var(--c-primary);
+  font-family: var(--font-display);
+  font-size: 14px;
+}
+
+.patient-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.patient-avatar {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-primary-soft);
+  border: 1px solid var(--c-primary-line);
+  color: var(--c-primary);
+  font-family: var(--font-display);
+  font-size: 14px;
+}
+
+.patient-cell__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.patient-cell__text b {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-ink);
+}
+
+.patient-cell__text em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--c-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.muted {
+  color: var(--c-muted);
+  font-size: 12px;
+}
+
+.tnum {
+  font-family: var(--font-mono);
+  color: var(--c-ink);
+}
+
+.status-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--c-success-text, #2f6f57);
+  font-size: 12px;
+}
+
+.status-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-dot.is-off {
+  color: var(--c-faint);
+}
+</style>
