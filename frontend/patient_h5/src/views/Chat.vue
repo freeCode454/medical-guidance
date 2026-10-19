@@ -260,7 +260,7 @@ async function exit() {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  color: #fff;
+  color: var(--c-surface);
   background: linear-gradient(145deg, var(--c-primary), var(--c-primary-strong));
   box-shadow: 0 6px 14px -7px rgba(20, 75, 71, 0.6);
 }
@@ -408,7 +408,7 @@ async function exit() {
 .row--me .bubble {
   background: linear-gradient(135deg, #1a5a55, var(--c-primary));
   border-bottom-right-radius: 5px;
-  color: #fff;
+  color: var(--c-surface);
   box-shadow: 0 10px 20px -12px rgba(20, 75, 71, 0.6);
 }
 
@@ -470,7 +470,7 @@ async function exit() {
 
 .field.is-focus {
   border-color: var(--c-primary-line);
-  background: #fff;
+  background: var(--c-surface);
   box-shadow: var(--ring);
 }
 
@@ -497,7 +497,7 @@ async function exit() {
   border: 0;
   border-radius: 50%;
   background: linear-gradient(135deg, #c9763c, #b15d2b);
-  color: #fff;
+  color: var(--c-surface);
   cursor: pointer;
   box-shadow: var(--shadow-accent);
   transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out),
@@ -586,14 +586,14 @@ async function exit() {
 /* ---------- 微信小程序式覆盖 ---------- */
 .chat {
   max-width: 560px;
-  background: #f5f5f5;
+  background: var(--c-bg);
 }
 
 .head {
   padding: 6px 10px;
   padding-top: calc(6px + env(safe-area-inset-top));
-  background: #ffffff;
-  border-bottom: 1px solid #ededed;
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-line);
   backdrop-filter: none;
 }
 
@@ -603,11 +603,11 @@ async function exit() {
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: #1f1f1f;
+  color: var(--c-ink);
 }
 
 .back:hover {
-  background: #f2f2f2;
+  background: var(--c-line-soft);
   border-color: transparent;
 }
 
@@ -625,16 +625,16 @@ async function exit() {
   font-family: var(--font-body);
   font-size: 16px;
   font-weight: 600;
-  color: #1f1f1f;
+  color: var(--c-ink);
 }
 
 .status {
-  color: #07c160;
+  color: var(--c-primary);
   font-size: 10px;
 }
 
 .status i {
-  background: #07c160;
+  background: var(--c-primary);
 }
 
 .messages {
@@ -645,62 +645,63 @@ async function exit() {
   padding: 9px 12px;
   border: 0;
   border-radius: 8px;
-  background: #ffffff;
-  color: #999999;
+  background: var(--c-surface);
+  color: var(--c-muted);
   font-size: 11px;
 }
 
 .bubble {
-  border: 0;
+  border: 1px solid var(--c-line);
   border-radius: 4px 10px 10px 10px;
-  background: #ffffff;
-  color: #1f1f1f;
+  background: var(--c-surface);
+  color: var(--c-ink);
   box-shadow: none;
 }
 
 .row--me .bubble {
+  border: 0;
   border-radius: 10px 4px 10px 10px;
-  background: #95ec69;
-  color: #1f1f1f;
+  background: var(--c-primary);
+  color: var(--c-surface);
 }
 
 .bubble-avatar {
   border: 0;
-  background: #e8f8ef;
-  color: #07c160;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
 }
 
 .composer {
-  background: #ffffff;
-  border-top: 1px solid #ededed;
+  background: var(--c-surface);
+  border-top: 1px solid var(--c-line);
   padding-bottom: calc(8px + env(safe-area-inset-bottom));
 }
 
 .field {
   border: 0;
   border-radius: 8px;
-  background: #f7f7f7;
+  background: var(--c-surface-soft);
 }
 
 .field.is-focus {
-  background: #ffffff;
-  box-shadow: 0 0 0 1px #07c160;
+  background: var(--c-surface);
+  box-shadow: 0 0 0 1px var(--c-primary);
 }
 
 .send {
   border-radius: 50%;
-  background: #07c160;
-  color: #ffffff;
-  box-shadow: none;
+  background: var(--c-accent);
+  color: var(--c-surface);
+  box-shadow: var(--shadow-accent);
 }
 
 .send:hover:not(:disabled),
 .send:active:not(:disabled) {
-  background: #06ad56;
+  background: var(--c-accent-strong);
   transform: none;
 }
 
 .composer__hint {
-  color: #b2b2b2;
+  color: var(--c-faint);
 }
 </style>

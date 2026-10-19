@@ -564,7 +564,7 @@ onMounted(load)
   border: 0;
   border-radius: 999px;
   padding: 12px 22px;
-  background: #07c160;
+  background: var(--c-accent);
   color: #fff;
   font-size: 14px;
   font-weight: 600;

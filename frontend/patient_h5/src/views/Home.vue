@@ -253,7 +253,7 @@ async function start() {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  color: #fff;
+  color: var(--c-surface);
   background: linear-gradient(145deg, var(--c-primary), var(--c-primary-strong));
   box-shadow: 0 6px 14px -6px rgba(20, 75, 71, 0.55);
 }
@@ -493,7 +493,7 @@ h1 {
 }
 
 .area.is-focus {
-  background: #fff;
+  background: var(--c-surface);
   border-color: var(--c-primary-line);
   box-shadow: var(--ring);
 }
@@ -635,7 +635,7 @@ h1 {
 
 .seg__btn.is-on {
   background: var(--c-primary);
-  color: #fff;
+  color: var(--c-surface);
   box-shadow: 0 4px 10px -4px rgba(20, 75, 71, 0.55);
 }
 
@@ -666,7 +666,7 @@ h1 {
 
 .age__input:focus {
   border-color: var(--c-primary-line);
-  background: #fff;
+  background: var(--c-surface);
   box-shadow: var(--ring);
 }
 
@@ -717,7 +717,7 @@ h1 {
   border-radius: var(--r-pill);
   padding: 16px 20px;
   background: linear-gradient(135deg, #c9763c, #b15d2b);
-  color: #fff;
+  color: var(--c-surface);
   font-size: 16.5px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -774,7 +774,7 @@ h1 {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
+  border-top-color: var(--c-surface);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -963,14 +963,14 @@ h1 {
 .m-page {
   min-height: 100vh;
   min-height: 100dvh;
-  background: #f5f5f5;
+  background: var(--c-bg);
   padding-bottom: calc(72px + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
 .m-nav-link {
   font-size: 13px;
-  color: #07c160;
+  color: var(--c-primary);
   text-decoration: none;
   padding: 6px;
 }
@@ -998,14 +998,14 @@ h1 {
 .m-hello__text p {
   font-size: 10px;
   letter-spacing: 0.14em;
-  color: #07c160;
+  color: var(--c-accent-text);
 }
 
 .m-hello__text h2 {
   margin-top: 3px;
   font-size: 22px;
   line-height: 1.3;
-  color: #1f1f1f;
+  color: var(--c-ink);
 }
 
 .m-hello__text span {
@@ -1013,7 +1013,7 @@ h1 {
   margin-top: 5px;
   font-size: 12px;
   line-height: 1.6;
-  color: #888;
+  color: var(--c-muted);
 }
 
 .m-avatar {
@@ -1023,8 +1023,8 @@ h1 {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #e8f8ef;
-  color: #07c160;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
   font-size: 18px;
   font-weight: 600;
 }
@@ -1032,7 +1032,7 @@ h1 {
 .m-card {
   padding: 16px;
   border-radius: 12px;
-  background: #fff;
+  background: var(--c-surface);
 }
 
 .m-card__head {
@@ -1046,28 +1046,28 @@ h1 {
   font-family: var(--font-body);
   font-size: 15px;
   font-weight: 600;
-  color: #1f1f1f;
+  color: var(--c-ink);
 }
 
 .m-card__head span {
   padding: 2px 7px;
   border-radius: 4px;
-  background: #f2f2f2;
-  color: #999;
+  background: var(--c-line-soft);
+  color: var(--c-faint);
   font-size: 10px;
 }
 
 .m-textarea {
   padding: 12px;
   border-radius: 8px;
-  background: #f7f7f7;
+  background: var(--c-surface-soft);
   border: 1px solid transparent;
   transition: border-color 0.2s ease;
 }
 
 .m-textarea.is-focus {
-  border-color: #07c160;
-  background: #fff;
+  border-color: var(--c-primary);
+  background: var(--c-surface);
 }
 
 .m-textarea.is-shake {
@@ -1082,7 +1082,7 @@ h1 {
   outline: none;
   resize: none;
   background: transparent;
-  color: #1f1f1f;
+  color: var(--c-ink);
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.7;
@@ -1094,7 +1094,7 @@ h1 {
   justify-content: space-between;
   gap: 10px;
   margin-top: 8px;
-  color: #999;
+  color: var(--c-faint);
   font-size: 10.5px;
 }
 
@@ -1111,21 +1111,21 @@ h1 {
 }
 
 .m-chips > span {
-  color: #999;
+  color: var(--c-faint);
   font-size: 11px;
 }
 
 .m-chip {
   padding: 5px 10px;
-  border: 1px solid #ededed;
+  border: 1px solid var(--c-line);
   border-radius: 999px;
-  background: #fff;
+  background: var(--c-surface);
   color: #555;
   font-size: 11px;
 }
 
 .m-chip:active {
-  background: #f2f2f2;
+  background: var(--c-line-soft);
 }
 
 .m-consent {
@@ -1133,14 +1133,14 @@ h1 {
   align-items: flex-start;
   gap: 7px;
   margin-top: 14px;
-  color: #888;
+  color: var(--c-muted);
   font-size: 11px;
   line-height: 1.6;
 }
 
 .m-consent input {
   margin-top: 2px;
-  accent-color: #07c160;
+  accent-color: var(--c-primary);
 }
 
 .m-btn {
@@ -1149,8 +1149,8 @@ h1 {
   margin-top: 16px;
   border: 0;
   border-radius: 8px;
-  background: #07c160;
-  color: #fff;
+  background: var(--c-accent);
+  color: var(--c-surface);
   font-family: var(--font-body);
   font-size: 15px;
   font-weight: 500;
@@ -1158,7 +1158,7 @@ h1 {
 }
 
 .m-btn:active {
-  background: #06ad56;
+  background: var(--c-accent-strong);
 }
 
 .m-btn:disabled {
@@ -1168,7 +1168,7 @@ h1 {
 .m-services {
   margin-top: 10px;
   border-radius: 12px;
-  background: #fff;
+  background: var(--c-surface);
   overflow: hidden;
 }
 
@@ -1179,7 +1179,7 @@ h1 {
   padding: 13px 14px;
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid #f2f2f2;
+  border-bottom: 1px solid var(--c-line-soft);
 }
 
 .m-service:last-child {
@@ -1187,7 +1187,7 @@ h1 {
 }
 
 .m-service:active {
-  background: #fafafa;
+  background: var(--c-surface-soft);
 }
 
 .m-service__icon {
@@ -1205,8 +1205,8 @@ h1 {
 }
 
 .m-service__icon--green {
-  background: #e8f8ef;
-  color: #07c160;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
 }
 
 .m-service__icon--blue {
@@ -1215,8 +1215,8 @@ h1 {
 }
 
 .m-service__icon--orange {
-  background: #fff1e6;
-  color: #ff8f1f;
+  background: var(--c-accent-soft);
+  color: var(--c-accent-strong);
 }
 
 .m-service__text {
@@ -1230,17 +1230,17 @@ h1 {
 .m-service__text b {
   font-size: 13.5px;
   font-weight: 500;
-  color: #1f1f1f;
+  color: var(--c-ink);
 }
 
 .m-service__text em {
   font-style: normal;
   font-size: 10.5px;
-  color: #999;
+  color: var(--c-faint);
 }
 
 .m-service__arrow {
-  color: #c8c8c8;
+  color: var(--c-faint);
   font-size: 20px;
 }
 
@@ -1248,13 +1248,13 @@ h1 {
   margin-top: 16px;
   padding: 0 4px;
   text-align: center;
-  color: #b2b2b2;
+  color: var(--c-faint);
   font-size: 10px;
   line-height: 1.7;
 }
 
 .m-tip a {
-  color: #07c160;
+  color: var(--c-primary);
   text-decoration: none;
 }
 

@@ -35,8 +35,8 @@ const active = computed(() => (route.path === '/profile' ? 'profile' : 'home'))
   height: calc(52px + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.98);
-  border-top: 1px solid #ededed;
+  background: rgba(255, 253, 249, 0.98);
+  border-top: 1px solid var(--c-line);
 }
 
 .mini-tabbar__item {
@@ -46,7 +46,7 @@ const active = computed(() => (route.path === '/profile' ? 'profile' : 'home'))
   align-items: center;
   justify-content: center;
   gap: 2px;
-  color: #999999;
+  color: var(--c-faint);
   text-decoration: none;
   font-size: 10px;
 }
@@ -57,11 +57,11 @@ const active = computed(() => (route.path === '/profile' ? 'profile' : 'home'))
 }
 
 .mini-tabbar__item.is-active {
-  color: #07c160;
+  color: var(--c-primary);
   font-weight: 500;
 }
 
 .mini-tabbar__item:active {
-  background: #f7f7f7;
+  background: var(--c-surface-soft);
 }
 </style>

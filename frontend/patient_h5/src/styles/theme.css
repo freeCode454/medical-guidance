@@ -12,30 +12,30 @@
  */
 
 :root {
-  /* ---------- 微信小程序式色板 ---------- */
-  --c-bg: #f5f5f5;
-  --c-bg-deep: #ededed;
-  --c-surface: #ffffff;
-  --c-surface-soft: #f7f7f7;
+  /* ---------- 原诊室暖光色板 ---------- */
+  --c-bg: #f6f1e8;
+  --c-bg-deep: #efe7d9;
+  --c-surface: #fffdf9;
+  --c-surface-soft: #fbf6ec;
 
-  --c-primary: #07c160;
-  --c-primary-strong: #06ad56;
-  --c-primary-soft: #e8f8ef;
-  --c-primary-line: #c8ecd7;
+  --c-primary: #144b47;
+  --c-primary-strong: #0c3734;
+  --c-primary-soft: #e3ede9;
+  --c-primary-line: #c9dbd5;
 
-  --c-accent: #07c160;
-  --c-accent-strong: #06ad56;
-  --c-accent-text: #06ad56;
-  --c-accent-soft: #e8f8ef;
+  --c-accent: #bf6a34;
+  --c-accent-strong: #a55726;
+  --c-accent-text: #a55726;
+  --c-accent-soft: #f7e7d9;
 
-  --c-ink: #1f1f1f;
-  --c-ink-soft: #555555;
-  --c-muted: #888888;
-  --c-faint: #b2b2b2;
+  --c-ink: #1d2a28;
+  --c-ink-soft: #44514d;
+  --c-muted: #646e68;
+  --c-faint: #7d8780;
 
-  --c-line: #ededed;
-  --c-line-soft: #f2f2f2;
-  --c-danger: #fa5151;
+  --c-line: #e6ddcd;
+  --c-line-soft: #f0e9dd;
+  --c-danger: #b4432f;
 
   /* ---------- 字体 ---------- */
   --font-display: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
@@ -71,11 +71,11 @@
   --sp-12: 48px;
 
   /* ---------- 阴影 ---------- */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-accent: 0 4px 12px rgba(7, 193, 96, 0.24);
+  --shadow-xs: 0 1px 2px rgba(29, 42, 40, 0.05);
+  --shadow-sm: 0 1px 2px rgba(29, 42, 40, 0.04), 0 6px 16px -8px rgba(29, 42, 40, 0.16);
+  --shadow-md: 0 2px 4px rgba(29, 42, 40, 0.04), 0 18px 36px -18px rgba(29, 42, 40, 0.24);
+  --shadow-lg: 0 4px 8px rgba(29, 42, 40, 0.04), 0 40px 72px -32px rgba(20, 75, 71, 0.3);
+  --shadow-accent: 0 2px 4px rgba(165, 87, 38, 0.14), 0 16px 30px -14px rgba(191, 106, 52, 0.55);
 
   /* ---------- 缓动 ---------- */
   --ease-out: cubic-bezier(0.22, 0.8, 0.28, 1);
@@ -84,15 +84,15 @@
   --dur: 240ms;
   --dur-slow: 640ms;
 
-  --ring: 0 0 0 4px rgba(7, 193, 96, 0.12);
-  --ring-accent: 0 0 0 4px rgba(7, 193, 96, 0.14);
+  --ring: 0 0 0 4px rgba(20, 75, 71, 0.12);
+  --ring-accent: 0 0 0 4px rgba(191, 106, 52, 0.14);
 
   /* Vant 主题覆盖 */
   --van-primary-color: var(--c-primary);
   --van-text-color: var(--c-ink);
   --van-background: var(--c-bg);
-  --van-toast-background: rgba(0, 0, 0, 0.75);
-  --van-overlay-background: rgba(0, 0, 0, 0.45);
+  --van-toast-background: rgba(29, 42, 40, 0.88);
+  --van-overlay-background: rgba(20, 40, 38, 0.45);
   --van-dialog-radius: 12px;
   --van-dialog-background: var(--c-surface);
   --van-dialog-header-font-weight: 600;
@@ -130,7 +130,10 @@ body {
 body {
   min-height: 100vh;
   overflow-x: hidden;
-  background: var(--c-bg);
+  background:
+    radial-gradient(1000px 620px at 92% -10%, rgba(191, 106, 52, 0.075), transparent 62%),
+    radial-gradient(880px 560px at 0% -6%, rgba(20, 75, 71, 0.07), transparent 60%),
+    var(--c-bg);
 }
 
 @media (min-width: 900px) {
@@ -178,7 +181,7 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-weight: 600;
-  color: var(--c-ink);
+  color: var(--c-primary);
   margin: 0;
   text-wrap: balance;
   letter-spacing: 0;

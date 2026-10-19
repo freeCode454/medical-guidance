@@ -374,7 +374,7 @@ h1 {
   border: 0;
   border-radius: var(--r-pill);
   padding: 15px;
-  background: #07c160;
+  background: var(--c-accent);
   color: #fff;
   font-size: 15.5px;
   font-weight: 600;

@@ -43,16 +43,16 @@ function goBack() {
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr) 56px;
   align-items: center;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 253, 249, 0.96);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid #ededed;
+  border-bottom: 1px solid var(--c-line);
 }
 
 .mini-nav h1 {
   font-family: var(--font-body);
   font-size: 16px;
   font-weight: 600;
-  color: #1f1f1f;
+  color: var(--c-ink);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -67,12 +67,12 @@ function goBack() {
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: #1f1f1f;
+  color: var(--c-ink);
   cursor: pointer;
 }
 
 .mini-nav__back:active {
-  background: #f2f2f2;
+  background: var(--c-surface-soft);
 }
 
 .mini-nav__back svg {
