@@ -8,7 +8,7 @@
     <text class="intro__desc">描述身体不适，智能助手会先了解情况，再给出就诊建议。</text>
   </view>
 
-  <view class="welcome">
+  <view class="welcome" hover-class="welcome--active" bindtap="goChat">
     <view class="welcome__head">
       <view class="welcome__badge">AI</view>
       <text class="welcome__name">智能导诊助手</text>
@@ -21,31 +21,10 @@
       您好，请用一句话告诉我：哪里不舒服、大概多久了？
     </view>
     <text class="welcome__example">例如：肚子疼三天了，还拉肚子</text>
-  </view>
-
-  <view class="composer">
-    <view class="input-row">
-      <input
-        class="chat-input"
-        value="{{input}}"
-        placeholder="描述您的不适…"
-        placeholder-class="placeholder"
-        confirm-type="send"
-        cursor-spacing="24"
-        bindinput="onInput"
-        bindconfirm="onSend"
-      />
-      <button
-        class="send-btn {{loading || !input ? 'is-disabled' : ''}}"
-        hover-class="send-btn--active"
-        loading="{{loading}}"
-        disabled="{{loading || !input}}"
-        bindtap="onSend"
-      >
-        <text wx:if="{{!loading}}">发送</text>
-      </button>
+    <view class="welcome__cta">
+      <text>点击开始问诊</text>
+      <text class="welcome__arrow">›</text>
     </view>
-    <text class="composer__note">内容仅用于本次预问诊，医生可查看预问诊记录</text>
   </view>
 
   <bottom-nav active="home" />

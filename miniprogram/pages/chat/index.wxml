@@ -21,7 +21,7 @@
     <view class="day-label">本次问诊</view>
 
     <view wx:if="{{loading}}" class="empty-tip">正在加载对话…</view>
-    <view wx:elif="{{!messages.length}}" class="empty-tip">正在准备第一个问题…</view>
+    <view wx:elif="{{!messages.length}}" class="empty-tip">{{sessionId ? '正在准备第一个问题…' : '请描述身体不适，开始本次问诊'}}</view>
 
     <view
       wx:for="{{messages}}"

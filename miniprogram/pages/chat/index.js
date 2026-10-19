@@ -24,8 +24,9 @@ Page({
 
   onLoad(options) {
     if (!auth.requireLogin()) return
-    this.setData({ sessionId: options.sessionId || '' })
-    this.loadAll()
+    const sessionId = options.sessionId || ''
+    this.setData({ sessionId, loading: Boolean(sessionId) })
+    if (sessionId) this.loadAll()
   },
 
   onShow() {
@@ -115,11 +116,35 @@ Page({
     if (!content || this.data.sending) return
     this.setData({ sending: true, awaitingReply: true, input: '' })
     try {
-      await request(`/patient/sessions/${this.data.sessionId}/messages`, {
-        method: 'POST',
-        data: { content, msg_type: 'TEXT' }
-      })
-      await this.loadMessages()
+      if (!this.data.sessionId) {
+        let profile = null
+        try {
+          profile = await auth.getProfile()
+        } catch (e) {
+          // 资料读取失败不阻断首次问诊
+        }
+        const gender = profile && (profile.gender_label === '男' || profile.gender_label === '女')
+          ? profile.gender_label
+          : null
+        const session = await request('/patient/sessions', {
+          method: 'POST',
+          data: {
+            chief_complaint: content,
+            input_type: 'TEXT',
+            gender,
+            age: profile && profile.age != null ? profile.age : null
+          }
+        })
+        this.setData({ sessionId: session.session_id, loading: true })
+        await this.loadAll()
+        this.startPolling()
+      } else {
+        await request(`/patient/sessions/${this.data.sessionId}/messages`, {
+          method: 'POST',
+          data: { content, msg_type: 'TEXT' }
+        })
+        await this.loadMessages()
+      }
     } catch (e) {
       this.setData({ input: content, awaitingReply: false })
       wx.showToast({ title: e.message || '发送失败', icon: 'none' })
