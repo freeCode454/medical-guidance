@@ -171,7 +171,12 @@ Page({
 
   onRecord(e) {
     const id = e.currentTarget.dataset.id
-    if (id) wx.navigateTo({ url: `/pages/result/index?sessionId=${id}` })
+    const date = encodeURIComponent(e.currentTarget.dataset.date || '')
+    if (id) {
+      wx.navigateTo({
+        url: `/pages/result/index?sessionId=${id}&from=history&date=${date}`
+      })
+    }
   },
 
   goHome() {

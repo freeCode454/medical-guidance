@@ -80,6 +80,7 @@
       wx:for="{{records}}"
       wx:key="record_id"
       data-id="{{item.session_id}}"
+      data-date="{{item.dateText}}"
       bindtap="onRecord"
     >
       <view class="record__top">

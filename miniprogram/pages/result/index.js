@@ -13,6 +13,8 @@ Page({
     sessionId: '',
     loading: true,
     error: '',
+    isHistory: false,
+    visitDate: '',
     triage: null,
     primary: null,
     recommended: [],
@@ -23,7 +25,13 @@ Page({
 
   onLoad(options) {
     if (!auth.requireLogin()) return
-    this.setData({ sessionId: options.sessionId || '' })
+    const isHistory = options.from === 'history'
+    this.setData({
+      sessionId: options.sessionId || '',
+      isHistory,
+      visitDate: decodeURIComponent(options.date || '')
+    })
+    wx.setNavigationBarTitle({ title: isHistory ? '历史病历' : '分诊结果' })
     this.load()
   },
 
@@ -31,13 +39,17 @@ Page({
     this.setData({ loading: true, error: '' })
     try {
       const triage = await request(`/patient/sessions/${this.data.sessionId}/triage`)
-      const recommended = (triage.recommended_depts || []).map((d) => ({
+      const all = (triage.recommended_depts || []).map((d) => ({
         ...d,
         pct: Math.round((d.confidence || 0) * 100)
       }))
+      const primary = all[0] || null
+      const recommended = primary
+        ? all.filter((d) => d.dept_code !== primary.dept_code)
+        : all
       this.setData({
         triage,
-        primary: recommended[0] || null,
+        primary,
         recommended,
         confidencePct: Math.round((triage.confidence || 0) * 100),
         routeLabel: ROUTE_LABELS[triage.route] || triage.route

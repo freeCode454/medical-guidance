@@ -8,7 +8,13 @@
   </view>
 
   <block wx:else>
-    <view class="result-head">
+    <view wx:if="{{isHistory}}" class="history-head">
+      <text class="history-badge">历史病历</text>
+      <text class="history-title">{{primary.dept_name || '预问诊记录'}}</text>
+      <text class="history-meta">{{visitDate || '既往预问诊记录'}}</text>
+    </view>
+
+    <view wx:if="{{!isHistory}}" class="result-head">
       <view class="eyebrow">{{routeLabel}}</view>
       <view class="result-title">{{primary.dept_name || '待医生确认'}}</view>
       <view class="confidence">匹配度 {{confidencePct}}%</view>
@@ -23,7 +29,7 @@
       <view class="emergency-phone">{{triage.emergency_guidance.emergency_phone}}</view>
     </view>
 
-    <view class="card" wx:if="{{recommended.length}}">
+    <view class="card" wx:if="{{!isHistory && recommended.length}}">
       <view class="section">其他可能相关</view>
       <view class="dept-row" wx:for="{{recommended}}" wx:key="dept_code">
         <view class="dept-main">
@@ -35,7 +41,7 @@
     </view>
 
     <view class="card" wx:if="{{triage.symptom_summary}}">
-      <view class="section">本次问诊摘要</view>
+      <view class="section">问诊摘要</view>
       <view class="kv"><text class="k">主诉</text><text class="v">{{triage.symptom_summary.chief_complaint || '—'}}</text></view>
       <view class="kv"><text class="k">部位</text><text class="v">{{triage.symptom_summary.location || '—'}}</text></view>
       <view class="kv"><text class="k">性质</text><text class="v">{{triage.symptom_summary.nature || '—'}}</text></view>
@@ -51,15 +57,17 @@
       <view class="soap-text">{{emr.plan.note || '—'}}</view>
     </view>
 
-    <button
-      wx:if="{{primary && !(triage.emergency_guidance && triage.emergency_guidance.triggered)}}"
-      class="book-btn"
-      bindtap="goAppointment"
-    >
-      预约挂号 · {{primary.dept_name}}
-    </button>
+    <block wx:if="{{!isHistory}}">
+      <button
+        wx:if="{{primary && !(triage.emergency_guidance && triage.emergency_guidance.triggered)}}"
+        class="book-btn"
+        bindtap="goAppointment"
+      >
+        预约挂号 · {{primary.dept_name}}
+      </button>
 
-    <view class="disclaimer">{{triage.disclaimer}}</view>
-    <button class="btn-ghost" bindtap="onBack">返回对话</button>
+      <view class="disclaimer">{{triage.disclaimer}}</view>
+      <button class="btn-ghost" bindtap="onBack">返回对话</button>
+    </block>
   </block>
 </view>
