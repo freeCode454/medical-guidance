@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import * as echarts from 'echarts'
+import * as echarts from 'echarts/core'
+import { GraphChart } from 'echarts/charts'
+import { LegendComponent, TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import type { ECharts } from 'echarts/core'
 import { kg, type KgEdge, type KgNode, type KgStats } from '@/api/kg'
 import { depts } from '@/api/admin'
+
+echarts.use([GraphChart, TooltipComponent, LegendComponent, CanvasRenderer])
 
 type Mode = 'symptom' | 'dept'
 
@@ -22,7 +28,7 @@ const summary = ref('')
 const paths = ref<string[]>([])
 
 const chartEl = ref<HTMLDivElement>()
-const chart = shallowRef<echarts.ECharts>()
+const chart = shallowRef<ECharts>()
 
 const CATEGORIES = [
   { name: '症状', color: '#2f6f6a' },
