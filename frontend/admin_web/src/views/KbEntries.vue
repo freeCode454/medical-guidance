@@ -441,7 +441,14 @@ onMounted(() => {
       </div>
     </section>
 
-    <el-drawer v-model="detailVisible" title="知识条目详情" size="520px" destroy-on-close>
+    <el-dialog
+      v-model="detailVisible"
+      title="知识条目详情"
+      width="680px"
+      top="6vh"
+      destroy-on-close
+      class="kb-detail-dialog"
+    >
       <div v-loading="detailLoading" class="detail-body">
         <template v-if="detail">
           <div class="detail-head">
@@ -481,7 +488,7 @@ onMounted(() => {
       <template #footer>
         <el-button @click="detailVisible = false">关闭</el-button>
       </template>
-    </el-drawer>
+    </el-dialog>
 
     <el-dialog v-model="dialog" title="新增知识条目" width="560px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
@@ -787,6 +794,9 @@ onMounted(() => {
 
 .detail-body {
   min-height: 220px;
+  max-height: calc(78vh - 130px);
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
 .detail-head {
