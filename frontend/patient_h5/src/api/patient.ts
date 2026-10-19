@@ -7,6 +7,40 @@ export interface PatientSession {
   device_id: string
 }
 
+export interface PatientProfile {
+  patient_id: string
+  account: string
+  patient_no: string | null
+  age: number | null
+  gender: string | null
+  gender_label: string
+  created_at: string | null
+  last_login_time: string | null
+  session_count: number
+  appointment_count: number
+  record_count: number
+}
+
+export interface MedicalRecord {
+  record_id: string
+  session_id: string
+  visit_time: string | null
+  chief_complaint: string | null
+  dept_name: string | null
+  summary: string
+  generate_status: string
+}
+
+export function getProfile() {
+  return http.get<PatientProfile>('/patient/profile')
+}
+
+export function listMedicalRecords(limit = 20) {
+  return http.get<{ total: number; items: MedicalRecord[] }>(
+    `/patient/records?limit=${limit}`,
+  )
+}
+
 export interface PatientAuth {
   access_token: string
   refresh_token: string

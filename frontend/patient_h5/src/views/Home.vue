@@ -61,11 +61,6 @@ function shake() {
   })
 }
 
-function logout() {
-  store.logout()
-  router.push('/login')
-}
-
 async function start() {
   const text = complaint.value.trim()
   if (!text) {
@@ -130,10 +125,10 @@ async function start() {
         </svg>
         隐私保护
       </span>
-      <div class="account">
-        <span>{{ store.account || '已登录' }}</span>
-        <button type="button" @click="logout">退出</button>
-      </div>
+      <router-link class="account" to="/profile" aria-label="个人中心">
+        <span class="account__dot" aria-hidden="true" />
+        我的
+      </router-link>
     </header>
 
     <main class="layout">
@@ -395,32 +390,24 @@ async function start() {
 }
 
 .account {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px 6px 12px;
-  border: 1px solid var(--c-line);
+  gap: 7px;
+  padding: 7px 13px;
+  border: 1px solid var(--c-primary-line);
   border-radius: var(--r-pill);
-  background: var(--c-surface);
+  background: var(--c-primary-soft);
   font-size: 11.5px;
-  color: var(--c-muted);
-}
-
-.account span {
-  max-width: 110px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.account button {
-  border: 0;
-  border-radius: var(--r-pill);
-  padding: 4px 8px;
-  background: var(--c-surface-soft);
+  font-weight: 500;
   color: var(--c-primary);
-  font-size: 10.5px;
-  cursor: pointer;
+  text-decoration: none;
+}
+
+.account__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-primary);
 }
 
 @media (max-width: 720px) {
@@ -1003,48 +990,51 @@ h1 {
   }
 
   .layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 452px;
-    gap: clamp(48px, 7vw, 96px);
-    align-items: center;
-    align-content: center;
-    padding: 12px 0 24px;
+    display: flex;
+    flex-direction: column;
+    max-width: 720px;
+    gap: 20px;
+    align-items: stretch;
+    padding: 18px 0 24px;
   }
 
   .intro {
     display: block;
-    margin: 0;
+    max-width: 620px;
+    margin: 0 auto;
+    text-align: center;
   }
 
   .intro .eyebrow {
     display: inline-flex;
+    justify-content: center;
   }
 
   .intro .lede {
     display: block;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .intro .steps {
-    display: grid;
-  }
-
+  .intro .steps,
   .intro .intro-note {
-    display: block;
+    display: none;
   }
 
   h1 {
-    font-size: var(--fs-display);
-    line-height: 1.2;
-    margin: 18px 0;
+    font-size: clamp(38px, 5.2vw, 56px);
+    line-height: 1.22;
+    margin: 16px 0 12px;
   }
 
   h1 br {
-    display: inline;
+    display: block;
   }
 
   .panel {
-    max-width: none;
-    margin: 0;
+    max-width: 560px;
+    margin: 0 auto;
     animation: rise 0.75s var(--ease-out) 0.12s both;
   }
 

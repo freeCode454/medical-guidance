@@ -21,7 +21,13 @@ from app.schemas.session import (
     SessionCreateResponse,
 )
 from app.schemas.triage import TriageResultResponse
-from app.services import appointment_service, consent_service, history_service, session_service
+from app.services import (
+    appointment_service,
+    consent_service,
+    history_service,
+    patient_portal_service,
+    session_service,
+)
 
 router = APIRouter(prefix="/api/v1/patient", tags=["患者端"])
 
@@ -130,6 +136,31 @@ async def list_messages(
 async def get_emr(session_id: str, db: DbSession, patient: CurrentPatient) -> ApiResponse[dict]:
     """查询预问诊病历（患者视图，12.3.2）。"""
     data = await session_service.get_emr(db, session_id, patient)
+    return ApiResponse(data=data)
+
+
+@router.get("/profile", response_model=ApiResponse[dict])
+async def get_profile(db: DbSession, patient: CurrentPatient) -> ApiResponse[dict]:
+    """患者个人资料：账号、年龄、性别、建档时间与使用统计。"""
+    data = await patient_portal_service.get_profile(
+        db, tenant_id=patient["tenant_id"], patient_id=patient["sub"]
+    )
+    return ApiResponse(data=data)
+
+
+@router.get("/records", response_model=ApiResponse[dict])
+async def list_medical_records(
+    db: DbSession,
+    patient: CurrentPatient,
+    limit: int = Query(20, ge=1, le=50),
+) -> ApiResponse[dict]:
+    """患者自己的历史预问诊病历摘要。"""
+    data = await patient_portal_service.list_records(
+        db,
+        tenant_id=patient["tenant_id"],
+        patient_id=patient["sub"],
+        limit=limit,
+    )
     return ApiResponse(data=data)
 
 
