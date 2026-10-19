@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +15,7 @@ from app.api.deps import CurrentKbAdmin
 from app.common.database import get_db
 from app.schemas.common import ApiResponse
 from app.services import kb_service
+from app.services.kb_ingest import run_ingest_task
 
 router = APIRouter(prefix="/api/v1/admin/kb", tags=["知识库管理"])
 
@@ -203,9 +204,18 @@ async def list_publishes(
 
 
 @router.post("/ingest", response_model=ApiResponse[dict])
-async def trigger_ingest(db: DbSession, admin: CurrentKbAdmin) -> ApiResponse[dict]:
+async def trigger_ingest(
+    request: Request, background: BackgroundTasks, db: DbSession, admin: CurrentKbAdmin
+) -> ApiResponse[dict]:
     data = await kb_service.trigger_ingest(
         db, tenant_id=admin["tenant_id"], actor_id=admin["sub"]
+    )
+    background.add_task(
+        run_ingest_task,
+        data["task_id"],
+        tenant_id=admin["tenant_id"],
+        embedder=request.app.state.model_client.embedder,
+        store=request.app.state.milvus_store,
     )
     return ApiResponse(data=data, message="入库任务已创建")
 

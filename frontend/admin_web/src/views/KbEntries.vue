@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { kb, type KbEntry, type KbPublish } from '@/api/kb'
+import { kb, type KbEntry, type KbIngestTask, type KbPublish } from '@/api/kb'
 import { fmtDateTime } from '@/utils/format'
 
 const loading = ref(false)
@@ -14,6 +14,9 @@ const typeFilter = ref('')
 const activeFilter = ref('')
 const publishing = ref(false)
 const publishes = ref<KbPublish[]>([])
+const ingestTask = ref<KbIngestTask | null>(null)
+const ingesting = ref(false)
+let pollTimer: ReturnType<typeof setTimeout> | undefined
 
 const query = ref('')
 const results = ref<Array<{ dept_code: string; dept_name: string; score: number }>>([])
@@ -195,6 +198,53 @@ async function onPublish() {
   }
 }
 
+async function onIngest() {
+  try {
+    await ElMessageBox.confirm(
+      '重建会用当前启用的科室专长条目覆盖向量索引，并删除已停用科室的旧向量。确定执行？',
+      '重建向量索引',
+      { type: 'warning', confirmButtonText: '开始重建', cancelButtonText: '取消' },
+    )
+  } catch {
+    return
+  }
+  ingesting.value = true
+  try {
+    const task = await kb.ingest()
+    ingestTask.value = task
+    ElMessage.success('入库任务已创建，正在后台执行')
+    pollIngest(task.task_id)
+  } catch (e) {
+    ingesting.value = false
+    ElMessage.error((e as Error).message || '任务创建失败')
+  }
+}
+
+async function pollIngest(taskId: string) {
+  try {
+    const task = await kb.ingestTask(taskId)
+    ingestTask.value = task
+    if (task.status === 'SUCCESS' || task.status === 'FAILED' || task.status === 'ABORTED') {
+      ingesting.value = false
+      if (task.status === 'SUCCESS') {
+        ElMessage.success(`索引重建完成：${task.added_count} 条，清理 ${task.disabled_count ?? 0} 条`)
+        await load()
+        await loadPublishes()
+      } else {
+        ElMessage.error(task.error_json?.message || '索引重建失败')
+      }
+      return
+    }
+    pollTimer = setTimeout(() => pollIngest(taskId), 2000)
+  } catch {
+    ingesting.value = false
+  }
+}
+
+onBeforeUnmount(() => {
+  if (pollTimer) clearTimeout(pollTimer)
+})
+
 onMounted(() => {
   void load()
   void loadPublishes()
@@ -210,8 +260,21 @@ onMounted(() => {
       </div>
       <div class="page-actions">
         <el-button :loading="publishing" @click="onPublish">发布知识库</el-button>
+        <el-button :loading="ingesting" @click="onIngest">重建索引</el-button>
         <el-button type="primary" @click="dialog = true">新增条目</el-button>
       </div>
+    </div>
+
+    <div v-if="ingestTask" class="ingest-status" :class="`is-${ingestTask.status.toLowerCase()}`">
+      <span class="ingest-status__dot" aria-hidden="true" />
+      <span class="ingest-status__label">
+        向量索引 {{ ingestTask.status === 'RUNNING' ? '重建中' : ingestTask.status === 'SUCCESS' ? '已完成' : ingestTask.status === 'FAILED' ? '失败' : '排队中' }}
+      </span>
+      <div class="ingest-status__bar"><i :style="{ width: `${ingestTask.progress}%` }" /></div>
+      <span class="ingest-status__meta mono">
+        {{ ingestTask.progress }}% · 新增 {{ ingestTask.added_count }} · 清理 {{ ingestTask.disabled_count ?? 0 }}
+      </span>
+      <span v-if="ingestTask.error_json?.message" class="ingest-status__error">{{ ingestTask.error_json.message }}</span>
     </div>
 
     <div class="top-grid">
@@ -375,6 +438,71 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.ingest-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding: 9px 14px;
+  border: 1px solid var(--c-primary-line);
+  border-radius: 10px;
+  background: var(--c-primary-soft);
+  font-size: 12px;
+  color: var(--c-primary);
+}
+
+.ingest-status.is-failed {
+  border-color: rgba(180, 67, 47, 0.24);
+  background: rgba(180, 67, 47, 0.06);
+  color: var(--c-danger);
+}
+
+.ingest-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.ingest-status__label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ingest-status__bar {
+  flex: 1;
+  min-width: 120px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(23, 80, 78, 0.14);
+  overflow: hidden;
+}
+
+.ingest-status__bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+  transition: width 0.3s var(--ease);
+}
+
+.ingest-status__meta {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.ingest-status__error {
+  flex-basis: 100%;
+  font-size: 11.5px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
 .top-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);

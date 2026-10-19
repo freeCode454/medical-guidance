@@ -490,11 +490,26 @@ async def list_publishes(db: AsyncSession, *, tenant_id: str, page: int, size: i
 
 
 async def trigger_ingest(db: AsyncSession, *, tenant_id: str, actor_id: str) -> dict:
-    """触发知识库入库：创建异步任务记录（实际向量化入库后续接入 Celery）。"""
+    """触发知识库入库：创建异步任务记录，由后台 worker 重建科室向量。"""
+    running = await db.scalar(
+        select(KbIngestTask).where(
+            KbIngestTask.tenant_id == tenant_id,
+            KbIngestTask.status.in_(["PENDING", "RUNNING"]),
+        )
+    )
+    if running is not None:
+        from app.common.error_codes import KB_INGEST_RUNNING
+        raise BizError(KB_INGEST_RUNNING)
+
     task_no = f"ING{datetime.now(UTC):%Y%m%d%H%M%S}{uuid4().hex[:4]}"
     total = await db.scalar(
         select(func.count()).select_from(KbEntry).where(
-            KbEntry.tenant_id == tenant_id, KbEntry.is_active == "1"
+            KbEntry.tenant_id == tenant_id,
+            KbEntry.kb_type == "DEPT_EXPERTISE",
+            KbEntry.is_active == "1",
+            KbEntry.del_flag == "0",
+            KbEntry.dept_code.is_not(None),
+            ~KbEntry.dept_code.contains("-"),
         )
     )
     task = KbIngestTask(
@@ -532,6 +547,7 @@ async def list_ingest_tasks(db: AsyncSession, *, tenant_id: str, page: int, size
                 "progress": t.progress,
                 "total_count": t.total_count,
                 "added_count": t.added_count,
+                "disabled_count": t.disabled_count,
                 "failed_count": t.failed_count,
             }
             for t in rows
@@ -555,6 +571,7 @@ async def get_ingest_task(db: AsyncSession, *, tenant_id: str, task_id: str) -> 
         "total_count": task.total_count,
         "added_count": task.added_count,
         "updated_count": task.updated_count,
+        "disabled_count": task.disabled_count,
         "failed_count": task.failed_count,
         "error_json": task.error_json,
         "started_time": task.started_time.isoformat() if task.started_time else None,

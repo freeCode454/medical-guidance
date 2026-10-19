@@ -24,6 +24,20 @@ export interface KbPublish {
   published_time: string | null
 }
 
+export interface KbIngestTask {
+  task_id: string
+  task_no: string
+  status: string
+  stage: string | null
+  progress: number
+  total_count: number
+  added_count: number
+  updated_count?: number
+  disabled_count?: number
+  failed_count: number
+  error_json?: { message?: string } | null
+}
+
 export const kb = {
   list: (q: Record<string, any> = {}) => http.get<PageData<KbEntry>>(`/admin/kb/entries?${new URLSearchParams(Object.entries(q).filter(([, v]) => v != null && v !== '') as any)}`),
   create: (b: any) => http.post('/admin/kb/entries', b),
@@ -34,5 +48,6 @@ export const kb = {
   retrievalTest: (b: any) => http.post<{ candidates: Array<{ dept_code: string; dept_name: string; score: number }> }>('/admin/kb/retrieval-test', b),
   publish: () => http.post<{ publish_id: string; version_tag: string; entry_count: number }>('/admin/kb/publish', {}),
   publishes: () => http.get<{ total: number; items: KbPublish[] }>('/admin/kb/publishes'),
-  ingest: () => http.post('/admin/kb/ingest'),
+  ingest: () => http.post<KbIngestTask>('/admin/kb/ingest', {}),
+  ingestTask: (id: string) => http.get<KbIngestTask>(`/admin/kb/ingest-tasks/${id}`),
 }

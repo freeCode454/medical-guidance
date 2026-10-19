@@ -100,6 +100,21 @@ class MilvusStore:
         if ids:
             self._client.delete(spec.name, ids=ids)
 
+    def flush(self, spec: VectorCollection) -> None:
+        self._client.flush(spec.name)
+
+    def list_ids(
+        self, spec: VectorCollection, filter_expr: str = "", limit: int = 16384
+    ) -> list[str]:
+        """列出集合内满足过滤条件的 id（用于重建后清理陈旧向量）。"""
+        rows = self._client.query(
+            spec.name,
+            filter=filter_expr or "",
+            output_fields=["id"],
+            limit=limit,
+        )
+        return [str(row["id"]) for row in rows if row.get("id")]
+
     # ---------------- 检索 ----------------
 
     def hybrid_search(

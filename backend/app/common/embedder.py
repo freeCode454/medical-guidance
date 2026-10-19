@@ -231,7 +231,7 @@ class LocalBgeM3Embedder(BaseEmbedder):
         results: list[Embedding] = []
         for i, ids in enumerate(batch_ids):
             sparse: dict[int, float] = {}
-            for tid, score in zip(ids, scores[i].ravel(), strict=True):
+            for tid, score in zip(ids, scores[i].ravel()[: len(ids)], strict=True):
                 if tid in self._excluded_tokens:
                     continue
                 if score > 0:
