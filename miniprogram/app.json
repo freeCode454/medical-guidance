@@ -4,7 +4,8 @@
     "pages/login/index",
     "pages/profile/index",
     "pages/chat/index",
-    "pages/result/index"
+    "pages/result/index",
+    "pages/appointment/index"
   ],
   "window": {
     "navigationBarTitleText": "智能导诊",

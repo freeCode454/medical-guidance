@@ -1,0 +1,119 @@
+<view class="appointment-page">
+  <view class="dept-card">
+    <view class="dept-card__icon">挂</view>
+    <view class="dept-card__text">
+      <text class="dept-card__name">{{deptName || '选择科室'}}</text>
+      <text class="dept-card__sub">选择医生与时间，预约后到院就诊</text>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">正在加载号源…</view>
+  <view wx:elif="{{error}}" class="empty-card">
+    <text>{{error}}</text>
+    <button class="retry-btn" bindtap="load">重新加载</button>
+  </view>
+
+  <block wx:else>
+    <scroll-view class="date-scroll" scroll-x show-scrollbar="{{false}}">
+      <view
+        class="date {{index == activeIndex ? 'is-on' : ''}}"
+        wx:for="{{days}}"
+        wx:key="date"
+        data-index="{{index}}"
+        bindtap="onDate"
+      >
+        <text class="date__week">{{item.weekday}}</text>
+        <text class="date__day">{{item.label}}</text>
+      </view>
+    </scroll-view>
+
+    <view wx:if="{{!experts.length && !others.length}}" class="empty-card">当天暂无可预约医生</view>
+
+    <view wx:if="{{experts.length}}" class="doctor-group">
+      <view class="group-title">
+        <text>专家门诊</text>
+        <text class="group-title__hint">副主任及以上</text>
+      </view>
+      <view class="doctor" wx:for="{{experts}}" wx:key="doctor_id" wx:for-item="doctor" wx:for-index="di">
+        <view class="doctor__head">
+          <view class="doctor__avatar">{{doctor.initial}}</view>
+          <view class="doctor__info">
+            <text class="doctor__name">{{doctor.doctor_name}}</text>
+            <text class="doctor__title">{{doctor.title}}</text>
+          </view>
+          <text class="doctor__tag">专家</text>
+        </view>
+        <view class="slots">
+          <view
+            class="slot {{selected && selected.doctorId == doctor.doctor_id && selected.timeSlot == slot.time_slot ? 'is-on' : ''}} {{!slot.available ? 'is-off' : ''}}"
+            wx:for="{{doctor.slots}}"
+            wx:key="time_slot"
+            wx:for-item="slot"
+            wx:for-index="si"
+            data-group="expert"
+            data-di="{{di}}"
+            data-si="{{si}}"
+            bindtap="onSlot"
+          >
+            <text class="slot__time">{{slot.time_slot}}</text>
+            <text class="slot__left">{{slot.available ? '余 ' + slot.remaining : '约满'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{others.length}}" class="doctor-group">
+      <view class="group-title"><text>普通门诊</text></view>
+      <view class="doctor" wx:for="{{others}}" wx:key="doctor_id" wx:for-item="doctor" wx:for-index="di">
+        <view class="doctor__head">
+          <view class="doctor__avatar">{{doctor.initial}}</view>
+          <view class="doctor__info">
+            <text class="doctor__name">{{doctor.doctor_name}}</text>
+            <text class="doctor__title">{{doctor.title}}</text>
+          </view>
+        </view>
+        <view class="slots">
+          <view
+            class="slot {{selected && selected.doctorId == doctor.doctor_id && selected.timeSlot == slot.time_slot ? 'is-on' : ''}} {{!slot.available ? 'is-off' : ''}}"
+            wx:for="{{doctor.slots}}"
+            wx:key="time_slot"
+            wx:for-item="slot"
+            wx:for-index="si"
+            data-group="other"
+            data-di="{{di}}"
+            data-si="{{si}}"
+            bindtap="onSlot"
+          >
+            <text class="slot__time">{{slot.time_slot}}</text>
+            <text class="slot__left">{{slot.available ? '余 ' + slot.remaining : '约满'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="my-head">
+      <text>我的预约</text>
+      <text class="my-head__count">{{appointments.length}} 条</text>
+    </view>
+    <view wx:if="{{!appointments.length}}" class="empty-card">还没有预约记录</view>
+    <view class="my-item" wx:for="{{appointments}}" wx:key="appointment_id">
+      <view class="my-item__main">
+        <text class="my-item__title">{{item.dept_name}} · {{item.doctor_name}}</text>
+        <text class="my-item__time">{{item.dateText}} {{item.time_slot}}</text>
+        <text class="my-item__no">{{item.appointment_no}}</text>
+      </view>
+      <view class="my-item__side">
+        <text class="my-item__status {{item.can_cancel ? '' : 'is-off'}}">{{item.status_label}}</text>
+        <text wx:if="{{item.can_cancel}}" class="my-item__cancel" data-id="{{item.appointment_id}}" bindtap="cancel">取消</text>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{selected}}" class="confirm-bar">
+    <view class="confirm-bar__text">
+      <text class="confirm-bar__doctor">{{selected.doctorName}} · {{selected.timeSlot}}</text>
+      <text class="confirm-bar__sub">{{activeDay.date}} · {{selected.title}}</text>
+    </view>
+    <button class="confirm-btn" loading="{{booking}}" disabled="{{booking}}" bindtap="confirm">确认预约</button>
+  </view>
+</view>

@@ -51,6 +51,14 @@
       <view class="soap-text">{{emr.plan.note || '—'}}</view>
     </view>
 
+    <button
+      wx:if="{{primary && !(triage.emergency_guidance && triage.emergency_guidance.triggered)}}"
+      class="book-btn"
+      bindtap="goAppointment"
+    >
+      预约挂号 · {{primary.dept_name}}
+    </button>
+
     <view class="disclaimer">{{triage.disclaimer}}</view>
     <button class="btn-ghost" bindtap="onBack">返回对话</button>
   </block>

@@ -57,5 +57,16 @@ Page({
 
   onBack() {
     wx.navigateBack({ delta: 1 })
+  },
+
+  goAppointment() {
+    const primary = this.data.primary
+    if (!primary) return
+    const dept = encodeURIComponent(primary.dept_code || '')
+    const deptName = encodeURIComponent(primary.dept_name || '')
+    const sessionId = encodeURIComponent(this.data.sessionId || '')
+    wx.navigateTo({
+      url: `/pages/appointment/index?dept=${dept}&deptName=${deptName}&sessionId=${sessionId}`
+    })
   }
 })
