@@ -446,6 +446,7 @@ onMounted(() => {
       title="知识条目详情"
       width="680px"
       top="6vh"
+      append-to-body
       destroy-on-close
       class="kb-detail-dialog"
     >
