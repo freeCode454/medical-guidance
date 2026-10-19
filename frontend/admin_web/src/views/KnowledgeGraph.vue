@@ -31,7 +31,7 @@ const chartEl = ref<HTMLDivElement>()
 const chart = shallowRef<ECharts>()
 
 const CATEGORIES = [
-  { name: '症状', color: '#2f6f6a' },
+  { name: '症状', color: '#3b82f6' },
   { name: '疾病', color: '#bf6a34' },
   { name: '科室', color: '#3f8a6f' },
 ]
