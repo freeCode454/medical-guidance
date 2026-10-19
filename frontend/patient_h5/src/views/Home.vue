@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { useSessionStore } from '@/stores/session'
 import { getProfile, type PatientProfile } from '@/api/patient'
+import MiniNav from '@/components/MiniNav.vue'
+import MiniTabBar from '@/components/MiniTabBar.vue'
 
 const router = useRouter()
 const store = useSessionStore()
@@ -19,6 +21,7 @@ const textareaEl = ref<HTMLTextAreaElement | null>(null)
 const LIMIT = 300
 const count = computed(() => complaint.value.length)
 const nearLimit = computed(() => count.value >= LIMIT - 20)
+const initial = computed(() => (profile.value?.account || store.account || '患').slice(0, 1))
 
 onMounted(async () => {
   if (!store.hydrateAuth()) {
@@ -103,120 +106,111 @@ async function start() {
 </script>
 
 <template>
-  <div class="page">
-    <header class="topbar">
-      <div class="brand">
-        <span class="brand__mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path
-              d="M3 12h4l2.4-6 4.2 12 2.4-6H21"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </span>
-        <span class="brand__text">
-          <b>智能导诊</b>
-          <em>AI 预问诊 · 患者端</em>
-        </span>
-      </div>
-      <router-link class="account" to="/profile" aria-label="个人中心">
-        <span class="account__dot" aria-hidden="true" />
-        我的
-      </router-link>
-    </header>
+  <div class="m-page">
+    <MiniNav title="智能导诊">
+      <template #right>
+        <router-link class="m-nav-link" to="/profile">我的</router-link>
+      </template>
+    </MiniNav>
 
-    <main class="layout">
-      <section class="panel">
-        <form class="card" :class="{ 'is-shake': shaking }" novalidate @submit.prevent="start">
-          <div class="card__head">
-            <h2>描述您的不适</h2>
-            <span class="req">必填</span>
-          </div>
-
-          <div class="area" :class="{ 'is-focus': focused }">
-            <label class="sr-only" for="complaint">症状描述</label>
-            <textarea
-              id="complaint"
-              ref="textareaEl"
-              v-model="complaint"
-              class="area__input"
-              :maxlength="LIMIT"
-              rows="4"
-              placeholder="例如：肚子疼三天了，有点拉肚子"
-              @focus="focused = true"
-              @blur="focused = false"
-            />
-            <div class="area__foot">
-              <span class="hint">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"
-                    stroke="currentColor"
-                    stroke-width="1.4"
-                    stroke-linejoin="round"
-                  />
-                  <path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor" opacity=".5" />
-                </svg>
-                描述越具体，判断越准确
-              </span>
-              <span class="count tnum" :class="{ 'is-near': nearLimit }" aria-live="polite">
-                {{ count }}/{{ LIMIT }}
-              </span>
-            </div>
-          </div>
-
-          <div class="chips">
-            <span class="chips__label">试试：</span>
-            <button
-              v-for="c in chips"
-              :key="c.label"
-              type="button"
-              class="chip"
-              @click="fillChip(c)"
-            >
-              {{ c.label }}
-            </button>
-          </div>
-
-          <label class="consent">
-            <input v-model="consent" type="checkbox" class="consent__box" />
-            <span class="consent__text">
-              允许接诊医生调阅我的历史预问诊病历
-              <em>可随时撤回</em>
-            </span>
-          </label>
-
-          <button class="cta" type="submit" :disabled="loading" :aria-busy="loading">
-            <span v-if="!loading" class="cta__label">
-              开始问诊
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12h13M12.5 5.5L19 12l-6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <span v-else class="cta__label">
-              <span class="spinner" aria-hidden="true" />
-              正在准备…
-            </span>
-          </button>
-
-          <p class="cta-note">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 3l7 3v5.2c0 4.6-2.9 7.9-7 9.8-4.1-1.9-7-5.2-7-9.8V6l7-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-              <path d="M9 12l2.2 2.2L15.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            账号加密保护，信息仅用于本次分诊建议
-          </p>
-        </form>
+    <main class="m-main">
+      <section class="m-hello">
+        <div class="m-hello__text">
+          <p>AI 预问诊</p>
+          <h2>你好，{{ profile?.account || store.account || '患者' }}</h2>
+          <span>哪里不舒服？描述症状，AI 会像医生一样逐层追问。</span>
+        </div>
+        <span class="m-avatar" aria-hidden="true">{{ initial }}</span>
       </section>
+
+      <section class="m-card">
+        <div class="m-card__head">
+          <h3>描述不适</h3>
+          <span>必填</span>
+        </div>
+
+        <div class="m-textarea" :class="{ 'is-focus': focused, 'is-shake': shaking }">
+          <label class="sr-only" for="complaint">症状描述</label>
+          <textarea
+            id="complaint"
+            ref="textareaEl"
+            v-model="complaint"
+            :maxlength="LIMIT"
+            rows="4"
+            placeholder="例如：肚子疼三天了，有点拉肚子"
+            @focus="focused = true"
+            @blur="focused = false"
+          />
+          <div class="m-textarea__foot">
+            <span>描述越具体，判断越准确</span>
+            <span class="tnum" :class="{ 'is-near': nearLimit }">{{ count }}/{{ LIMIT }}</span>
+          </div>
+        </div>
+
+        <div class="m-chips">
+          <span>常用症状</span>
+          <button
+            v-for="c in chips"
+            :key="c.label"
+            type="button"
+            class="m-chip"
+            @click="fillChip(c)"
+          >
+            {{ c.label }}
+          </button>
+        </div>
+
+        <label class="m-consent">
+          <input v-model="consent" type="checkbox" />
+          <span>允许接诊医生调阅我的历史预问诊病历</span>
+        </label>
+
+        <button class="m-btn" type="button" :disabled="loading" @click="start">
+          <span v-if="!loading">开始问诊</span>
+          <span v-else>正在准备…</span>
+        </button>
+      </section>
+
+      <section class="m-services">
+        <router-link to="/profile" class="m-service">
+          <span class="m-service__icon m-service__icon--green">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" stroke-width="1.7" />
+              <path d="M8 3v4M16 3v4M4 10h16M9 14h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="m-service__text"><b>预约记录</b><em>查看挂号与就诊时间</em></span>
+          <span class="m-service__arrow">›</span>
+        </router-link>
+        <router-link to="/profile" class="m-service">
+          <span class="m-service__icon m-service__icon--blue">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 3h9l3 3v15H6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+              <path d="M14 3v4h4M9 12h6M9 16h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="m-service__text"><b>历史病历</b><em>查看既往预问诊记录</em></span>
+          <span class="m-service__arrow">›</span>
+        </router-link>
+        <router-link to="/profile" class="m-service">
+          <span class="m-service__icon m-service__icon--orange">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.7" />
+              <path d="M5 20c0-3.6 3.2-5.5 7-5.5s7 1.9 7 5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="m-service__text"><b>个人资料</b><em>年龄、性别与账号信息</em></span>
+          <span class="m-service__arrow">›</span>
+        </router-link>
+      </section>
+
+      <p class="m-tip">
+        本系统仅提供分诊建议，不构成医学诊断。急危重症请立即拨打
+        <a href="tel:120">120</a>。
+      </p>
     </main>
 
-    <footer class="foot">
-      本系统仅提供分诊建议，不构成医学诊断。急危重症请立即拨打
-      <a href="tel:120">120</a>。
-    </footer>
+    <MiniTabBar />
   </div>
 </template>
 
@@ -965,5 +959,308 @@ h1 {
   .intro > :nth-child(5) {
     animation-delay: 0.3s;
   }
+}
+.m-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #f5f5f5;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.m-nav-link {
+  font-size: 13px;
+  color: #07c160;
+  text-decoration: none;
+  padding: 6px;
+}
+
+.m-main {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 14px 14px 24px;
+  box-sizing: border-box;
+}
+
+.m-hello {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 4px 16px;
+}
+
+.m-hello__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.m-hello__text p {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: #07c160;
+}
+
+.m-hello__text h2 {
+  margin-top: 3px;
+  font-size: 22px;
+  line-height: 1.3;
+  color: #1f1f1f;
+}
+
+.m-hello__text span {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #888;
+}
+
+.m-avatar {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f8ef;
+  color: #07c160;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.m-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.m-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.m-card__head h3 {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+.m-card__head span {
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #f2f2f2;
+  color: #999;
+  font-size: 10px;
+}
+
+.m-textarea {
+  padding: 12px;
+  border-radius: 8px;
+  background: #f7f7f7;
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.m-textarea.is-focus {
+  border-color: #07c160;
+  background: #fff;
+}
+
+.m-textarea.is-shake {
+  animation: m-shake 0.4s ease;
+}
+
+.m-textarea textarea {
+  width: 100%;
+  min-height: 104px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: #1f1f1f;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.m-textarea__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  color: #999;
+  font-size: 10.5px;
+}
+
+.m-textarea__foot .is-near {
+  color: #fa5151;
+}
+
+.m-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.m-chips > span {
+  color: #999;
+  font-size: 11px;
+}
+
+.m-chip {
+  padding: 5px 10px;
+  border: 1px solid #ededed;
+  border-radius: 999px;
+  background: #fff;
+  color: #555;
+  font-size: 11px;
+}
+
+.m-chip:active {
+  background: #f2f2f2;
+}
+
+.m-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 14px;
+  color: #888;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.m-consent input {
+  margin-top: 2px;
+  accent-color: #07c160;
+}
+
+.m-btn {
+  width: 100%;
+  height: 44px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #07c160;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.m-btn:active {
+  background: #06ad56;
+}
+
+.m-btn:disabled {
+  opacity: 0.6;
+}
+
+.m-services {
+  margin-top: 10px;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.m-service {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 14px;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.m-service:last-child {
+  border-bottom: 0;
+}
+
+.m-service:active {
+  background: #fafafa;
+}
+
+.m-service__icon {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+}
+
+.m-service__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.m-service__icon--green {
+  background: #e8f8ef;
+  color: #07c160;
+}
+
+.m-service__icon--blue {
+  background: #e8f1ff;
+  color: #3b82f6;
+}
+
+.m-service__icon--orange {
+  background: #fff1e6;
+  color: #ff8f1f;
+}
+
+.m-service__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.m-service__text b {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1f1f1f;
+}
+
+.m-service__text em {
+  font-style: normal;
+  font-size: 10.5px;
+  color: #999;
+}
+
+.m-service__arrow {
+  color: #c8c8c8;
+  font-size: 20px;
+}
+
+.m-tip {
+  margin-top: 16px;
+  padding: 0 4px;
+  text-align: center;
+  color: #b2b2b2;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.m-tip a {
+  color: #07c160;
+  text-decoration: none;
+}
+
+@keyframes m-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 </style>

@@ -3,6 +3,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { useSessionStore } from '@/stores/session'
+import MiniNav from '@/components/MiniNav.vue'
+import MiniTabBar from '@/components/MiniTabBar.vue'
 import {
   getProfile,
   listAppointments,
@@ -75,18 +77,11 @@ onMounted(load)
 
 <template>
   <main class="profile-page">
-    <header class="profile-head">
-      <button class="icon-btn" type="button" aria-label="返回" @click="router.push('/')">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M14.5 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
-      <div>
-        <p class="eyebrow">我的</p>
-        <h1>个人中心</h1>
-      </div>
-      <button class="logout" type="button" @click="logout">退出</button>
-    </header>
+    <MiniNav title="我的" back>
+      <template #right>
+        <button class="logout" type="button" @click="logout">退出</button>
+      </template>
+    </MiniNav>
 
     <div v-if="loading" class="state">正在加载个人信息…</div>
     <div v-else-if="error" class="state state--error">
@@ -172,6 +167,8 @@ onMounted(load)
         </article>
       </section>
     </template>
+
+    <MiniTabBar />
   </main>
 </template>
 
@@ -180,7 +177,7 @@ onMounted(load)
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
-  padding: 22px 18px calc(40px + env(safe-area-inset-bottom));
+  padding: 0 14px calc(76px + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -257,6 +254,7 @@ onMounted(load)
 }
 
 .profile-card {
+  margin-top: 12px;
   padding: 18px;
   border: 1px solid var(--c-line);
   border-radius: 18px;

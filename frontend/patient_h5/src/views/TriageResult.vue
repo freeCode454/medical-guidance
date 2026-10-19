@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
+import MiniNav from '@/components/MiniNav.vue'
 
 const router = useRouter()
 const store = useSessionStore()
@@ -33,6 +34,7 @@ function pct(n: number) {
 
 <template>
   <div class="result">
+    <MiniNav title="分诊结果" back />
     <template v-if="loading">
       <div class="loading" role="status">
         <span class="spinner" aria-hidden="true" />
@@ -169,7 +171,8 @@ function pct(n: number) {
   width: 100%;
   max-width: 560px;
   margin: 0 auto;
-  padding: 34px 22px calc(28px + env(safe-area-inset-bottom));
+  padding: 0 14px calc(28px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: transparent;
 }
 
@@ -267,6 +270,7 @@ function pct(n: number) {
 /* ---------- 标题 ---------- */
 .head {
   margin-bottom: 24px;
+  padding-top: 18px;
 }
 
 .badge {
@@ -390,7 +394,7 @@ h1 {
   color: #fff;
   background:
     radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, 0.16), transparent 55%),
-    linear-gradient(145deg, #1a5a55, var(--c-primary-strong));
+    linear-gradient(145deg, #07c160, #06ad56);
   box-shadow: 0 24px 44px -26px rgba(12, 55, 52, 0.75);
   animation: rise 0.6s var(--ease-out) both;
 }
@@ -450,7 +454,7 @@ h1 {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #f0c9a8, #e0975c);
+  background: linear-gradient(90deg, #95ec69, #07c160);
   animation: grow 0.9s var(--ease-out) 0.15s both;
   transform-origin: left;
 }
@@ -581,7 +585,7 @@ h1 {
   border: 0;
   border-radius: var(--r-pill);
   padding: 16px;
-  background: linear-gradient(135deg, #c9763c, #b15d2b);
+  background: linear-gradient(135deg, #07c160, #06ad56);
   color: #fff;
   font-size: 16px;
   font-weight: 600;

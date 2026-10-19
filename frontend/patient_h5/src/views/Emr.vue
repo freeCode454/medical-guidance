@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
 import { getEmr } from '@/api/patient'
 import type { EmrView } from '@/api/patient'
+import MiniNav from '@/components/MiniNav.vue'
 
 const router = useRouter()
 const store = useSessionStore()
@@ -28,14 +29,12 @@ onMounted(load)
 
 <template>
   <div class="emr">
-    <header class="head">
-      <p class="eyebrow">预问诊病历</p>
-      <h1>就诊前，<br />医生会看到这些</h1>
-      <p class="lede">以下内容由本次问诊自动整理，就诊时可直接出示给医生。</p>
-      <p v-if="store.sessionNo" class="no">
-        问诊号 <b class="tnum">{{ store.sessionNo }}</b>
-      </p>
-    </header>
+    <MiniNav title="预问诊病历" back />
+
+    <section class="emr-intro">
+      <p>以下内容由本次问诊自动整理，就诊时可直接出示给医生。</p>
+      <p v-if="store.sessionNo" class="no">问诊号 <b class="tnum">{{ store.sessionNo }}</b></p>
+    </section>
 
     <div v-if="loading" class="loading" role="status">
       <span class="spinner" aria-hidden="true" />
@@ -124,8 +123,29 @@ onMounted(load)
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  padding: 32px 22px calc(28px + env(safe-area-inset-bottom));
+  padding: 14px 14px calc(28px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: transparent;
+}
+
+.emr-intro {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--c-surface);
+  color: var(--c-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.emr-intro .no {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--c-faint);
+  font-size: 11px;
 }
 
 /* ---------- 标题 ---------- */
@@ -354,7 +374,7 @@ h1 {
   border: 0;
   border-radius: var(--r-pill);
   padding: 15px;
-  background: linear-gradient(135deg, #c9763c, #b15d2b);
+  background: #07c160;
   color: #fff;
   font-size: 15.5px;
   font-weight: 600;

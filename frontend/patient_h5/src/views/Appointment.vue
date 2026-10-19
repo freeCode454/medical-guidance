@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { showConfirmDialog, showToast } from 'vant'
 import { useSessionStore } from '@/stores/session'
 import {
@@ -13,9 +13,9 @@ import {
   type AppointmentItem,
   type AppointmentSlot,
 } from '@/api/patient'
+import MiniNav from '@/components/MiniNav.vue'
 
 const route = useRoute()
-const router = useRouter()
 const store = useSessionStore()
 
 const deptCode = String(route.query.dept || '')
@@ -125,17 +125,7 @@ onMounted(load)
 
 <template>
   <main class="appointment-page">
-    <header class="head">
-      <button class="back" type="button" aria-label="返回" @click="router.back()">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M14.5 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
-      <div>
-        <p class="eyebrow">预约挂号</p>
-        <h1>{{ deptName || '选择号源' }}</h1>
-      </div>
-    </header>
+    <MiniNav :title="deptName || '预约挂号'" back />
 
     <div v-if="loading" class="state">正在加载全部号源…</div>
     <div v-else-if="error" class="state state--error">
@@ -248,7 +238,7 @@ onMounted(load)
   width: 100%;
   max-width: 560px;
   margin: 0 auto;
-  padding: 22px 18px calc(120px + env(safe-area-inset-bottom));
+  padding: 0 14px calc(120px + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -314,6 +304,7 @@ onMounted(load)
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 8px;
+  margin-top: 12px;
   margin-bottom: 18px;
   scrollbar-width: none;
 }
@@ -573,7 +564,7 @@ onMounted(load)
   border: 0;
   border-radius: 999px;
   padding: 12px 22px;
-  background: linear-gradient(135deg, #c9763c, #b15d2b);
+  background: #07c160;
   color: #fff;
   font-size: 14px;
   font-weight: 600;

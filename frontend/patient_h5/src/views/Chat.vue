@@ -120,29 +120,16 @@ async function exit() {
     <header class="head">
       <button class="back" type="button" aria-label="返回首页" @click="exit">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M14.5 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
 
       <div class="identity">
-        <span class="avatar" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M3 12h4l2.4-6 4.2 12 2.4-6H21" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
         <span class="identity__text">
-          <b>智能预问诊</b>
+          <b>智能问诊</b>
           <span class="status"><i aria-hidden="true" />问诊中 · 已答 {{ answered }} 问</span>
         </span>
       </div>
-
-      <span class="secure">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect x="5" y="10" width="14" height="10" rx="3" stroke="currentColor" stroke-width="1.6" />
-          <path d="M8.5 10V7.5a3.5 3.5 0 017 0V10" stroke="currentColor" stroke-width="1.6" />
-        </svg>
-        加密
-      </span>
     </header>
 
     <main ref="scrollEl" class="messages">
@@ -595,5 +582,125 @@ async function exit() {
   .composer__hint {
     display: block;
   }
+}
+/* ---------- 微信小程序式覆盖 ---------- */
+.chat {
+  max-width: 560px;
+  background: #f5f5f5;
+}
+
+.head {
+  padding: 6px 10px;
+  padding-top: calc(6px + env(safe-area-inset-top));
+  background: #ffffff;
+  border-bottom: 1px solid #ededed;
+  backdrop-filter: none;
+}
+
+.back {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #1f1f1f;
+}
+
+.back:hover {
+  background: #f2f2f2;
+  border-color: transparent;
+}
+
+.identity {
+  justify-content: center;
+  min-height: 44px;
+}
+
+.identity__text {
+  align-items: center;
+  text-align: center;
+}
+
+.identity__text b {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+.status {
+  color: #07c160;
+  font-size: 10px;
+}
+
+.status i {
+  background: #07c160;
+}
+
+.messages {
+  padding: 14px 14px 20px;
+}
+
+.notice {
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #999999;
+  font-size: 11px;
+}
+
+.bubble {
+  border: 0;
+  border-radius: 4px 10px 10px 10px;
+  background: #ffffff;
+  color: #1f1f1f;
+  box-shadow: none;
+}
+
+.row--me .bubble {
+  border-radius: 10px 4px 10px 10px;
+  background: #95ec69;
+  color: #1f1f1f;
+}
+
+.bubble-avatar {
+  border: 0;
+  background: #e8f8ef;
+  color: #07c160;
+}
+
+.composer {
+  background: #ffffff;
+  border-top: 1px solid #ededed;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+}
+
+.field {
+  border: 0;
+  border-radius: 8px;
+  background: #f7f7f7;
+}
+
+.field.is-focus {
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #07c160;
+}
+
+.send {
+  border-radius: 50%;
+  background: #07c160;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.send:hover:not(:disabled),
+.send:active:not(:disabled) {
+  background: #06ad56;
+  transform: none;
+}
+
+.composer__hint {
+  color: #b2b2b2;
 }
 </style>
