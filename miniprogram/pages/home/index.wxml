@@ -22,7 +22,7 @@
     </view>
 
     <view class="assistant__hello">
-      您好，我是智能导诊助手。请用一句话描述不适，我会像门诊医生一样逐层追问。
+      您好，我是智能导诊助手。请用一句话描述不适，我会像门诊医生一样逐步了解情况。
     </view>
 
     <view class="input-wrap {{focused ? 'is-focus' : ''}}">
@@ -59,10 +59,6 @@
     </view>
 
     <view class="action-row">
-      <view class="action-meta">
-        <text class="action-meta__dot"></text>
-        <text>约 3 分钟 · 逐层追问</text>
-      </view>
       <button
         class="start-btn"
         hover-class="start-btn--active"

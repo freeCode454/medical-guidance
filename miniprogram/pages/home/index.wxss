@@ -218,27 +218,11 @@
 .action-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 18rpx;
   margin-top: 26rpx;
   padding-top: 22rpx;
   border-top: 1rpx solid #f1eee7;
-}
-
-.action-meta {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  color: #8b9893;
-  font-size: 21rpx;
-  line-height: 1.5;
-}
-
-.action-meta__dot {
-  width: 10rpx;
-  height: 10rpx;
-  border-radius: 50%;
-  background: #3fa77f;
 }
 
 .start-btn {
