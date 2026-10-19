@@ -107,9 +107,5 @@ Page({
     } finally {
       this.setData({ loading: false })
     }
-  },
-
-  goProfile() {
-    wx.reLaunch({ url: '/pages/profile/index' })
   }
 })
