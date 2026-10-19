@@ -129,45 +129,6 @@ async function start() {
     </header>
 
     <main class="layout">
-      <!-- 左：品牌叙事（移动端收起） -->
-      <section class="intro">
-        <p class="eyebrow">
-          <span class="dot" aria-hidden="true" />
-          智能导诊 · 预问诊
-        </p>
-        <h1>哪里不舒服，<br /><span class="hl">先告诉它</span></h1>
-        <p class="lede">
-          用您自己的话说清症状，它会像医生一样逐层追问，帮您判断该挂哪个科室。
-        </p>
-
-        <ol class="steps">
-          <li>
-            <span class="num">01</span>
-            <div class="step-body">
-              <b>说清症状</b>
-              <p>用平时的说法描述，不必懂医学术语</p>
-            </div>
-          </li>
-          <li>
-            <span class="num">02</span>
-            <div class="step-body">
-              <b>智能追问</b>
-              <p>像门诊医生一样，逐层问清关键信息</p>
-            </div>
-          </li>
-          <li>
-            <span class="num">03</span>
-            <div class="step-body">
-              <b>分诊建议</b>
-              <p>给出该挂的科室，并整理一份预问诊病历</p>
-            </div>
-          </li>
-        </ol>
-
-        <p class="intro-note">约 3 分钟<span aria-hidden="true">·</span>无需注册<span aria-hidden="true">·</span>可随时结束</p>
-      </section>
-
-      <!-- 右：问诊表单 -->
       <section class="panel">
         <form class="card" :class="{ 'is-shake': shaking }" novalidate @submit.prevent="start">
           <div class="card__head">
