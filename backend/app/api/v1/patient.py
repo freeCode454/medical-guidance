@@ -14,6 +14,7 @@ from app.common.database import get_db
 from app.schemas.appointment import AppointmentCreateRequest
 from app.schemas.common import ApiResponse
 from app.schemas.consent import ConsentCreateRequest, ConsentItem, ConsentListResponse
+from app.schemas.patient import PatientProfileUpdateRequest
 from app.schemas.session import (
     MessageSendRequest,
     MessageSendResponse,
@@ -146,6 +147,23 @@ async def get_profile(db: DbSession, patient: CurrentPatient) -> ApiResponse[dic
         db, tenant_id=patient["tenant_id"], patient_id=patient["sub"]
     )
     return ApiResponse(data=data)
+
+
+@router.patch("/profile", response_model=ApiResponse[dict])
+async def update_profile(
+    req: PatientProfileUpdateRequest,
+    db: DbSession,
+    patient: CurrentPatient,
+) -> ApiResponse[dict]:
+    """患者自行修改性别、年龄。"""
+    data = await patient_portal_service.update_profile(
+        db,
+        tenant_id=patient["tenant_id"],
+        patient_id=patient["sub"],
+        gender=req.gender,
+        age=req.age,
+    )
+    return ApiResponse(data=data, message="资料已更新")
 
 
 @router.get("/records", response_model=ApiResponse[dict])

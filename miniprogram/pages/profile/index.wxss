@@ -34,9 +34,21 @@
 }
 
 .user-card__info {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4rpx;
+}
+
+.user-card__edit {
+  flex: none;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(243, 220, 200, 0.32);
+  background: rgba(243, 220, 200, 0.1);
+  color: #f3dcc8;
+  font-size: 20rpx;
 }
 
 .user-card__name {
@@ -130,6 +142,23 @@
   background: #ffffff;
   margin-bottom: 14rpx;
   box-shadow: 0 8rpx 24rpx rgba(23, 80, 78, 0.04);
+}
+
+.appointment:active {
+  background: #faf8f3;
+}
+
+.appointment__right {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.appointment__arrow {
+  color: #c8d3ce;
+  font-size: 32rpx;
+  line-height: 1;
 }
 
 .appointment__main {
@@ -239,4 +268,212 @@
   color: #b4432f;
   font-size: 27rpx;
   border: 1rpx solid #f0dfd9;
+}
+
+.retry-btn {
+  margin-top: 20rpx;
+  height: 68rpx;
+  line-height: 68rpx;
+  border-radius: 34rpx;
+  background: #17504e;
+  color: #ffffff;
+  font-size: 24rpx;
+}
+
+.sheet-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(18, 32, 30, 0.48);
+}
+
+.sheet {
+  width: 100%;
+  padding: 18rpx 32rpx calc(30rpx + env(safe-area-inset-bottom));
+  border-radius: 32rpx 32rpx 0 0;
+  background: #ffffff;
+}
+
+.sheet__handle {
+  width: 64rpx;
+  height: 8rpx;
+  margin: 0 auto 24rpx;
+  border-radius: 4rpx;
+  background: #e4eae7;
+}
+
+.sheet__title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1d2a28;
+}
+
+.sheet__sub {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 21rpx;
+  color: #8b9893;
+}
+
+.sheet__label {
+  display: block;
+  margin-top: 26rpx;
+  margin-bottom: 12rpx;
+  font-size: 23rpx;
+  color: #52615b;
+}
+
+.gender-options {
+  display: flex;
+  gap: 14rpx;
+}
+
+.gender-option {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 18rpx;
+  border: 1rpx solid #e6ece9;
+  background: #f7f9f8;
+  text-align: center;
+  color: #52615b;
+  font-size: 27rpx;
+}
+
+.gender-option.is-on {
+  background: #17504e;
+  border-color: #17504e;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.age-input-wrap {
+  display: flex;
+  align-items: center;
+  height: 80rpx;
+  padding: 0 22rpx;
+  border-radius: 18rpx;
+  border: 1rpx solid #e6ece9;
+  background: #f7f9f8;
+}
+
+.age-input {
+  flex: 1;
+  height: 80rpx;
+  font-size: 28rpx;
+  color: #1d2a28;
+}
+
+.age-unit {
+  flex: none;
+  font-size: 24rpx;
+  color: #8b9893;
+}
+
+.sheet__save {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  margin-top: 30rpx;
+  padding: 0;
+  border-radius: 44rpx;
+  background: #17504e;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.detail-card {
+  width: calc(100% - 88rpx);
+  margin-bottom: 50rpx;
+  padding: 30rpx;
+  border-radius: 30rpx;
+  background: #ffffff;
+  box-shadow: 0 24rpx 60rpx rgba(18, 32, 30, 0.24);
+}
+
+.detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 18rpx;
+  border-bottom: 1rpx solid #f1eee7;
+}
+
+.detail-head__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1d2a28;
+}
+
+.detail-head__close {
+  color: #aebbb6;
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.detail-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f6f2ea;
+}
+
+.detail-label {
+  flex: none;
+  width: 130rpx;
+  font-size: 22rpx;
+  color: #8b9893;
+}
+
+.detail-value {
+  flex: 1;
+  text-align: right;
+  font-size: 24rpx;
+  line-height: 1.5;
+  color: #1d2a28;
+}
+
+.detail-value--mono {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 20rpx;
+  color: #52615b;
+}
+
+.detail-value--status {
+  color: #2f8a5f;
+}
+
+.detail-cancel {
+  width: 100%;
+  height: 78rpx;
+  line-height: 78rpx;
+  margin-top: 22rpx;
+  padding: 0;
+  border-radius: 39rpx;
+  background: #fff4f0;
+  color: #b4432f;
+  font-size: 25rpx;
+  border: 1rpx solid #f2d8ce;
+}
+
+.detail-close {
+  width: 100%;
+  height: 78rpx;
+  line-height: 78rpx;
+  margin-top: 12rpx;
+  padding: 0;
+  border-radius: 39rpx;
+  background: #17504e;
+  color: #ffffff;
+  font-size: 25rpx;
 }

@@ -51,6 +51,32 @@ async def get_profile(db: AsyncSession, *, tenant_id: str, patient_id: str) -> d
     }
 
 
+async def update_profile(
+    db: AsyncSession,
+    *,
+    tenant_id: str,
+    patient_id: str,
+    gender: str | None = None,
+    age: int | None = None,
+) -> dict:
+    patient = await db.scalar(
+        select(Patient).where(
+            Patient.id == patient_id,
+            Patient.tenant_id == tenant_id,
+            Patient.del_flag == "0",
+        )
+    )
+    if patient is None:
+        return {}
+
+    if gender is not None:
+        patient.gender = {"男": "1", "女": "2"}.get(gender, patient.gender)
+    if age is not None:
+        patient.age = age
+    await db.commit()
+    return await get_profile(db, tenant_id=tenant_id, patient_id=patient_id)
+
+
 async def list_records(
     db: AsyncSession, *, tenant_id: str, patient_id: str, limit: int = 20
 ) -> dict:
