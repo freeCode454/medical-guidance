@@ -310,9 +310,10 @@ async def list_patients(
     }
 
 
-async def toggle_patient(
+async def delete_patient(
     db: AsyncSession, *, tenant_id: str, actor_id: str, actor_role: str, patient_id: str
 ) -> dict:
+    """软删除患者账号：列表隐藏、禁止登录，问诊/预约/病历数据保留。"""
     patient = await db.scalar(
         select(Patient).where(
             Patient.id == patient_id,
@@ -322,7 +323,8 @@ async def toggle_patient(
     )
     if patient is None:
         raise BizError(USER_NOT_FOUND, "患者不存在")
-    patient.status = "0" if patient.status == "1" else "1"
+    patient.del_flag = "1"
+    patient.status = "0"
     patient.update_by = actor_id
     patient.update_time = datetime.now(UTC)
     await _write_audit(
@@ -333,10 +335,10 @@ async def toggle_patient(
         action_type=AuditActionType.PERM_CHANGE.value,
         target_type="patient",
         target_id=patient.id,
-        detail={"status": patient.status, "account": patient.account},
+        detail={"deleted": True, "account": patient.account},
     )
     await db.commit()
-    return {"patient_id": patient_id, "status": patient.status}
+    return {"patient_id": patient_id, "deleted": True}
 
 
 # ---- 科室 -----------------------------------------------------------------

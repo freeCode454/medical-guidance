@@ -43,7 +43,7 @@ export const patients = {
         Object.entries(q).filter(([, v]) => v != null && v !== '') as any,
       )}`,
     ),
-  toggle: (id: string) => http.post(`/admin/patients/${id}/toggle`),
+  remove: (id: string) => http.delete(`/admin/patients/${id}`),
 }
 
 // 科室

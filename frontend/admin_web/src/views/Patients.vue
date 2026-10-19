@@ -10,7 +10,6 @@ const page = ref(1)
 const size = ref(10)
 const total = ref(0)
 const keyword = ref('')
-const statusFilter = ref('')
 const registeredFilter = ref('true')
 
 async function load() {
@@ -20,7 +19,6 @@ async function load() {
       page: page.value,
       size: size.value,
       keyword: keyword.value || null,
-      status: statusFilter.value || null,
       registered: registeredFilter.value || null,
     })
     items.value = d.items
@@ -39,7 +37,6 @@ function search() {
 
 function resetFilters() {
   keyword.value = ''
-  statusFilter.value = ''
   registeredFilter.value = 'true'
   search()
 }
@@ -55,24 +52,23 @@ function onSizeChange(s: number) {
   void load()
 }
 
-async function onToggle(row: Patient) {
-  const action = row.status === '1' ? '停用' : '启用'
+async function onDelete(row: Patient) {
   const name = row.account || row.patient_no || row.patient_id
   try {
     await ElMessageBox.confirm(
-      `${action}后该患者${row.status === '1' ? '将无法登录，但问诊与预约记录保留' : '可以重新登录'}。确定${action}「${name}」？`,
-      `确认${action}`,
-      { type: 'warning', confirmButtonText: `确定${action}`, cancelButtonText: '取消' },
+      `删除后该患者将无法登录，问诊、预约与病历历史会保留。确定删除「${name}」？`,
+      '确认删除患者',
+      { type: 'warning', confirmButtonText: '确定删除', cancelButtonText: '取消' },
     )
   } catch {
     return
   }
   try {
-    await patients.toggle(row.patient_id)
-    ElMessage.success(`已${action}`)
+    await patients.remove(row.patient_id)
+    ElMessage.success('患者已删除')
     await load()
   } catch (e) {
-    ElMessage.error((e as Error).message || '操作失败')
+    ElMessage.error((e as Error).message || '删除失败')
   }
 }
 
@@ -84,7 +80,7 @@ onMounted(load)
     <div class="page-head">
       <div class="page-title">
         <h1>患者管理</h1>
-        <p>查看普通患者账号、问诊与预约情况；停用后患者无法登录，历史数据保留。</p>
+        <p>查看普通患者账号、问诊与预约情况；删除后患者无法登录，历史数据保留。</p>
       </div>
     </div>
 
@@ -109,11 +105,6 @@ onMounted(load)
         <el-option label="已注册患者" value="true" />
         <el-option label="匿名患者" value="false" />
         <el-option label="全部患者" value="" />
-      </el-select>
-
-      <el-select v-model="statusFilter" placeholder="全部状态" clearable style="width: 120px" @change="search">
-        <el-option label="启用" value="1" />
-        <el-option label="停用" value="0" />
       </el-select>
 
       <el-button @click="search">查询</el-button>
@@ -155,23 +146,9 @@ onMounted(load)
             <span class="muted">{{ row.last_login_time ? fmtDateTime(row.last_login_time) : '从未登录' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="90">
-          <template #default="{ row }">
-            <span class="status-dot" :class="{ 'is-off': row.status !== '1' }">
-              {{ row.status === '1' ? '启用' : '停用' }}
-            </span>
-          </template>
-        </el-table-column>
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
-            <el-button
-              link
-              :type="row.status === '1' ? 'danger' : 'success'"
-              size="small"
-              @click="onToggle(row)"
-            >
-              {{ row.status === '1' ? '停用' : '启用' }}
-            </el-button>
+            <el-button link type="danger" size="small" @click="onDelete(row)">删除</el-button>
           </template>
         </el-table-column>
 
@@ -280,25 +257,5 @@ onMounted(load)
 .tnum {
   font-family: var(--font-mono);
   color: var(--c-ink);
-}
-
-.status-dot {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--c-success-text, #2f6f57);
-  font-size: 12px;
-}
-
-.status-dot::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.status-dot.is-off {
-  color: var(--c-faint);
 }
 </style>

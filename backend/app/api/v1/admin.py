@@ -168,19 +168,19 @@ async def list_patients(
     return ApiResponse(data=data)
 
 
-@router.post("/patients/{patient_id}/toggle", response_model=ApiResponse[dict])
-async def toggle_patient(
+@router.delete("/patients/{patient_id}", response_model=ApiResponse[dict])
+async def delete_patient(
     patient_id: str, db: DbSession, admin: CurrentOrgAdmin
 ) -> ApiResponse[dict]:
-    """启用/停用患者账号；停用后无法登录，历史数据保留。"""
-    data = await admin_service.toggle_patient(
+    """删除患者账号（软删除，保留问诊与预约历史）。"""
+    data = await admin_service.delete_patient(
         db,
         tenant_id=admin["tenant_id"],
         actor_id=admin["sub"],
         actor_role=admin["role"],
         patient_id=patient_id,
     )
-    return ApiResponse(data=data)
+    return ApiResponse(data=data, message="患者已删除")
 
 
 # ---- 科室（ORG_ADMIN） -----------------------------------------------------
