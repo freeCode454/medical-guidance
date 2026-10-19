@@ -18,8 +18,7 @@ Page({
     rounds: 0,
     loading: true,
     sending: false,
-    scrollId: '',
-    quickReplies: ['没有', '有一点', '不确定']
+    scrollTop: 0
   },
 
   onLoad(options) {
@@ -90,13 +89,12 @@ Page({
       isPatient: m.role === 'PATIENT',
       isAi: m.role !== 'PATIENT'
     }))
-    const last = messages.length ? `m${messages.length - 1}` : ''
     this.setData({
       messages,
       hasTriage: !!session.has_triage,
       status: session.status || '',
       rounds: session.inquiry_rounds || 0,
-      scrollId: last
+      scrollTop: this.data.scrollTop + 10000
     })
   },
 
@@ -106,10 +104,6 @@ Page({
 
   async onSend() {
     await this.sendContent(this.data.input)
-  },
-
-  async onQuickReply(e) {
-    await this.sendContent(e.currentTarget.dataset.text || '')
   },
 
   async sendContent(raw) {

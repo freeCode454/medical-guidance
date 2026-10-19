@@ -243,26 +243,6 @@
   font-size: 34rpx;
 }
 
-.quick-replies {
-  white-space: nowrap;
-  margin-bottom: 12rpx;
-}
-
-.quick-reply {
-  display: inline-block;
-  margin-right: 12rpx;
-  padding: 8rpx 20rpx;
-  border-radius: 999rpx;
-  border: 1rpx solid #e6ece9;
-  background: #f7f9f8;
-  color: #52615b;
-  font-size: 22rpx;
-}
-
-.quick-reply:active {
-  background: #eef5f2;
-}
-
 .input-row {
   display: flex;
   align-items: center;
@@ -284,32 +264,28 @@
 }
 
 .send-btn {
-  width: 76rpx;
+  width: 20%;
+  flex: 0 0 20%;
   height: 76rpx;
-  flex: none;
   padding: 0;
-  border-radius: 50%;
-  background: #17504e;
+  border-radius: 38rpx;
+  background: #2f6fed;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6rpx 16rpx rgba(23, 80, 78, 0.2);
+  font-size: 26rpx;
+  font-weight: 500;
+  box-shadow: 0 6rpx 16rpx rgba(47, 111, 237, 0.24);
 }
 
 .send-btn.is-disabled {
-  background: #d8e2de;
+  background: #cfe0ff;
   box-shadow: none;
 }
 
 .send-btn--active {
-  background: #0f3b39;
-}
-
-.send-arrow {
-  font-size: 34rpx;
-  line-height: 1;
-  font-weight: 500;
+  background: #1f5ed6;
 }
 
 .composer-note {

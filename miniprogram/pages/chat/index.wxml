@@ -16,10 +16,7 @@
   <scroll-view
     class="chat-scroll"
     scroll-y
-    scroll-into-view="{{scrollId}}"
-    scroll-with-animation
-    enhanced
-    show-scrollbar="{{false}}"
+    scroll-top="{{scrollTop}}"
   >
     <view class="day-label">本次问诊</view>
 
@@ -67,21 +64,6 @@
       <text class="result-banner__arrow">›</text>
     </view>
 
-    <scroll-view
-      wx:if="{{messages.length && !hasTriage}}"
-      class="quick-replies"
-      scroll-x
-      show-scrollbar="{{false}}"
-    >
-      <view
-        class="quick-reply"
-        wx:for="{{quickReplies}}"
-        wx:key="*this"
-        data-text="{{item}}"
-        bindtap="onQuickReply"
-      >{{item}}</view>
-    </scroll-view>
-
     <view class="input-row">
       <input
         class="chat-input"
@@ -101,7 +83,7 @@
         disabled="{{sending || !input}}"
         bindtap="onSend"
       >
-        <text wx:if="{{!sending}}" class="send-arrow">↑</text>
+        <text wx:if="{{!sending}}">发送</text>
       </button>
     </view>
 
