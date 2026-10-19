@@ -88,6 +88,8 @@ class Settings(BaseSettings):
     checkpoint_backend: Literal["memory", "postgres"] = "postgres"
     # 留空表示复用 database_url（psycopg 需要去掉 SQLAlchemy 的 +asyncpg 驱动后缀）
     checkpoint_database_url: str = ""
+    checkpoint_pool_min_size: int = 1
+    checkpoint_pool_max_size: int = 5
 
     # 对象存储（MinIO，S3 兼容）
     object_storage_endpoint: str = "localhost:9000"
@@ -164,6 +166,13 @@ class Settings(BaseSettings):
 
         校验不通过则启动失败——宁可起不来，也不要带着数据外泄风险运行。
         """
+        # ---- 检查点连接池参数 ----
+        if not 1 <= self.checkpoint_pool_min_size <= self.checkpoint_pool_max_size <= 20:
+            raise ValueError(
+                "检查点连接池需满足 1 <= CHECKPOINT_POOL_MIN_SIZE <= "
+                "CHECKPOINT_POOL_MAX_SIZE <= 20"
+            )
+
         # ---- 本地向量模型的路径必须真实存在，否则启动即失败 ----
         if self.embedding_is_local:
             if not self.embedding_model_path:

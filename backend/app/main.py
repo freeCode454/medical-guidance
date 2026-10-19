@@ -15,6 +15,7 @@ import logging
 import sys
 from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
+from typing import Any, cast
 
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -77,13 +78,25 @@ async def lifespan(app: FastAPI):
         else:
             try:
                 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+                from psycopg_pool import AsyncConnectionPool
 
-                checkpointer = await checkpoint_stack.enter_async_context(
-                    AsyncPostgresSaver.from_conn_string(settings.checkpoint_dsn)
+                pool = AsyncConnectionPool(
+                    conninfo=settings.checkpoint_dsn,
+                    min_size=settings.checkpoint_pool_min_size,
+                    max_size=settings.checkpoint_pool_max_size,
+                    open=False,
+                    kwargs={"autocommit": True, "prepare_threshold": 0},
                 )
+                await pool.open(wait=True)
+                checkpoint_stack.push_async_callback(pool.close)
+                checkpointer = AsyncPostgresSaver(cast(Any, pool))
                 await checkpointer.setup()
                 app.state.checkpoint_saver = checkpointer
-                logger.info("编排检查点：PostgreSQL")
+                logger.info(
+                    "编排检查点：PostgreSQL（连接池 %s~%s）",
+                    settings.checkpoint_pool_min_size,
+                    settings.checkpoint_pool_max_size,
+                )
             except Exception:
                 await checkpoint_stack.aclose()
                 checkpointer = None

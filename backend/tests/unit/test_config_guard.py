@@ -51,6 +51,15 @@ def test_prod_rejects_memory_checkpoint() -> None:
         )
 
 
+def test_checkpoint_pool_bounds() -> None:
+    with pytest.raises(ValidationError, match="连接池"):
+        Settings(
+            _env_file=None,
+            checkpoint_pool_min_size=5,
+            checkpoint_pool_max_size=2,
+        )
+
+
 def test_dev_sandbox_allows_public_endpoint() -> None:
     settings = Settings(
         _env_file=None,
