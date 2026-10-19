@@ -127,12 +127,16 @@ medical-guidance/
 │   ├── patient_h5/          # 患者端 H5
 │   ├── doctor_web/          # 医生工作台
 │   └── admin_web/           # 管理后台
+├── miniprogram/             # 患者端微信小程序（原生骨架，直连 REST API）
 ├── kb/                      # 知识库源数据（Excel）+ 规则文件
 ├── deploy/                  # docker-compose 基础设施 + init.sql
 └── Makefile                 # 常用命令（含 make verify）
 ```
 
 ## 快速开始
+
+> 微信小程序：用微信开发者工具打开 [`miniprogram/`](miniprogram/README.md)，模拟器直接连本机后端；
+> 真机把 `miniprogram/config.js` 改成电脑局域网 IP，并用 `HOST=0.0.0.0 python -m app` 启动后端。
 
 **环境**：Docker Desktop、Python 3.11（建议 conda）、Node 22+。
 

@@ -1,0 +1,140 @@
+.empty {
+  padding: 140rpx 20rpx;
+  text-align: center;
+  color: #8a938d;
+  font-size: 26rpx;
+}
+
+.result-head {
+  padding: 20rpx 4rpx 28rpx;
+}
+
+.eyebrow {
+  font-size: 22rpx;
+  letter-spacing: 4rpx;
+  color: #bf6a34;
+  margin-bottom: 12rpx;
+}
+
+.result-title {
+  font-size: 56rpx;
+  font-weight: 600;
+  color: #17504e;
+  line-height: 1.3;
+}
+
+.confidence {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #66716b;
+}
+
+.emergency {
+  background: #fff2ee;
+  border: 2rpx solid #e7b3a6;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.emergency-title {
+  color: #b4432f;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.emergency-text {
+  margin-top: 8rpx;
+  color: #8a3b2c;
+  font-size: 26rpx;
+  line-height: 1.7;
+}
+
+.emergency-phone {
+  margin-top: 8rpx;
+  color: #b4432f;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.section {
+  font-size: 24rpx;
+  color: #66716b;
+  letter-spacing: 2rpx;
+  margin-bottom: 16rpx;
+}
+
+.dept-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 2rpx dashed #f0e9dd;
+}
+
+.dept-row:last-child {
+  border-bottom: none;
+}
+
+.dept-name {
+  font-size: 28rpx;
+  color: #22302e;
+}
+
+.dept-score {
+  font-size: 24rpx;
+  color: #17504e;
+}
+
+.kv {
+  display: flex;
+  gap: 16rpx;
+  padding: 8rpx 0;
+  font-size: 26rpx;
+  line-height: 1.7;
+}
+
+.k {
+  color: #8a938d;
+  flex: none;
+  width: 72rpx;
+}
+
+.v {
+  color: #22302e;
+  flex: 1;
+}
+
+.soap-label {
+  margin-top: 18rpx;
+  font-size: 22rpx;
+  color: #8a938d;
+}
+
+.soap-text {
+  margin-top: 4rpx;
+  font-size: 27rpx;
+  line-height: 1.75;
+  color: #22302e;
+  white-space: pre-wrap;
+}
+
+.disclaimer {
+  margin: 8rpx 0 20rpx;
+  font-size: 22rpx;
+  line-height: 1.7;
+  color: #8a938d;
+}
+
+.error-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #17504e;
+  margin-bottom: 10rpx;
+}
+
+.error-text {
+  font-size: 25rpx;
+  color: #8a3b2c;
+  line-height: 1.7;
+}

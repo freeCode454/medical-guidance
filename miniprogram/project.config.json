@@ -1,0 +1,19 @@
+{
+  "description": "MedicalGuidance 患者端小程序",
+  "packOptions": {
+    "ignore": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": true,
+    "minified": false,
+    "enhance": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.4.0",
+  "appid": "touristappid",
+  "projectname": "MedicalGuidance-MiniProgram",
+  "miniprogramRoot": "./",
+  "condition": {}
+}

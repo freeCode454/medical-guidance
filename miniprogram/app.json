@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/chat/index",
+    "pages/result/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "智能导诊",
+    "navigationBarBackgroundColor": "#17504e",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f1ea",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

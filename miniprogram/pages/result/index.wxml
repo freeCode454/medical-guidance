@@ -1,0 +1,51 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="empty">正在生成分诊建议…</view>
+
+  <view wx:elif="{{error}}" class="card">
+    <view class="error-title">暂时无法获取分诊结果</view>
+    <view class="error-text">{{error}}</view>
+    <button class="btn-ghost" bindtap="load">重试</button>
+  </view>
+
+  <block wx:else>
+    <view class="result-head">
+      <view class="eyebrow">{{routeLabel}}</view>
+      <view class="result-title">{{primary.dept_name || '待医生确认'}}</view>
+      <view class="confidence">匹配度 {{confidencePct}}%</view>
+    </view>
+
+    <view wx:if="{{triage.emergency_guidance && triage.emergency_guidance.triggered}}" class="emergency">
+      <view class="emergency-title">请立即就医</view>
+      <view class="emergency-text">{{triage.emergency_guidance.advice}}</view>
+      <view class="emergency-phone">{{triage.emergency_guidance.emergency_phone}}</view>
+    </view>
+
+    <view class="card" wx:if="{{recommended.length}}">
+      <view class="section">其他可能相关</view>
+      <view class="dept-row" wx:for="{{recommended}}" wx:key="dept_code">
+        <view class="dept-name">{{item.dept_name}}</view>
+        <view class="dept-score">{{item.pct}}%</view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{triage.symptom_summary}}">
+      <view class="section">本次问诊摘要</view>
+      <view class="kv"><text class="k">主诉</text><text class="v">{{triage.symptom_summary.chief_complaint || '—'}}</text></view>
+      <view class="kv"><text class="k">部位</text><text class="v">{{triage.symptom_summary.location || '—'}}</text></view>
+      <view class="kv"><text class="k">性质</text><text class="v">{{triage.symptom_summary.nature || '—'}}</text></view>
+      <view class="kv"><text class="k">伴随</text><text class="v">{{triage.symptom_summary.accompanying || '—'}}</text></view>
+    </view>
+
+    <view class="card" wx:if="{{emr}}">
+      <view class="section">预问诊病历</view>
+      <view class="soap-label">S 主观资料</view>
+      <view class="soap-text">{{emr.subjective.chief_complaint || '—'}}</view>
+      <view class="soap-text">{{emr.subjective.present_illness || ''}}</view>
+      <view class="soap-label">P 就诊建议</view>
+      <view class="soap-text">{{emr.plan.note || '—'}}</view>
+    </view>
+
+    <view class="disclaimer">{{triage.disclaimer}}</view>
+    <button class="btn-ghost" bindtap="onBack">返回对话</button>
+  </block>
+</view>

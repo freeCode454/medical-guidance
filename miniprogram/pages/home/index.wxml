@@ -1,0 +1,44 @@
+<view class="page">
+  <view class="brand">
+    <view class="brand-mark">诊</view>
+    <view>
+      <view class="brand-name">智能导诊</view>
+      <view class="brand-sub">预问诊 · 分诊建议</view>
+    </view>
+  </view>
+
+  <view class="hero">
+    <view class="hero-title">哪里不舒服，</view>
+    <view class="hero-title">先告诉它</view>
+    <view class="hero-sub">描述越具体，分诊越准确。全程匿名，信息仅用于本次分诊建议。</view>
+  </view>
+
+  <view class="card">
+    <view class="label">描述您的不适</view>
+    <textarea
+      class="textarea"
+      value="{{complaint}}"
+      maxlength="300"
+      placeholder="例如：肚子疼三天了，还拉肚子，没有发烧"
+      placeholder-class="placeholder"
+      bindinput="onInput"
+    />
+    <view class="counter">{{complaint.length}}/300</view>
+  </view>
+
+  <view class="row">
+    <view class="card">
+      <view class="label">性别（选填）</view>
+      <picker range="{{genders}}" value="{{genderIndex}}" bindchange="onGender">
+        <view class="picker">{{genders[genderIndex]}}</view>
+      </picker>
+    </view>
+    <view class="card">
+      <view class="label">年龄（选填）</view>
+      <input class="input" type="number" value="{{age}}" placeholder="例如 30" bindinput="onAge" />
+    </view>
+  </view>
+
+  <button class="btn" loading="{{loading}}" disabled="{{loading}}" bindtap="onStart">开始问诊</button>
+  <view class="tip">本系统仅提供分诊建议，不构成医学诊断。急危重症请立即拨打 120。</view>
+</view>

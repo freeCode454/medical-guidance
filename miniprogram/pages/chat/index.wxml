@@ -1,0 +1,30 @@
+<view class="chat-page">
+  <scroll-view class="chat-scroll" scroll-y scroll-into-view="{{scrollId}}" scroll-with-animation>
+    <view wx:if="{{loading}}" class="empty">正在加载对话…</view>
+    <view wx:elif="{{!messages.length}}" class="empty">正在准备第一个问题…</view>
+
+    <view
+      wx:for="{{messages}}"
+      wx:key="message_id"
+      id="m{{index}}"
+      class="msg {{item.isPatient ? 'patient' : 'ai'}}"
+    >
+      <view class="role">{{item.roleLabel}}</view>
+      <view class="bubble"><text>{{item.content}}</text></view>
+    </view>
+  </scroll-view>
+
+  <view class="composer">
+    <input
+      class="composer-input"
+      value="{{input}}"
+      placeholder="说说您的感受…"
+      confirm-type="send"
+      bindinput="onInput"
+      bindconfirm="onSend"
+    />
+    <button class="send" loading="{{sending}}" disabled="{{sending}}" bindtap="onSend">发送</button>
+  </view>
+
+  <button wx:if="{{hasTriage}}" class="result-btn" bindtap="onResult">查看分诊结果</button>
+</view>
