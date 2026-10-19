@@ -57,6 +57,7 @@ export interface TriageResult {
   }>
   symptom_summary: SymptomSummary
   inquiry_rounds: number
+  history_used?: boolean
   emergency_guidance: EmergencyGuidance | null
   disclaimer: string
   generated_time: string
@@ -79,6 +80,50 @@ export interface ConsentItem {
   expire_time: string | null
   revoke_time: string | null
   channel: string | null
+}
+
+export interface AppointmentSlot {
+  time_slot: string
+  capacity: number
+  remaining: number
+  available: boolean
+}
+
+export interface AppointmentDoctor {
+  doctor_id: string
+  doctor_name: string
+  title: string
+  is_expert: boolean
+  slots: AppointmentSlot[]
+}
+
+export interface AppointmentDay {
+  date: string
+  weekday: string
+  doctors: AppointmentDoctor[]
+}
+
+export interface AppointmentDeptSlots {
+  dept_code: string
+  dept_name: string
+  dates: AppointmentDay[]
+}
+
+export interface AppointmentItem {
+  appointment_id: string
+  appointment_no: string
+  session_id: string | null
+  dept_code: string
+  dept_name: string
+  doctor_id: string
+  doctor_name: string
+  doctor_title: string | null
+  schedule_date: string
+  time_slot: string
+  status: string
+  status_label: string
+  can_cancel: boolean
+  create_time: string | null
 }
 
 // 创建匿名会话（拿患者 token）
@@ -149,4 +194,29 @@ export function getTriage(sessionId: string) {
 // 查询患者视图病历
 export function getEmr(sessionId: string) {
   return http.get<EmrView>(`/patient/sessions/${sessionId}/emr`)
+}
+
+// 预约挂号
+export function getAppointmentSlots(deptCode: string) {
+  return http.get<AppointmentDeptSlots>(
+    `/patient/appointments/slots?dept_code=${encodeURIComponent(deptCode)}`,
+  )
+}
+
+export function listAppointments() {
+  return http.get<{ items: AppointmentItem[] }>('/patient/appointments')
+}
+
+export function bookAppointment(payload: {
+  session_id?: string | null
+  dept_code: string
+  doctor_id: string
+  schedule_date: string
+  time_slot: string
+}) {
+  return http.post<AppointmentItem>('/patient/appointments', payload)
+}
+
+export function cancelAppointment(appointmentId: string) {
+  return http.post<AppointmentItem>(`/patient/appointments/${appointmentId}/cancel`)
 }

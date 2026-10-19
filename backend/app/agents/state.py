@@ -38,6 +38,9 @@ class TriageState(TypedDict, total=False):
     patient_hash: str | None
     gender: str  # 男 / 女（供分诊规则人群过滤）
     age: int  # 年龄（供儿童/老年科室过滤）
+    history_summary: str  # 已授权既往病历摘要
+    history_past: list[str]  # 已授权既往史
+    history_allergy: list[str]  # 已授权过敏史
 
     # ---- 对话（追加） ----
     chief_complaint: str

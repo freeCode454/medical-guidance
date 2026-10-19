@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import CurrentPatient
 from app.common.database import get_db
+from app.schemas.appointment import AppointmentCreateRequest
 from app.schemas.common import ApiResponse
 from app.schemas.consent import ConsentCreateRequest, ConsentItem, ConsentListResponse
 from app.schemas.session import (
@@ -20,7 +21,7 @@ from app.schemas.session import (
     SessionCreateResponse,
 )
 from app.schemas.triage import TriageResultResponse
-from app.services import consent_service, session_service
+from app.services import appointment_service, consent_service, history_service, session_service
 
 router = APIRouter(prefix="/api/v1/patient", tags=["患者端"])
 
@@ -37,6 +38,13 @@ async def create_session(
 ) -> ApiResponse[SessionCreateResponse]:
     """创建一次预问诊会话，并触发编排图（追问/分诊）。"""
     data = await session_service.create_session(db, patient, req)
+    # 患者已授权时，把既往病史摘要注入本次问诊上下文（未授权不读取）
+    history = await history_service.load_history_context(
+        db,
+        tenant_id=patient["tenant_id"],
+        patient_id=patient["sub"],
+        exclude_session_id=data.session_id,
+    )
     # 后台触发编排图：主诉 → 澄清追问（interrupt）或直接分诊
     if req.chief_complaint:
         background_tasks.add_task(
@@ -47,6 +55,9 @@ async def create_session(
             chief_complaint=req.chief_complaint,
             gender=req.gender,
             age=req.age,
+            history_summary=history["summary"] if history else None,
+            history_past=history["past_history"] if history else None,
+            history_allergy=history["allergy"] if history else None,
         )
     return ApiResponse(data=data)
 
@@ -120,6 +131,65 @@ async def get_emr(session_id: str, db: DbSession, patient: CurrentPatient) -> Ap
     """查询预问诊病历（患者视图，12.3.2）。"""
     data = await session_service.get_emr(db, session_id, patient)
     return ApiResponse(data=data)
+
+
+# ---------------- 预约挂号 ----------------
+
+
+@router.get("/appointments/slots", response_model=ApiResponse[dict])
+async def list_appointment_slots(
+    db: DbSession,
+    patient: CurrentPatient,
+    dept_code: str = Query(..., min_length=1, max_length=32),
+) -> ApiResponse[dict]:
+    """查询某科室未来 7 天的医生、日期与全部时段号源。"""
+    data = await appointment_service.list_slots(
+        db, tenant_id=patient["tenant_id"], dept_code=dept_code
+    )
+    return ApiResponse(data=data)
+
+
+@router.get("/appointments", response_model=ApiResponse[dict])
+async def list_appointments(
+    db: DbSession, patient: CurrentPatient
+) -> ApiResponse[dict]:
+    """我的预约记录。"""
+    data = await appointment_service.list_appointments(
+        db, tenant_id=patient["tenant_id"], patient_id=patient["sub"]
+    )
+    return ApiResponse(data=data)
+
+
+@router.post("/appointments", response_model=ApiResponse[dict])
+async def create_appointment(
+    req: AppointmentCreateRequest, db: DbSession, patient: CurrentPatient
+) -> ApiResponse[dict]:
+    """预约挂号：占用一个号源。"""
+    data = await appointment_service.create_appointment(
+        db,
+        tenant_id=patient["tenant_id"],
+        patient_id=patient["sub"],
+        session_id=req.session_id,
+        dept_code=req.dept_code,
+        doctor_id=req.doctor_id,
+        schedule_date=req.schedule_date,
+        time_slot=req.time_slot,
+    )
+    return ApiResponse(data=data, message="预约成功")
+
+
+@router.post("/appointments/{appointment_id}/cancel", response_model=ApiResponse[dict])
+async def cancel_appointment(
+    appointment_id: str, db: DbSession, patient: CurrentPatient
+) -> ApiResponse[dict]:
+    """取消预约。"""
+    data = await appointment_service.cancel_appointment(
+        db,
+        tenant_id=patient["tenant_id"],
+        patient_id=patient["sub"],
+        appointment_id=appointment_id,
+    )
+    return ApiResponse(data=data, message="已取消预约")
 
 
 # ---------------- 病史调阅授权 ----------------

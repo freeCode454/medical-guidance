@@ -7,6 +7,11 @@ const router = createRouter({
     { path: '/chat', name: 'chat', component: () => import('@/views/Chat.vue') },
     { path: '/result', name: 'result', component: () => import('@/views/TriageResult.vue') },
     { path: '/emr', name: 'emr', component: () => import('@/views/Emr.vue') },
+    {
+      path: '/appointment',
+      name: 'appointment',
+      component: () => import('@/views/Appointment.vue'),
+    },
   ],
 })
 

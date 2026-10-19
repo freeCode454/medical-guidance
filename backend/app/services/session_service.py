@@ -267,6 +267,7 @@ async def get_triage_result(
         recommended_depts=recommended,
         symptom_summary=summary,
         inquiry_rounds=session.inquiry_rounds,
+        history_used=bool(evidence.get("history_used")),
         emergency_guidance=emergency,
         disclaimer="本系统仅提供分诊建议，不构成医学诊断。请以医生面诊为准。",
         generated_time=result.create_time,

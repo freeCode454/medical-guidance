@@ -49,14 +49,23 @@ def _build_prompt(state: TriageState) -> str:
     dept_lines = "\n".join(
         f"- {d.get('dept_code')} {d.get('dept_name', '')}" for d in depts
     )
+    history_context = state.get("history_summary") or ""
+    history_block = (
+        "\n已授权的既往病历摘要（只用于补充既往史/过敏史，不得改写为本次症状）：\n"
+        f"{history_context[:1200]}\n"
+        if history_context
+        else "\n患者未授权或无既往病历，不得编造既往史/过敏史。\n"
+    )
     return (
         "你是门诊预问诊病历撰写助手。根据对话记录和分诊结论，生成符合规范的 SOAP 四段式病历。\n\n"
         f"患者主诉：{state.get('chief_complaint', '')}\n\n"
         f"对话历史：\n{history}\n\n"
         f"已采集医学信息：{json.dumps(entities, ensure_ascii=False)}\n\n"
-        f"分诊建议科室：\n{dept_lines}\n\n"
+        f"分诊建议科室：\n{dept_lines}\n"
+        f"{history_block}\n"
         "按要求输出四段：\n"
-        "1. subjective（S 主观资料）：主诉、现病史、既往史、过敏史，仅写患者已陈述的内容\n"
+        "1. subjective（S 主观资料）：主诉、现病史、既往史、过敏史，仅写患者已陈述的内容；"
+        "已授权的既往史可作为补充，但要标明来自历史病历\n"
         "2. objective（O 客观资料）：已采集的客观体征；预问诊阶段缺失时写「无」，不得编造\n"
         "3. assessment（A 评估）：鉴别方向，面向医生，可含疾病方向的推测，仅医生端可见\n"
         "4. plan（P 计划）：建议就诊科室、建议补充检查；【严禁】出现任何用药建议\n"

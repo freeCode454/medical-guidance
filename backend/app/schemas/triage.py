@@ -53,6 +53,7 @@ class TriageResultResponse(BaseModel):
     recommended_depts: list[RecommendedDept] = Field(default_factory=list, description="建议科室列表")
     symptom_summary: SymptomSummary = Field(description="症状摘要")
     inquiry_rounds: int = Field(description="已追问轮次")
+    history_used: bool = Field(default=False, description="是否参考了患者授权的既往病历")
     emergency_guidance: EmergencyGuidance | None = Field(
         default=None, description="危重症引导信息，仅 route=EMERGENCY 时非空"
     )

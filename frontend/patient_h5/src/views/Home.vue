@@ -72,17 +72,19 @@ async function start() {
 
   loading.value = true
   try {
-    await store.startSession(text, {
-      gender: gender.value ?? undefined,
-      age: ageNum,
-    })
+    // 先授权再创建会话：后端创建会话时会读取已授权的既往病历并注入问诊上下文
     if (consent.value) {
       try {
+        await store.ensureAuth()
         await store.grantEmrConsent()
       } catch {
         // 授权失败不阻断问诊，患者可在病历页再次授权
       }
     }
+    await store.startSession(text, {
+      gender: gender.value ?? undefined,
+      age: ageNum,
+    })
     router.push('/chat')
   } catch (e) {
     showToast((e as Error).message || '启动问诊失败，请重试')

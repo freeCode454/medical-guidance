@@ -77,6 +77,9 @@ function pct(n: number) {
         <p class="lede">
           {{ emergency ? '您的描述触发了急危重症预警，请优先线下就医' : '根据您的描述，最匹配的科室是' }}
         </p>
+        <p v-if="store.triage.history_used && !emergency" class="history-note">
+          已结合您授权的既往病历，本次摘要会参考历史过敏史与既往史。
+        </p>
       </header>
 
       <!-- 危重症引导：优先于科室推荐展示 -->
@@ -135,7 +138,18 @@ function pct(n: number) {
           <button class="ghost-btn" type="button" @click="router.push('/')">重新问诊</button>
         </template>
         <template v-else>
-          <button class="primary-btn" type="button" @click="router.push('/emr')">
+          <button
+            v-if="primary"
+            class="primary-btn"
+            type="button"
+            @click="router.push({ path: '/appointment', query: { dept: primary.dept_code, sessionId: store.sessionId } })"
+          >
+            预约挂号 · {{ primary.dept_name }}
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 4v3M18 4v3M4 9h16M5 6h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button class="primary-btn primary-btn--book" type="button" @click="router.push('/emr')">
             查看预问诊病历
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M5 12h13M12.5 5.5L19 12l-6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -329,6 +343,13 @@ function pct(n: number) {
   text-decoration: none;
 }
 
+.primary-btn.primary-btn--book {
+  background: var(--c-surface);
+  color: var(--c-primary);
+  border: 1px solid var(--c-primary-line);
+  box-shadow: var(--shadow-xs);
+}
+
 .eyebrow {
   font-size: 12px;
   letter-spacing: 0.14em;
@@ -346,6 +367,18 @@ h1 {
   margin-top: 10px;
   font-size: 14px;
   color: var(--c-muted);
+}
+
+.history-note {
+  display: inline-flex;
+  margin-top: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--c-primary-line);
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+  font-size: 11.5px;
+  line-height: 1.5;
 }
 
 /* ---------- 首选科室 ---------- */

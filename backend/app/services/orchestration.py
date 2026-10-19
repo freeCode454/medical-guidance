@@ -64,6 +64,7 @@ def _build_evidence(result: dict) -> dict:
         },
         "risk_flag": bool(result.get("risk_flag")),
         "risk_reason": result.get("risk_reason"),
+        "history_used": bool(result.get("history_summary")),
         "kg_paths": kg_paths,
     }
 
@@ -111,6 +112,9 @@ class TriageOrchestrator:
         patient_hash: str | None = None,
         gender: str | None = None,
         age: int | None = None,
+        history_summary: str | None = None,
+        history_past: list[str] | None = None,
+        history_allergy: list[str] | None = None,
     ) -> None:
         """创建会话后首次触发：跑图到 interrupt（追问）或 done。
 
@@ -131,6 +135,10 @@ class TriageOrchestrator:
             state["gender"] = gender
         if age is not None:
             state["age"] = age
+        if history_summary:
+            state["history_summary"] = history_summary
+            state["history_past"] = history_past or []
+            state["history_allergy"] = history_allergy or []
         try:
             result = await self.graph.ainvoke(state, config=self._config(session_id))
         except Exception:

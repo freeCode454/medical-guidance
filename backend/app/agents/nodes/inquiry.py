@@ -60,13 +60,21 @@ def _build_prompt(state: TriageState) -> str:
     history = "\n".join(f"{m.get('role')}: {m.get('content')}" for m in messages)
     entities = state.get("entities", {})
     asked = "、".join(state.get("asked", [])) or "无"
+    history_context = state.get("history_summary") or ""
+    history_block = (
+        "\n患者已授权的既往病历摘要（可作为追问背景，但不得当作本次症状）：\n"
+        f"{history_context[:1200]}\n"
+        if history_context
+        else "\n患者未授权或无既往病历，不得假设历史病史。\n"
+    )
     return (
         "你是医疗预问诊信息采集助手。判断已有信息是否足够用于分诊，避免不必要的追问。\n\n"
         f"患者主诉：{state.get('chief_complaint', '')}\n\n"
         f"对话历史：\n{history}\n\n"
         f"已采集信息：{json.dumps(entities, ensure_ascii=False)}\n"
         f"已问过：{asked}\n"
-        f"当前已追问轮次：{state.get('inquiry_rounds', 0)}\n\n"
+        f"当前已追问轮次：{state.get('inquiry_rounds', 0)}\n"
+        f"{history_block}\n"
         "已采集判定标准（关键）：主诉或对话里【已经提到】的信息就算已采集，"
         "不要因为「不够具体」而重复追问。例如：\n"
         "- 提到「三天了」= 时长已采集\n"

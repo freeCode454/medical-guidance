@@ -36,6 +36,7 @@ export const useSessionStore = defineStore('session', () => {
 
   // 初始化匿名身份
   async function ensureAuth() {
+    if (patientId.value) return
     const d = await api.createAnonymousSession(deviceId.value)
     setToken(d.access_token)
     patientId.value = d.patient_id
