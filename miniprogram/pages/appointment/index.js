@@ -23,6 +23,7 @@ Page({
     others: [],
     appointments: [],
     selected: null,
+    successInfo: null,
     booking: false
   },
 
@@ -126,8 +127,13 @@ Page({
           time_slot: s.timeSlot
         }
       })
-      wx.showToast({ title: `预约成功：${item.schedule_date} ${item.time_slot}`, icon: 'none', duration: 2500 })
-      this.setData({ selected: null })
+      this.setData({
+        selected: null,
+        successInfo: {
+          ...item,
+          dateText: fmtDate(item.schedule_date)
+        }
+      })
       await this.load()
     } catch (e) {
       wx.showToast({ title: e.message || '预约失败', icon: 'none' })
@@ -135,6 +141,12 @@ Page({
       this.setData({ booking: false })
     }
   },
+
+  closeSuccess() {
+    this.setData({ successInfo: null })
+  },
+
+  noop() {},
 
   cancel(e) {
     const id = e.currentTarget.dataset.id

@@ -54,6 +54,14 @@ def _dept_name(dept: Dept | None, code: str) -> str:
     return dept.dept_name if dept else code
 
 
+def _specialty(dept: Dept | None) -> str:
+    if dept and dept.sub_specialty:
+        return "、".join(str(item) for item in dept.sub_specialty if item)
+    if dept:
+        return f"{dept.dept_name}常见病"
+    return "专科常见病"
+
+
 def _status_label(status: str) -> str:
     return {
         "BOOKED": "已预约",
@@ -133,6 +141,7 @@ async def list_slots(
                     "doctor_name": doctor.real_name or doctor.account,
                     "title": doctor.title or "医师",
                     "is_expert": _is_expert(doctor.title),
+                    "specialty": _specialty(dept),
                     "slots": slots,
                 }
             )

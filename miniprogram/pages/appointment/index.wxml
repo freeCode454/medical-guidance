@@ -40,6 +40,7 @@
           <view class="doctor__info">
             <text class="doctor__name">{{doctor.doctor_name}}</text>
             <text class="doctor__title">{{doctor.title}}</text>
+            <text wx:if="{{doctor.specialty}}" class="doctor__specialty">擅长：{{doctor.specialty}}</text>
           </view>
           <text class="doctor__tag">专家</text>
         </view>
@@ -115,5 +116,43 @@
       <text class="confirm-bar__sub">{{activeDay.date}} · {{selected.title}}</text>
     </view>
     <button class="confirm-btn" loading="{{booking}}" disabled="{{booking}}" bindtap="confirm">确认预约</button>
+  </view>
+
+  <view wx:if="{{successInfo}}" class="success-mask" catchtouchmove="noop">
+    <view class="success-card">
+      <view class="success-icon">✓</view>
+      <text class="success-title">预约成功</text>
+      <text class="success-sub">请按预约时间到院就诊</text>
+
+      <view class="success-detail">
+        <view class="success-row">
+          <text class="success-label">预约单号</text>
+          <text class="success-value success-value--mono">{{successInfo.appointment_no}}</text>
+        </view>
+        <view class="success-row">
+          <text class="success-label">就诊科室</text>
+          <text class="success-value">{{successInfo.dept_name}}</text>
+        </view>
+        <view class="success-row">
+          <text class="success-label">医生</text>
+          <text class="success-value">{{successInfo.doctor_name}}（{{successInfo.doctor_title}}）</text>
+        </view>
+        <view class="success-row">
+          <text class="success-label">就诊日期</text>
+          <text class="success-value">{{successInfo.dateText}}</text>
+        </view>
+        <view class="success-row">
+          <text class="success-label">就诊时段</text>
+          <text class="success-value">{{successInfo.time_slot}}</text>
+        </view>
+        <view class="success-row">
+          <text class="success-label">预约状态</text>
+          <text class="success-value success-value--status">{{successInfo.status_label}}</text>
+        </view>
+      </view>
+
+      <text class="success-tip">请提前 15 分钟到院，携带有效身份证件</text>
+      <button class="success-btn" bindtap="closeSuccess">知道了</button>
+    </view>
   </view>
 </view>
