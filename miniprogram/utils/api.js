@@ -1,7 +1,18 @@
 const { BASE_URL } = require('../config')
 
+function currentPath() {
+  const pages = getCurrentPages()
+  return pages.length ? pages[pages.length - 1].route : ''
+}
+
+function clearAuth() {
+  wx.removeStorageSync('mg_token')
+  wx.removeStorageSync('mg_patient_id')
+  wx.removeStorageSync('mg_account')
+}
+
 /**
- * 统一请求：解包 { code, message, data }，带患者 token。
+ * 统一请求：解包 { code, message, data }，自动带患者 token。
  */
 function request(path, { method = 'GET', data, auth = true } = {}) {
   return new Promise((resolve, reject) => {
@@ -21,14 +32,20 @@ function request(path, { method = 'GET', data, auth = true } = {}) {
           reject(new Error(`请求失败（HTTP ${res.statusCode}）`))
           return
         }
-        if (body.code !== 200) {
-          if (body.code === 401) wx.removeStorageSync('mg_token')
-          const err = new Error(body.message || `请求失败（${body.code}）`)
-          err.code = body.code
-          reject(err)
+        if (body.code === 200) {
+          resolve(body.data)
           return
         }
-        resolve(body.data)
+
+        if ([10003, 10004, 10005].includes(body.code)) {
+          clearAuth()
+          if (currentPath() !== 'pages/login/index') {
+            wx.reLaunch({ url: '/pages/login/index' })
+          }
+        }
+        const err = new Error(body.message || `请求失败（${body.code}）`)
+        err.code = body.code
+        reject(err)
       },
       fail(err) {
         reject(new Error(err.errMsg || '网络异常，请确认后端已启动'))

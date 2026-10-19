@@ -1,0 +1,18 @@
+<view class="tabbar">
+  <view
+    class="tabbar__item {{active === 'home' ? 'is-on' : ''}}"
+    data-path="/pages/home/index"
+    bindtap="go"
+  >
+    <image class="tabbar__icon" src="{{homeIcon}}" mode="aspectFit" />
+    <text>首页</text>
+  </view>
+  <view
+    class="tabbar__item {{active === 'profile' ? 'is-on' : ''}}"
+    data-path="/pages/profile/index"
+    bindtap="go"
+  >
+    <image class="tabbar__icon" src="{{userIcon}}" mode="aspectFit" />
+    <text>我的</text>
+  </view>
+</view>

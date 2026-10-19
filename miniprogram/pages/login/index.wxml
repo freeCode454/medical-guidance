@@ -1,0 +1,76 @@
+<view class="login-page">
+  <view class="login-hero">
+    <view class="logo">诊</view>
+    <text class="login-title">智能导诊</text>
+    <text class="login-sub">院内 AI 预问诊助手</text>
+  </view>
+
+  <view class="login-card">
+    <view class="tabs">
+      <view
+        class="tab {{mode === 'login' ? 'is-on' : ''}}"
+        data-mode="login"
+        bindtap="switchMode"
+      >登录</view>
+      <view
+        class="tab {{mode === 'register' ? 'is-on' : ''}}"
+        data-mode="register"
+        bindtap="switchMode"
+      >注册</view>
+    </view>
+
+    <view class="field">
+      <text class="field-label">账号</text>
+      <input
+        class="field-input"
+        value="{{account}}"
+        placeholder="请输入患者账号"
+        placeholder-class="placeholder"
+        maxlength="64"
+        bindinput="onAccount"
+      />
+    </view>
+
+    <view class="field">
+      <text class="field-label">密码</text>
+      <view class="password-row">
+        <input
+          class="field-input"
+          value="{{password}}"
+          password="{{!showPassword}}"
+          placeholder="至少 8 位"
+          placeholder-class="placeholder"
+          maxlength="64"
+          bindinput="onPassword"
+        />
+        <text class="eye" bindtap="togglePassword">{{showPassword ? '隐藏' : '显示'}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{mode === 'register'}}" class="field">
+      <text class="field-label">确认密码</text>
+      <input
+        class="field-input"
+        value="{{confirm}}"
+        password="{{!showPassword}}"
+        placeholder="再次输入密码"
+        placeholder-class="placeholder"
+        maxlength="64"
+        bindinput="onConfirm"
+      />
+    </view>
+
+    <button class="primary-btn" loading="{{loading}}" disabled="{{loading}}" bindtap="submit">
+      {{mode === 'login' ? '登录' : '注册并登录'}}
+    </button>
+
+    <view class="hint">
+      <text wx:if="{{mode === 'login'}}">登录后可查看预约、病历和个人信息</text>
+      <text wx:else>注册只创建患者账号；医生与管理员请使用网页端</text>
+    </view>
+  </view>
+
+  <view class="login-foot">
+    <text>本系统仅提供分诊建议，不构成医学诊断</text>
+  </view>
+</view>

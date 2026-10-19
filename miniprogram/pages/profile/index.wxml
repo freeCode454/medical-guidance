@@ -1,0 +1,88 @@
+<view class="profile">
+  <view wx:if="{{loading}}" class="empty">正在加载个人信息…</view>
+  <view wx:elif="{{error}}" class="empty-card">
+    <text>{{error}}</text>
+    <button class="retry-btn" bindtap="load">重新加载</button>
+  </view>
+
+  <block wx:else>
+    <view class="user-card">
+      <view class="user-card__top">
+        <view class="avatar">{{initial}}</view>
+        <view class="user-card__info">
+          <text class="user-card__name">{{profile.account}}</text>
+          <text class="user-card__no">{{profile.patient_no || profile.patient_id}}</text>
+        </view>
+      </view>
+
+      <view class="facts">
+        <view class="fact">
+          <text class="fact__label">性别</text>
+          <text class="fact__value">{{profile.gender_label}}</text>
+        </view>
+        <view class="fact">
+          <text class="fact__label">年龄</text>
+          <text class="fact__value">{{ageText}}</text>
+        </view>
+        <view class="fact">
+          <text class="fact__label">建档时间</text>
+          <text class="fact__value">{{createdText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="stats">
+      <view class="stat">
+        <text class="stat__num">{{profile.session_count}}</text>
+        <text class="stat__label">问诊</text>
+      </view>
+      <view class="stat">
+        <text class="stat__num">{{profile.appointment_count}}</text>
+        <text class="stat__label">预约</text>
+      </view>
+      <view class="stat">
+        <text class="stat__num">{{profile.record_count}}</text>
+        <text class="stat__label">病历</text>
+      </view>
+    </view>
+
+    <view class="section-head">
+      <text>挂号记录</text>
+      <text class="section-head__count">{{appointments.length}} 条</text>
+    </view>
+    <view wx:if="{{!appointments.length}}" class="empty-card">还没有预约记录</view>
+    <view class="appointment" wx:for="{{appointments}}" wx:key="appointment_id">
+      <view class="appointment__main">
+        <text class="appointment__title">{{item.dept_name}} · {{item.doctor_name}}</text>
+        <text class="appointment__time">{{item.dateText}} {{item.time_slot}}</text>
+        <text class="appointment__no">{{item.appointment_no}}</text>
+      </view>
+      <text class="status {{item.isDone ? 'is-off' : ''}}">{{item.status_label}}</text>
+    </view>
+
+    <view class="section-head">
+      <text>历史病历</text>
+      <text class="section-head__count">{{records.length}} 份</text>
+    </view>
+    <view wx:if="{{!records.length}}" class="empty-card">还没有生成过预问诊病历</view>
+    <view
+      class="record"
+      wx:for="{{records}}"
+      wx:key="record_id"
+      data-id="{{item.session_id}}"
+      bindtap="onRecord"
+    >
+      <view class="record__top">
+        <text class="record__dept">{{item.dept_name || '预问诊'}}</text>
+        <text class="record__date">{{item.dateText}}</text>
+      </view>
+      <text class="record__complaint">{{item.chief_complaint || '未记录主诉'}}</text>
+      <text class="record__summary">{{item.summary}}</text>
+      <text class="record__link">查看病历 ›</text>
+    </view>
+
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </block>
+
+  <bottom-nav active="profile" />
+</view>

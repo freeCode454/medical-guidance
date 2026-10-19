@@ -1,4 +1,5 @@
 const { request } = require('../../utils/api')
+const auth = require('../../utils/auth')
 
 const ROLE_LABELS = {
   PATIENT: '我',
@@ -21,6 +22,7 @@ Page({
   },
 
   onLoad(options) {
+    if (!auth.requireLogin()) return
     this.setData({ sessionId: options.sessionId || '' })
     this.loadAll()
   },

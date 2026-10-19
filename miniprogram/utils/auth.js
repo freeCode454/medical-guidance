@@ -1,63 +1,69 @@
 const { request } = require('./api')
 
-function fallbackHex() {
-  let out = ''
-  for (let i = 0; i < 64; i += 1) out += Math.floor(Math.random() * 16).toString(16)
-  return out
+const TOKEN_KEY = 'mg_token'
+
+function getToken() {
+  return wx.getStorageSync(TOKEN_KEY) || ''
 }
 
-function randomHex() {
-  return new Promise((resolve) => {
-    if (!wx.getRandomValues) {
-      resolve(fallbackHex())
-      return
-    }
-    wx.getRandomValues({
-      length: 32,
-      success(res) {
-        try {
-          const bytes = new Uint8Array(res.randomValues)
-          resolve(
-            Array.from(bytes)
-              .map((b) => b.toString(16).padStart(2, '0'))
-              .join('')
-          )
-        } catch (e) {
-          resolve(fallbackHex())
-        }
-      },
-      fail() {
-        resolve(fallbackHex())
-      }
-    })
-  })
+function isLoggedIn() {
+  return Boolean(getToken() && wx.getStorageSync('mg_account'))
 }
 
-async function getDeviceId() {
-  let deviceId = wx.getStorageSync('mg_device_id')
-  if (!deviceId || deviceId.length < 32) {
-    deviceId = await randomHex()
-    wx.setStorageSync('mg_device_id', deviceId)
-  }
-  return deviceId
+function saveAuth(data) {
+  wx.setStorageSync(TOKEN_KEY, data.access_token)
+  wx.setStorageSync('mg_patient_id', data.patient_id || '')
+  wx.setStorageSync('mg_account', data.account || '')
 }
 
-async function ensureAuth() {
-  let token = wx.getStorageSync('mg_token')
-  if (token) return token
+function clearAuth() {
+  wx.removeStorageSync(TOKEN_KEY)
+  wx.removeStorageSync('mg_patient_id')
+  wx.removeStorageSync('mg_account')
+}
 
-  const deviceId = await getDeviceId()
-  const data = await request('/auth/patient/session', {
+function requireLogin() {
+  if (isLoggedIn()) return true
+  // 清除旧版匿名 token，避免绕过账号登录
+  if (getToken()) clearAuth()
+  wx.reLaunch({ url: '/pages/login/index' })
+  return false
+}
+
+async function login(account, password) {
+  const data = await request('/auth/login', {
     method: 'POST',
     auth: false,
-    data: {
-      device_id: deviceId,
-      client_type: 'MINIPROGRAM',
-      channel: 'WECHAT_MP'
-    }
+    data: { account, password }
   })
-  wx.setStorageSync('mg_token', data.access_token)
-  return data.access_token
+  if (data.role !== 'PATIENT') {
+    throw new Error('该账号不是患者账号，请使用患者账号登录')
+  }
+  saveAuth(data)
+  return data
 }
 
-module.exports = { ensureAuth, getDeviceId }
+async function register(account, password) {
+  const data = await request('/auth/patient/register', {
+    method: 'POST',
+    auth: false,
+    data: { account, password }
+  })
+  saveAuth(data)
+  return data
+}
+
+function getProfile() {
+  return request('/patient/profile')
+}
+
+module.exports = {
+  getToken,
+  isLoggedIn,
+  saveAuth,
+  clearAuth,
+  requireLogin,
+  login,
+  register,
+  getProfile
+}
