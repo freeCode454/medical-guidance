@@ -13,6 +13,15 @@ export interface KbEntry {
   update_time: string | null
 }
 
+export interface KbEntryDetail extends KbEntry {
+  content: string
+  content_json?: unknown
+  icd10_codes?: string[] | null
+  age_group?: string | null
+  gender?: string | null
+  source?: string | null
+}
+
 export interface PageData<T> { total: number; page: number; size: number; items: T[] }
 
 export interface KbPublish {
@@ -41,7 +50,7 @@ export interface KbIngestTask {
 export const kb = {
   list: (q: Record<string, any> = {}) => http.get<PageData<KbEntry>>(`/admin/kb/entries?${new URLSearchParams(Object.entries(q).filter(([, v]) => v != null && v !== '') as any)}`),
   create: (b: any) => http.post('/admin/kb/entries', b),
-  get: (id: string) => http.get(`/admin/kb/entries/${id}`),
+  get: (id: string) => http.get<KbEntryDetail>(`/admin/kb/entries/${id}`),
   update: (id: string, b: any) => http.put(`/admin/kb/entries/${id}`, b),
   toggle: (id: string) => http.post(`/admin/kb/entries/${id}/toggle`),
   history: (id: string) => http.get(`/admin/kb/entries/${id}/history`),

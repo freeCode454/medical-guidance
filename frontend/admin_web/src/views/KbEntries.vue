@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { kb, type KbEntry, type KbIngestTask, type KbPublish } from '@/api/kb'
+import { kb, type KbEntry, type KbEntryDetail, type KbIngestTask, type KbPublish } from '@/api/kb'
 import { fmtDateTime } from '@/utils/format'
 
 const loading = ref(false)
@@ -25,6 +25,9 @@ const testing = ref(false)
 const dialog = ref(false)
 const saving = ref(false)
 const formRef = ref<FormInstance>()
+const detailVisible = ref(false)
+const detailLoading = ref(false)
+const detail = ref<KbEntryDetail | null>(null)
 const form = reactive({
   entry_code: '',
   kb_type: 'DEPT_EXPERTISE',
@@ -136,6 +139,30 @@ async function onCreate() {
     ElMessage.error((e as Error).message || '新增失败')
   } finally {
     saving.value = false
+  }
+}
+
+async function onView(row: KbEntry) {
+  detailVisible.value = true
+  detailLoading.value = true
+  detail.value = null
+  try {
+    detail.value = await kb.get(row.entry_id)
+  } catch (e) {
+    ElMessage.error((e as Error).message || '详情加载失败')
+    detailVisible.value = false
+  } finally {
+    detailLoading.value = false
+  }
+}
+
+function formatJson(value: unknown) {
+  if (value == null) return ''
+  if (typeof value === 'string') return value
+  try {
+    return JSON.stringify(value, null, 2)
+  } catch {
+    return String(value)
   }
 }
 
@@ -348,7 +375,7 @@ onMounted(() => {
     </div>
 
     <section class="table-card" v-loading="loading">
-      <el-table :data="items" row-key="entry_id">
+      <el-table :data="items" row-key="entry_id" @row-click="onView">
         <el-table-column label="条目" min-width="260">
           <template #default="{ row }">
             <div class="entry-cell">
@@ -370,18 +397,25 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="参与检索" width="110">
           <template #default="{ row }">
-            <el-switch
-              :model-value="row.is_active"
-              inline-prompt
-              active-text="开"
-              inactive-text="关"
-              @change="onToggle(row)"
-            />
+            <span @click.stop>
+              <el-switch
+                :model-value="row.is_active"
+                inline-prompt
+                active-text="开"
+                inactive-text="关"
+                @change="onToggle(row)"
+              />
+            </span>
           </template>
         </el-table-column>
         <el-table-column label="更新时间" width="160">
           <template #default="{ row }">
             <span class="muted">{{ row.update_time ? fmtDateTime(row.update_time) : '—' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="76" fixed="right">
+          <template #default="{ row }">
+            <el-button link type="primary" @click.stop="onView(row)">查看</el-button>
           </template>
         </el-table-column>
 
@@ -406,6 +440,48 @@ onMounted(() => {
         />
       </div>
     </section>
+
+    <el-drawer v-model="detailVisible" title="知识条目详情" size="520px" destroy-on-close>
+      <div v-loading="detailLoading" class="detail-body">
+        <template v-if="detail">
+          <div class="detail-head">
+            <span class="entry-type">{{ typeShort[detail.kb_type] || detail.kb_type.slice(0, 2) }}</span>
+            <div class="detail-head__text">
+              <h2>{{ detail.title || detail.entry_code }}</h2>
+              <p class="mono">{{ detail.entry_code }}</p>
+            </div>
+            <el-tag size="small" :type="detail.is_active ? 'success' : 'info'" effect="plain">
+              {{ detail.is_active ? '参与检索' : '未参与' }}
+            </el-tag>
+          </div>
+
+          <div class="detail-meta">
+            <div><span>类型</span><b>{{ typeLabels[detail.kb_type] || detail.kb_type }}</b></div>
+            <div><span>归属科室</span><b>{{ detail.dept_code || '—' }}</b></div>
+            <div><span>版本</span><b class="mono">{{ detail.entry_version || '—' }}</b></div>
+            <div><span>状态</span><b>{{ detail.status || '—' }}</b></div>
+            <div><span>更新时间</span><b>{{ detail.update_time ? fmtDateTime(detail.update_time) : '—' }}</b></div>
+            <div><span>来源</span><b>{{ detail.source || '—' }}</b></div>
+            <div><span>ICD-10</span><b class="mono">{{ detail.icd10_codes?.join(', ') || '—' }}</b></div>
+            <div><span>适用人群</span><b>{{ [detail.age_group, detail.gender].filter(Boolean).join(' / ') || '—' }}</b></div>
+          </div>
+
+          <section class="detail-section">
+            <h3>正文</h3>
+            <pre class="detail-pre">{{ detail.content || '—' }}</pre>
+          </section>
+
+          <section v-if="detail.content_json" class="detail-section">
+            <h3>结构化内容</h3>
+            <pre class="detail-pre">{{ formatJson(detail.content_json) }}</pre>
+          </section>
+        </template>
+        <div v-else-if="!detailLoading" class="detail-empty">没有加载到条目内容</div>
+      </div>
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-drawer>
 
     <el-dialog v-model="dialog" title="新增知识条目" width="560px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
@@ -699,6 +775,106 @@ onMounted(() => {
   font-style: normal;
   font-size: 10.5px;
   color: var(--c-faint);
+}
+
+.table-card :deep(.el-table__row) {
+  cursor: pointer;
+}
+
+.table-card :deep(.el-table__row:hover > td) {
+  background: var(--c-surface-soft) !important;
+}
+
+.detail-body {
+  min-height: 220px;
+}
+
+.detail-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--c-line-soft);
+}
+
+.detail-head__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-head__text h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--c-ink);
+}
+
+.detail-head__text p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--c-faint);
+}
+
+.detail-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 18px;
+  margin-top: 6px;
+}
+
+.detail-meta > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--c-line-soft);
+  font-size: 12px;
+}
+
+.detail-meta span {
+  color: var(--c-muted);
+}
+
+.detail-meta b {
+  font-weight: 500;
+  color: var(--c-ink-soft);
+  text-align: right;
+  word-break: break-all;
+}
+
+.detail-section {
+  margin-top: 20px;
+}
+
+.detail-section h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.detail-pre {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--c-line-soft);
+  border-radius: 10px;
+  background: var(--c-surface-soft);
+  color: var(--c-ink-soft);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+.detail-empty {
+  padding: 60px 0;
+  text-align: center;
+  color: var(--c-faint);
+  font-size: 12px;
 }
 
 .form-grid {
