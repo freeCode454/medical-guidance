@@ -1,75 +1,51 @@
-<view class="home">
-  <view class="greeting">
-    <view class="greeting__text">
-      <text class="greeting__eyebrow">AI 预问诊</text>
-      <text class="greeting__title">你好，{{account}}</text>
-      <text class="greeting__sub">今天身体哪里不舒服？</text>
+<view class="home-chat">
+  <view class="intro">
+    <view class="intro__top">
+      <text class="intro__eyebrow">AI 预问诊</text>
+      <view class="avatar">{{initial}}</view>
     </view>
-    <view class="avatar">{{initial}}</view>
+    <text class="intro__title">你好，{{account}}</text>
+    <text class="intro__desc">描述身体不适，智能助手会先了解情况，再给出就诊建议。</text>
   </view>
 
-  <view class="assistant">
-    <view class="assistant__head">
-      <view class="assistant__badge">AI</view>
-      <view class="assistant__info">
-        <text class="assistant__name">智能导诊助手</text>
-        <text class="assistant__sub">已连接院内知识库 · 仅提供分诊建议</text>
-      </view>
-      <view class="assistant__online">
+  <view class="welcome">
+    <view class="welcome__head">
+      <view class="welcome__badge">AI</view>
+      <text class="welcome__name">智能导诊助手</text>
+      <view class="welcome__online">
         <text class="dot"></text>
         <text>在线</text>
       </view>
     </view>
-
-    <view class="assistant__hello">
-      您好，我是智能导诊助手。请用一句话描述不适，我会像门诊医生一样逐步了解情况。
+    <view class="welcome__bubble">
+      您好，请用一句话告诉我：哪里不舒服、大概多久了？
     </view>
+    <text class="welcome__example">例如：肚子疼三天了，还拉肚子</text>
+  </view>
 
-    <view class="input-wrap {{focused ? 'is-focus' : ''}}">
-      <textarea
-        class="input"
-        value="{{complaint}}"
-        maxlength="300"
-        placeholder="描述症状，例如：肚子疼三天了，还拉肚子"
+  <view class="composer">
+    <view class="input-row">
+      <input
+        class="chat-input"
+        value="{{input}}"
+        placeholder="描述您的不适…"
         placeholder-class="placeholder"
-        auto-height
+        confirm-type="send"
+        cursor-spacing="24"
         bindinput="onInput"
-        bindfocus="onFocus"
-        bindblur="onBlur"
+        bindconfirm="onSend"
       />
-      <text class="count">{{complaint.length}}/300</text>
-    </view>
-
-    <view class="quick">
-      <text class="quick__label">常见症状</text>
-      <view
-        class="quick__chip"
-        wx:for="{{quick}}"
-        wx:key="label"
-        data-text="{{item.text}}"
-        bindtap="onQuick"
-      >{{item.label}}</view>
-    </view>
-
-    <view class="consent" bindtap="toggleConsent">
-      <view class="checkbox {{consent ? 'is-on' : ''}}">
-        <text wx:if="{{consent}}">✓</text>
-      </view>
-      <text>允许医生调阅我的历史预问诊病历</text>
-    </view>
-
-    <view class="action-row">
       <button
-        class="start-btn {{loading ? 'is-disabled' : ''}}"
-        hover-class="start-btn--active"
+        class="send-btn {{loading || !input ? 'is-disabled' : ''}}"
+        hover-class="send-btn--active"
         loading="{{loading}}"
-        disabled="{{loading}}"
-        bindtap="onStart"
+        disabled="{{loading || !input}}"
+        bindtap="onSend"
       >
-        <text>开始问诊</text>
-        <text class="start-btn__arrow">→</text>
+        <text wx:if="{{!loading}}">发送</text>
       </button>
     </view>
+    <text class="composer__note">内容仅用于本次预问诊，医生可查看预问诊记录</text>
   </view>
 
   <bottom-nav active="home" />
