@@ -306,8 +306,6 @@ onMounted(load)
   grid-template-columns: 1fr 1fr;
   gap: 12px 16px;
   margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--c-line-soft);
 }
 
 .fact {
@@ -336,9 +334,8 @@ onMounted(load)
 
 .stat {
   padding: 14px 10px;
-  border: 1px solid var(--c-line);
   border-radius: 14px;
-  background: var(--c-surface);
+  background: var(--c-surface-soft);
   text-align: center;
 }
 
@@ -379,8 +376,8 @@ onMounted(load)
 
 .empty {
   padding: 24px 12px;
-  border: 1px dashed var(--c-line);
   border-radius: 14px;
+  background: var(--c-surface-soft);
   text-align: center;
   color: var(--c-faint);
   font-size: 12px;
@@ -392,9 +389,8 @@ onMounted(load)
   justify-content: space-between;
   gap: 10px;
   padding: 12px 14px;
-  border: 1px solid var(--c-line);
   border-radius: 14px;
-  background: var(--c-surface);
+  background: var(--c-surface-soft);
   margin-bottom: 8px;
 }
 
@@ -438,9 +434,8 @@ onMounted(load)
 
 .record {
   padding: 13px 14px;
-  border: 1px solid var(--c-line);
   border-radius: 14px;
-  background: var(--c-surface);
+  background: var(--c-surface-soft);
   margin-bottom: 8px;
   cursor: pointer;
 }
@@ -484,5 +479,6 @@ onMounted(load)
   margin-top: 6px;
   font-size: 10.5px;
   color: var(--c-primary);
+  text-decoration: none;
 }
 </style>

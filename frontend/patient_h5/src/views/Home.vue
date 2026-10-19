@@ -3,13 +3,13 @@ import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { useSessionStore } from '@/stores/session'
+import { getProfile, type PatientProfile } from '@/api/patient'
 
 const router = useRouter()
 const store = useSessionStore()
 
 const complaint = ref('')
-const gender = ref<'男' | '女' | null>(null)
-const age = ref<number | string | null>(null)
+const profile = ref<PatientProfile | null>(null)
 const loading = ref(false)
 const focused = ref(false)
 const shaking = ref(false)
@@ -20,8 +20,16 @@ const LIMIT = 300
 const count = computed(() => complaint.value.length)
 const nearLimit = computed(() => count.value >= LIMIT - 20)
 
-onMounted(() => {
-  if (!store.hydrateAuth()) router.replace('/login')
+onMounted(async () => {
+  if (!store.hydrateAuth()) {
+    router.replace('/login')
+    return
+  }
+  try {
+    profile.value = await getProfile()
+  } catch {
+    // 资料加载失败不阻断问诊；规则层会跳过人群过滤
+  }
 })
 
 // 常见主诉：点一下填入一句完整描述，降低「不知道怎么写」的门槛
@@ -45,14 +53,6 @@ function fillChip(chip: (typeof chips)[number]) {
   })
 }
 
-function normalizeAge() {
-  if (typeof age.value !== 'number' || !Number.isFinite(age.value)) {
-    age.value = null
-    return
-  }
-  age.value = Math.min(120, Math.max(0, Math.round(age.value)))
-}
-
 function shake() {
   shaking.value = false
   void nextTick(() => {
@@ -70,9 +70,13 @@ async function start() {
     return
   }
 
-  const rawAge = age.value
-  const ageNum =
-    typeof rawAge === 'number' && Number.isFinite(rawAge) ? rawAge : undefined
+  const profileGender =
+    profile.value?.gender_label === '男'
+      ? '男'
+      : profile.value?.gender_label === '女'
+        ? '女'
+        : undefined
+  const ageNum = profile.value?.age ?? undefined
 
   loading.value = true
   try {
@@ -86,7 +90,7 @@ async function start() {
       }
     }
     await store.startSession(text, {
-      gender: gender.value ?? undefined,
+      gender: profileGender,
       age: ageNum,
     })
     router.push('/chat')
@@ -118,13 +122,6 @@ async function start() {
           <em>AI 预问诊 · 患者端</em>
         </span>
       </div>
-      <span class="privacy">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect x="5" y="10" width="14" height="10" rx="3" stroke="currentColor" stroke-width="1.6" />
-          <path d="M8.5 10V7.5a3.5 3.5 0 017 0V10" stroke="currentColor" stroke-width="1.6" />
-        </svg>
-        隐私保护
-      </span>
       <router-link class="account" to="/profile" aria-label="个人中心">
         <span class="account__dot" aria-hidden="true" />
         我的
@@ -221,44 +218,6 @@ async function start() {
             >
               {{ c.label }}
             </button>
-          </div>
-
-          <div class="meta">
-            <div class="meta__field">
-              <span class="meta__label">性别 <em>选填</em></span>
-              <div class="seg" role="group" aria-label="性别">
-                <button
-                  v-for="g in (['男', '女'] as const)"
-                  :key="g"
-                  type="button"
-                  class="seg__btn"
-                  :class="{ 'is-on': gender === g }"
-                  :aria-pressed="gender === g"
-                  @click="gender = gender === g ? null : g"
-                >
-                  {{ g }}
-                </button>
-              </div>
-            </div>
-
-            <div class="meta__field">
-              <label class="meta__label" for="age">年龄 <em>选填</em></label>
-              <div class="age">
-                <input
-                  id="age"
-                  v-model.number="age"
-                  class="age__input tnum"
-                  type="number"
-                  inputmode="numeric"
-                  min="0"
-                  max="120"
-                  placeholder="例如 32"
-                  autocomplete="off"
-                  @blur="normalizeAge"
-                />
-                <span class="age__unit">岁</span>
-              </div>
-            </div>
           </div>
 
           <label class="consent">
@@ -370,25 +329,6 @@ async function start() {
   letter-spacing: 0.08em;
 }
 
-.privacy {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
-  border: 1px solid var(--c-line);
-  border-radius: var(--r-pill);
-  background: rgba(255, 253, 249, 0.7);
-  font-size: 12px;
-  color: var(--c-ink-soft);
-  backdrop-filter: blur(6px);
-}
-
-.privacy svg {
-  width: 13px;
-  height: 13px;
-  color: var(--c-primary);
-}
-
 .account {
   display: inline-flex;
   align-items: center;
@@ -408,12 +348,6 @@ async function start() {
   height: 6px;
   border-radius: 50%;
   background: var(--c-primary);
-}
-
-@media (max-width: 720px) {
-  .privacy {
-    display: none;
-  }
 }
 
 /* ---------- 布局 ---------- */
