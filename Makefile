@@ -116,6 +116,12 @@ test-unit:  ## 后端单元测试（不依赖数据库/模型/向量库）
 test-e2e:  ## 端到端冒烟（需后端 + PostgreSQL + Milvus + LLM）
 	cd backend && $(PY) -m pytest tests/test_e2e_smoke.py -q
 
+checkpoint-clean-dry:  ## 预览将清理的检查点（默认保留 30 天）
+	cd backend && $(PY) scripts/cleanup_checkpoints.py --days 30 --dry-run
+
+checkpoint-clean:  ## 清理超过 30 天的已结束会话检查点
+	cd backend && $(PY) scripts/cleanup_checkpoints.py --days 30
+
 front-check:  ## 三端前端类型检查 + 构建
 	cd frontend/patient_h5 && npm run typecheck && npm run build
 	cd frontend/doctor_web && npm run typecheck && npm run build
@@ -129,4 +135,4 @@ verify:  ## 提交前一次跑完：lint + 单测 + 三端构建
 .PHONY: help db-up vector-up cache-up storage-up infra-down infra-logs \
         db-verify db-tables db-reset install dev dev-reload check ready \
         kb-gen kb-import kg-build kg-dept-network neo4j \
-        lint fmt typecheck test-unit test-e2e front-check verify
+        lint fmt typecheck test-unit test-e2e checkpoint-clean-dry checkpoint-clean front-check verify
