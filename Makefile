@@ -88,7 +88,10 @@ ready:  ## 检查依赖是否就绪（PostgreSQL + Milvus）
 kb-gen:  ## 生成知识库源数据 Excel（kb/医学知识库源数据.xlsx）
 	cd backend && $(PY) scripts/gen_kb_excel.py
 
-kb-import:  ## Excel → PostgreSQL + Milvus + kb/rules.json
+kb-enrich:  ## 清洗 Excel 并生成疾病知识卡/症状别名/科室导诊卡/知识条目清单
+	cd backend && $(PY) scripts/enrich_kb_excel.py
+
+kb-import: kb-enrich  ## Excel → PostgreSQL + Milvus + kb/rules.json（先清洗丰富）
 	cd backend && $(PY) scripts/import_kb.py
 
 kg-build:  ## 从 Excel 抽三元组构建 Neo4j 知识图谱（需 Neo4j 运行）
@@ -134,5 +137,5 @@ verify:  ## 提交前一次跑完：lint + 单测 + 三端构建
 
 .PHONY: help db-up vector-up cache-up storage-up infra-down infra-logs \
         db-verify db-tables db-reset install dev dev-reload check ready \
-        kb-gen kb-import kg-build kg-dept-network neo4j \
+        kb-gen kb-enrich kb-import kg-build kg-dept-network neo4j \
         lint fmt typecheck test-unit test-e2e checkpoint-clean-dry checkpoint-clean front-check verify

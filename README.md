@@ -19,7 +19,7 @@
 
 | 项目 | 结果 | 位置 |
 |---|---|---|
-| 后端单元测试 | 75 passed | [`backend/tests/unit`](backend/tests/unit) |
+| 后端单元测试 | 76 passed | [`backend/tests/unit`](backend/tests/unit) |
 | 静态检查 | ruff 0 / mypy 0 | [CI](.github/workflows/ci.yml) |
 | 端到端冒烟 | 完整问诊 + 红旗拦截（需真实 PG/Milvus/LLM） | [`test_e2e_smoke.py`](backend/tests/test_e2e_smoke.py) |
 | 检查点恢复 | interrupt → 新连接 → resume（真实 PostgreSQL） | [`tests/integration`](backend/tests/integration) |
@@ -63,7 +63,7 @@
 4. **一致性**：会话消息序号用 PostgreSQL advisory lock 串行化；分诊/病历落库幂等；后台任务异常不再静默。
 5. **检查点持久化**：LangGraph 挂起态落 PostgreSQL（`AsyncPostgresSaver`），服务重启/多 worker 后患者回答仍能继续追问；
    Windows 用 `python -m app` 启动以避开 Proactor 事件循环限制。
-6. **质量门禁**：ruff + mypy + 75 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
+6. **质量门禁**：ruff + mypy + 76 个单测 + 三端 typecheck/build，GitHub Actions 每次 push/PR 全跑；
    `pre-commit` 本地对齐。
 7. **隐私授权**：患者显式授权（scope / 有效期 / 撤回），医生调阅历史病历前强制校验；
    无授权返回空列表并写审计，不泄露"有无病历"。
@@ -158,6 +158,7 @@ make ready                # /readyz：PostgreSQL + Milvus 是否就绪
 # 5. 演示数据（Excel 已在 kb/，可跳过 gen）
 cd backend
 python scripts/seed_dev.py
+python scripts/enrich_kb_excel.py      # 清洗 + 疾病知识卡/别名/科室导诊卡/知识条目清单
 python scripts/import_kb.py
 python scripts/init_dev_passwords.py   # ⚠️ 种子哈希是占位符，不跑无法登录
 python scripts/build_kg.py             # 可选，需 Neo4j
@@ -187,7 +188,7 @@ cd frontend/admin_web  && npm install && npm run dev   # 5175
 ```bash
 make lint         # ruff
 make typecheck    # mypy（基线）
-make test-unit    # 75 个单测，不依赖外部服务
+make test-unit    # 76 个单测，不依赖外部服务
 make front-check  # 三端 typecheck + build
 make verify       # 以上一次跑完
 
@@ -207,7 +208,6 @@ CI 见 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端 lint/type
 
 - 设备密钥保存在 localStorage，存在 XSS 读取风险；高风险操作尚未二次校验；
 - 检查点已落 PostgreSQL 并使用连接池（1~5）；保留期清理脚本已提供，需由运维配置定时调度；
-- 知识库科室向量已可由后台任务重建；指南/药品/病例等集合尚未接入向量入库；
 - WebSocket 票据与事件总线仍在进程内，多实例部署和断线重放还未实现；
 - 医生端/管理后台首屏包体偏大（Element Plus 全量）。
 
@@ -220,6 +220,7 @@ CI 见 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端 lint/type
 | [03-数据库设计说明书](docs/03-数据库设计说明书.md) | 23 张表、索引、Redis 键、RLS |
 | [04-API接口设计说明书](docs/04-API接口设计说明书.md) | REST/WS 接口与错误码 |
 | [05-工程质量报告](docs/05-工程质量报告.md) | 本轮审计、修复、未修项与数字口径 |
+| [06-知识库数据质量报告](docs/06-知识库数据质量报告.md) | 全 sheet 清洗、派生表、重复/冲突与向量集合映射 |
 
 ## License
 

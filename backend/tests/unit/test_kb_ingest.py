@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from app.common.exceptions import BizError
-from app.services.kb_ingest import rebuild_dept_vectors
+from app.services.kb_ingest import _row_for, rebuild_dept_vectors
 
 
 class _Scalars:
@@ -79,3 +79,46 @@ async def test_rebuild_rejects_empty_active_set() -> None:
             embedder=_Embedder(),
             store=_Store(),
         )
+
+
+def test_row_mapping_for_all_collections() -> None:
+    entry = SimpleNamespace(
+        id="a" * 32,
+        dept_code="DIG",
+        title="急性胃肠炎",
+        content="腹痛腹泻",
+        icd10_codes=["A09.9"],
+        age_group="adult",
+        gender="1",
+        content_json={
+            "evidence_level": "A",
+            "year": 2021,
+            "chapter": "第十一章",
+            "drug_name": "阿莫西林",
+            "severity": "HIGH",
+        },
+    )
+    emb = SimpleNamespace(dense=[0.1], sparse={1: 0.2})
+
+    dept = _row_for("dept", entry, "text", emb, "t1")
+    assert dept["id"] == "dept_DIG"
+    assert dept["dept_name"] == "急性胃肠炎"
+
+    symptom = _row_for("symptom", entry, "text", emb, "t1")
+    assert symptom["icd10_code"] == "A09.9"
+    assert symptom["age_group"] == "adult"
+
+    guideline = _row_for("guideline", entry, "text", emb, "t1")
+    assert guideline["evidence_level"] == "A"
+    assert guideline["pub_year"] == "2021"
+
+    icd = _row_for("icd10", entry, "text", emb, "t1")
+    assert "tenant_id" not in icd
+    assert icd["chapter"] == "第十一章"
+
+    drug = _row_for("drug", entry, "text", emb, "t1")
+    assert drug["drug_name"] == "阿莫西林"
+    assert drug["taboo_type"] == "HIGH"
+
+    case = _row_for("case", entry, "text", emb, "t1")
+    assert case["dept_code"] == "DIG"

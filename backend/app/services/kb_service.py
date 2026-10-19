@@ -505,11 +505,12 @@ async def trigger_ingest(db: AsyncSession, *, tenant_id: str, actor_id: str) -> 
     total = await db.scalar(
         select(func.count()).select_from(KbEntry).where(
             KbEntry.tenant_id == tenant_id,
-            KbEntry.kb_type == "DEPT_EXPERTISE",
             KbEntry.is_active == "1",
             KbEntry.del_flag == "0",
-            KbEntry.dept_code.is_not(None),
-            ~KbEntry.dept_code.contains("-"),
+            or_(
+                KbEntry.kb_type != "DEPT_EXPERTISE",
+                ~KbEntry.dept_code.contains("-"),
+            ),
         )
     )
     task = KbIngestTask(

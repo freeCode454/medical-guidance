@@ -19,6 +19,7 @@ from app.common.error_codes import KB_ENTRY_INVALID
 from app.common.exceptions import BizError
 from app.models import KbEntry, KbIngestTask
 from app.retrieval import KB_DEPT
+from app.retrieval.collections import KB_CASE, KB_DRUG, KB_GUIDELINE, KB_ICD10, KB_SYMPTOM
 
 _ACTIVE_DEPT_ENTRY = (
     KbEntry.kb_type == "DEPT_EXPERTISE",
@@ -100,6 +101,139 @@ async def rebuild_dept_vectors(
     }
 
 
+_PLANS: tuple[tuple[Any, tuple[str, ...], str], ...] = (
+    (KB_DEPT, ("DEPT_EXPERTISE",), "dept"),
+    (KB_SYMPTOM, ("SYMPTOM_DISEASE",), "symptom"),
+    (KB_GUIDELINE, ("GUIDELINE", "GUIDELINE_REC"), "guideline"),
+    (KB_ICD10, ("ICD-10",), "icd10"),
+    (KB_DRUG, ("DRUG_SAFETY",), "drug"),
+    (KB_CASE, ("CASE",), "case"),
+)
+
+
+def _vector_id(kind: str, entry: KbEntry) -> str:
+    if kind == "dept":
+        return f"dept_{entry.dept_code}"
+    return f"kb_{entry.id}"
+
+
+def _row_for(kind: str, entry: KbEntry, text: str, embedding: Any, tenant_id: str) -> dict:
+    meta = entry.content_json or {}
+    base = {
+        "id": _vector_id(kind, entry),
+        "dense": embedding.dense,
+        "sparse": embedding.sparse or {},
+        "text": text[:4000],
+        "tenant_id": tenant_id,
+    }
+    if kind == "dept":
+        base.update(dept_code=entry.dept_code, dept_name=(entry.title or entry.dept_code or "")[:64])
+    elif kind == "symptom":
+        base.update(
+            dept_code=(entry.dept_code or "")[:32],
+            icd10_code=((entry.icd10_codes or [""])[0])[:16],
+            age_group=(entry.age_group or "all")[:16],
+            gender=(entry.gender or "0")[:1],
+        )
+    elif kind == "guideline":
+        base.update(
+            icd10_code=((entry.icd10_codes or [""])[0])[:16],
+            evidence_level=str(meta.get("evidence_level", ""))[:16],
+            pub_year=str(meta.get("year", ""))[:8],
+        )
+    elif kind == "icd10":
+        base.pop("tenant_id", None)  # ICD-10 全局共享，不分区
+        base.update(chapter=str(meta.get("chapter", ""))[:64], alias=(entry.title or "")[:64])
+    elif kind == "drug":
+        base.update(
+            drug_name=str(meta.get("drug_name") or entry.title or "")[:64],
+            taboo_type=str(meta.get("severity", ""))[:16],
+        )
+    elif kind == "case":
+        base.update(dept_code=(entry.dept_code or "")[:32], diagnosis=(entry.title or "")[:64])
+    return base
+
+
+async def _load_entries(
+    db: AsyncSession, tenant_id: str, types: tuple[str, ...], dept_only: bool = False
+) -> list[KbEntry]:
+    conds = [
+        KbEntry.tenant_id == tenant_id,
+        KbEntry.kb_type.in_(types),
+        KbEntry.is_active == "1",
+        KbEntry.del_flag == "0",
+    ]
+    if dept_only:
+        conds.extend([KbEntry.dept_code.is_not(None), ~KbEntry.dept_code.contains("-")])
+    return list(
+        (
+            await db.scalars(
+                select(KbEntry).where(*conds).order_by(KbEntry.entry_code)
+            )
+        ).all()
+    )
+
+
+async def rebuild_all_vectors(
+    db: AsyncSession,
+    *,
+    tenant_id: str,
+    embedder: Any,
+    store: Any,
+    progress_cb: Callable[[int], Awaitable[None]] | None = None,
+) -> dict:
+    """按知识类型重建全部向量集合（科室/疾病症状/指南/ICD/用药/病例）。"""
+    plans: list[tuple[Any, str, list[KbEntry]]] = []
+    for spec, types, kind in _PLANS:
+        entries = await _load_entries(db, tenant_id, types, dept_only=kind == "dept")
+        if entries:
+            plans.append((spec, kind, entries))
+
+    total = sum(len(entries) for _, _, entries in plans)
+    if total == 0:
+        raise BizError(KB_ENTRY_INVALID, "没有启用的知识条目，无法重建索引")
+
+    upserted = deleted = done = 0
+    for spec, kind, entries in plans:
+        texts = [f"{e.title or e.entry_code}\n{(e.content or '')[:3800]}" for e in entries]
+        # 只把前 240 字送进模型：知识条目的核心语义集中在开头，
+        # 避免对 3000+ 字长文做完整 tokenize 导致入库耗时失控。
+        embed_texts = [text[:240] for text in texts]
+        embeddings = []
+        for start in range(0, len(embed_texts), 32):
+            batch = await embedder.embed(embed_texts[start : start + 32])
+            embeddings.extend(batch)
+            done += len(batch)
+            if progress_cb is not None:
+                await progress_cb(20 + int(60 * done / total))
+
+        rows = [
+            _row_for(kind, entry, texts[idx], emb, tenant_id)
+            for idx, (entry, emb) in enumerate(zip(entries, embeddings, strict=False))
+        ]
+        if not spec.has_sparse:
+            for row in rows:
+                row.pop("sparse", None)
+        await asyncio.to_thread(store.ensure_ready, spec)
+        await asyncio.to_thread(store.upsert, spec, rows)
+        filter_expr = "" if kind == "icd10" else f'tenant_id == "{tenant_id}"'
+        existing = await asyncio.to_thread(store.list_ids, spec, filter_expr)
+        active_ids = {row["id"] for row in rows}
+        stale = sorted(set(existing) - active_ids)
+        if stale:
+            await asyncio.to_thread(store.delete, spec, stale)
+            await asyncio.to_thread(store.flush, spec)
+        upserted += len(rows)
+        deleted += len(stale)
+
+    return {
+        "total": total,
+        "upserted": upserted,
+        "deleted": deleted,
+        "collections": [spec.name for spec, _, _ in plans],
+    }
+
+
 async def run_ingest_task(
     task_id: str, *, tenant_id: str, embedder: Any, store: Any
 ) -> None:
@@ -124,7 +258,7 @@ async def run_ingest_task(
             await db.commit()
 
         try:
-            result = await rebuild_dept_vectors(
+            result = await rebuild_all_vectors(
                 db,
                 tenant_id=tenant_id,
                 embedder=embedder,

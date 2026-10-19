@@ -96,6 +96,13 @@ class MilvusStore:
         self._client.upsert(spec.name, rows)
         self._client.flush(spec.name)  # insert 是异步的，必须 flush
 
+    def ensure_ready(self, spec: VectorCollection) -> None:
+        """确保集合与索引存在并已加载（幂等）。"""
+        if self.ensure_collection(spec):
+            self.create_index(spec)
+        else:
+            self._client.load_collection(spec.name)
+
     def delete(self, spec: VectorCollection, ids: list[str]) -> None:
         if ids:
             self._client.delete(spec.name, ids=ids)
@@ -107,6 +114,8 @@ class MilvusStore:
         self, spec: VectorCollection, filter_expr: str = "", limit: int = 16384
     ) -> list[str]:
         """列出集合内满足过滤条件的 id（用于重建后清理陈旧向量）。"""
+        if not self._client.has_collection(spec.name):
+            return []
         rows = self._client.query(
             spec.name,
             filter=filter_expr or "",

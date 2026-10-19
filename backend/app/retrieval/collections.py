@@ -72,7 +72,7 @@ KB_GUIDELINE = VectorCollection(
 KB_ICD10 = VectorCollection(
     name="kb_icd10",
     has_sparse=False,
-    scalar_fields=(("text", "varchar4096"), ("chapter", "varchar16"), ("alias", "varchar64")),
+    scalar_fields=(("text", "varchar4096"), ("chapter", "varchar64"), ("alias", "varchar64")),
     partition_key=None,  # 编码是行业标准，全局共享，不归属机构
     description="编码对照：ICD-10 编码对齐（F56）",
 )

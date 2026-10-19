@@ -50,81 +50,92 @@ def _kv(keys: list[str], row: list) -> dict:
 
 
 async def import_entries() -> None:
-    """把知识库类数据写入 mg_kb_entry（全量替换：先清理脚本生成的旧数据）。"""
-    # (sheet, keys, kb_type, entry_code_prefix, content 字段)
-    plans = [
-        ("科室字典", ["dept_code", "dept_name", "aliases", "expertise", "sub_specialty", "related_diseases"],
-         "DEPT_EXPERTISE", "DEPT", ["dept_name", "expertise", "related_diseases"]),
-        ("疾病特征库", ["disease_name", "dept_code", "symptoms", "differential", "risk_factors"],
-         "SYMPTOM_DISEASE", "DISEASE", ["disease_name", "symptoms", "differential"]),
-        ("临床指南", ["dept_code", "title", "content", "evidence_level", "year", "source"],
-         "GUIDELINE", "GUIDE", ["title", "content"]),
-        ("指南推荐意见",
-         ["dept_code", "disease_name", "recommendation", "evidence_level",
-          "recommendation_strength", "population", "scene", "guideline_source", "year"],
-         "GUIDELINE_REC", "GUIDEREC", ["disease_name", "recommendation", "scene", "population"]),
-        ("ICD-10映射", ["disease_name", "icd10_code", "chapter", "inclusion", "exclusion"],
-         "ICD-10", "ICD10", ["disease_name", "icd10_code", "inclusion"]),
-        ("症状本体库", ["standard_name", "synonyms", "body_part", "duration"],
-         "SYMPTOM_DISEASE", "SYMPTOM", ["standard_name", "synonyms", "body_part"]),
-        ("禁忌症与用药风险", ["drug_name", "allergy_item", "severity", "suggestion", "population", "note"],
-         "DRUG_SAFETY", "DRUG", ["drug_name", "allergy_item", "suggestion"]),
+    """从「知识条目清单」全量导入 mg_kb_entry。
+
+    清单由 scripts/enrich_kb_excel.py 生成，已把科室、疾病、指南、推荐、ICD、
+    症状、用药风险统一成可入库的条目，并带上 content_json / icd10 / source。
+    """
+    catalog = _rows("知识条目清单")
+    if not catalog:
+        raise SystemExit(
+            "知识条目清单为空：请先运行 python scripts/enrich_kb_excel.py"
+        )
+
+    keys = [
+        "entry_code", "kb_type", "vector_collection", "title", "content",
+        "dept_code", "icd10_codes", "age_group", "gender", "source", "content_json",
     ]
+    prefixes = ("DEPT", "DISEASE", "GUIDE", "GUIDEREC", "ICD10", "SYMPTOM", "DRUG")
 
     total = 0
     async with AsyncSessionFactory() as db:
-        # 清理脚本生成的旧条目（按 entry_code 前缀），保证全量替换
-        prefixes = [p for _, _, _, p, _ in plans]
-        old = (await db.scalars(
-            select(KbEntry).where(KbEntry.tenant_id == DEFAULT_TENANT_ID)
-        )).all()
+        old = (
+            await db.scalars(
+                select(KbEntry).where(KbEntry.tenant_id == DEFAULT_TENANT_ID)
+            )
+        ).all()
         removed = 0
-        for e in old:
-            code = e.entry_code or ""
-            if any(code.startswith(pfx + "-") for pfx in prefixes):
-                await db.delete(e)
+        for entry in old:
+            code = entry.entry_code or ""
+            if any(code.startswith(prefix + "-") for prefix in prefixes):
+                await db.delete(entry)
                 removed += 1
         if removed:
             await db.flush()
             print(f"清理旧条目 {removed} 条")
 
-        for sheet, keys, kb_type, prefix, content_fields in plans:
-            rows = _rows(sheet)
-            for idx, row in enumerate(rows, start=1):
-                d = _kv(keys, row)
-                entry_code = f"{prefix}-{idx:03d}"
-                if kb_type == "DEPT_EXPERTISE":
-                    entry_code = f"{prefix}-{d['dept_code']}"
-                content = " ".join(d.get(f, "") for f in content_fields)
-
-                existing = await db.scalar(
-                    select(KbEntry).where(
-                        KbEntry.tenant_id == DEFAULT_TENANT_ID, KbEntry.entry_code == entry_code
+        for row in catalog:
+            data = _kv(keys, row)
+            entry_code = data["entry_code"]
+            icd_codes = [c for c in data["icd10_codes"].split("|") if c]
+            try:
+                content_json = json.loads(data["content_json"]) if data["content_json"] else {}
+            except json.JSONDecodeError:
+                content_json = {}
+            title = data["title"] or data["entry_code"]
+            entry = await db.scalar(
+                select(KbEntry).where(
+                    KbEntry.tenant_id == DEFAULT_TENANT_ID,
+                    KbEntry.entry_code == entry_code,
+                )
+            )
+            if entry is not None:
+                entry.kb_type = data["kb_type"]
+                entry.title = title
+                entry.content = data["content"]
+                entry.content_json = content_json
+                entry.dept_code = data["dept_code"] or None
+                entry.icd10_codes = icd_codes or None
+                entry.age_group = data["age_group"] or "all"
+                entry.gender = data["gender"] or "0"
+                entry.source = data["source"] or None
+                entry.entry_version = "v2"
+                entry.status = "1"
+                entry.is_active = "1"
+            else:
+                db.add(
+                    KbEntry(
+                        id=gen_id(),
+                        tenant_id=DEFAULT_TENANT_ID,
+                        kb_type=data["kb_type"],
+                        entry_code=entry_code,
+                        title=title,
+                        content=data["content"],
+                        content_json=content_json,
+                        dept_code=data["dept_code"] or None,
+                        icd10_codes=icd_codes or None,
+                        age_group=data["age_group"] or "all",
+                        gender=data["gender"] or "0",
+                        source=data["source"] or None,
+                        entry_version="v2",
+                        status="1",
+                        is_active="1",
+                        create_by="system",
                     )
                 )
-                if existing is not None:
-                    existing.content = content
-                    existing.content_json = d
-                    existing.dept_code = d.get("dept_code") or None
-                else:
-                    db.add(
-                        KbEntry(
-                            id=gen_id(),
-                            tenant_id=DEFAULT_TENANT_ID,
-                            kb_type=kb_type,
-                            entry_code=entry_code,
-                            title=d.get("title") or d.get("dept_name") or d.get("disease_name") or d.get("standard_name") or d.get("drug_name"),
-                            content=content,
-                            content_json=d,
-                            dept_code=d.get("dept_code") or None,
-                            status="1",  # 已发布
-                            is_active="1",  # 参与检索
-                            create_by="system",
-                        )
-                    )
-                total += 1
+            total += 1
         await db.commit()
-    print(f"mg_kb_entry 导入 {total} 条（幂等）")
+    print(f"mg_kb_entry 导入 {total} 条（来自知识条目清单）")
 
 
 async def import_dept_vectors(embedder, store: MilvusStore) -> None:
