@@ -60,7 +60,7 @@
 
     <view class="action-row">
       <button
-        class="start-btn"
+        class="start-btn {{loading ? 'is-disabled' : ''}}"
         hover-class="start-btn--active"
         loading="{{loading}}"
         disabled="{{loading}}"
@@ -79,7 +79,7 @@
   <view class="services">
     <view class="service" bindtap="goProfile">
       <view class="service__icon service__icon--green">
-        <image src="/assets/icon-calendar.png" mode="aspectFit" />
+        <image class="service__icon-img" src="/assets/icon-calendar.png" mode="aspectFit" />
       </view>
       <view class="service__body">
         <text class="service__name">预约记录</text>
@@ -89,7 +89,7 @@
     </view>
     <view class="service" bindtap="goProfile">
       <view class="service__icon service__icon--blue">
-        <image src="/assets/icon-file.png" mode="aspectFit" />
+        <image class="service__icon-img" src="/assets/icon-file.png" mode="aspectFit" />
       </view>
       <view class="service__body">
         <text class="service__name">历史病历</text>
@@ -99,7 +99,7 @@
     </view>
     <view class="service" bindtap="goProfile">
       <view class="service__icon service__icon--amber">
-        <image src="/assets/icon-user.png" mode="aspectFit" />
+        <image class="service__icon-img" src="/assets/icon-user.png" mode="aspectFit" />
       </view>
       <view class="service__body">
         <text class="service__name">个人资料</text>

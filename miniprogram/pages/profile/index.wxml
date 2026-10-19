@@ -47,7 +47,7 @@
     </view>
 
     <view class="section-head">
-      <text>挂号记录</text>
+      <text class="section-head__title">挂号记录</text>
       <text class="section-head__count">{{appointments.length}} 条</text>
     </view>
     <view wx:if="{{!appointments.length}}" class="empty-card">还没有预约记录</view>
@@ -61,7 +61,7 @@
     </view>
 
     <view class="section-head">
-      <text>历史病历</text>
+      <text class="section-head__title">历史病历</text>
       <text class="section-head__count">{{records.length}} 份</text>
     </view>
     <view wx:if="{{!records.length}}" class="empty-card">还没有生成过预问诊病历</view>

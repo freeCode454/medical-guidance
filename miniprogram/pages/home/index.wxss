@@ -254,7 +254,7 @@
   transform: translateY(1rpx);
 }
 
-.start-btn[disabled] {
+.start-btn.is-disabled {
   opacity: 0.6;
   box-shadow: none;
 }
@@ -299,7 +299,7 @@
   justify-content: center;
 }
 
-.service__icon image {
+.service__icon-img {
   width: 36rpx;
   height: 36rpx;
 }

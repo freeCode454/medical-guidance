@@ -1,49 +1,110 @@
 <view class="chat-page">
-  <view class="chat-head">
-    <view class="chat-status">
-      <text class="status-dot"></text>
-      <text>问诊中</text>
+  <view class="chat-top">
+    <view class="assistant-row">
+      <view class="ai-avatar">AI</view>
+      <view class="assistant-meta">
+        <text class="assistant-name">智能导诊助手</text>
+        <view class="assistant-status">
+          <text class="status-dot"></text>
+          <text>正在了解您的症状</text>
+        </view>
+      </view>
+      <text wx:if="{{rounds}}" class="rounds">{{rounds}} 轮</text>
     </view>
-    <text class="chat-rounds">已追问 {{rounds}} 轮</text>
   </view>
 
-  <scroll-view class="chat-scroll" scroll-y scroll-into-view="{{scrollId}}" scroll-with-animation>
-    <view wx:if="{{loading}}" class="empty">正在加载对话…</view>
-    <view wx:elif="{{!messages.length}}" class="empty">正在准备第一个问题…</view>
+  <scroll-view
+    class="chat-scroll"
+    scroll-y
+    scroll-into-view="{{scrollId}}"
+    scroll-with-animation
+    enhanced
+    show-scrollbar="{{false}}"
+  >
+    <view class="day-label">本次问诊</view>
+
+    <view wx:if="{{loading}}" class="empty-tip">正在加载对话…</view>
+    <view wx:elif="{{!messages.length}}" class="empty-tip">正在准备第一个问题…</view>
 
     <view
       wx:for="{{messages}}"
       wx:key="message_id"
       id="m{{index}}"
-      class="msg {{item.isPatient ? 'patient' : 'ai'}}"
+      class="msg {{item.isPatient ? 'msg--me' : 'msg--ai'}}"
     >
-      <view class="avatar">{{item.isPatient ? '我' : 'AI'}}</view>
+      <view class="msg-avatar">{{item.isPatient ? '我' : 'AI'}}</view>
       <view class="msg-body">
-        <view class="role">{{item.roleLabel}}</view>
-        <view class="bubble"><text>{{item.content}}</text></view>
+        <text class="msg-role">{{item.roleLabel}}</text>
+        <view class="bubble">
+          <text>{{item.content}}</text>
+        </view>
       </view>
     </view>
 
-    <view wx:if="{{sending}}" class="msg ai">
-      <view class="avatar">AI</view>
+    <view wx:if="{{sending}}" class="msg msg--ai">
+      <view class="msg-avatar">AI</view>
       <view class="msg-body">
-        <view class="role">智能助手</view>
-        <view class="bubble typing">正在思考…</view>
+        <text class="msg-role">智能助手</text>
+        <view class="bubble bubble--typing">
+          <view class="typing-dots"><text class="typing-dot"></text><text class="typing-dot"></text><text class="typing-dot"></text></view>
+          <text>正在整理问题</text>
+        </view>
       </view>
     </view>
+
+    <view class="scroll-bottom"></view>
   </scroll-view>
 
   <view class="composer">
-    <input
-      class="composer-input"
-      value="{{input}}"
-      placeholder="说说您的感受…"
-      confirm-type="send"
-      bindinput="onInput"
-      bindconfirm="onSend"
-    />
-    <button class="send" loading="{{sending}}" disabled="{{sending}}" bindtap="onSend">发送</button>
-  </view>
+    <view wx:if="{{hasTriage}}" class="result-banner" bindtap="onResult">
+      <view class="result-banner__left">
+        <text class="result-banner__dot"></text>
+        <view>
+          <text class="result-banner__title">分诊建议已生成</text>
+          <text class="result-banner__sub">查看推荐科室与预问诊病历</text>
+        </view>
+      </view>
+      <text class="result-banner__arrow">›</text>
+    </view>
 
-  <button wx:if="{{hasTriage}}" class="result-btn" bindtap="onResult">查看分诊结果</button>
+    <scroll-view
+      wx:if="{{messages.length && !hasTriage}}"
+      class="quick-replies"
+      scroll-x
+      show-scrollbar="{{false}}"
+    >
+      <view
+        class="quick-reply"
+        wx:for="{{quickReplies}}"
+        wx:key="*this"
+        data-text="{{item}}"
+        bindtap="onQuickReply"
+      >{{item}}</view>
+    </scroll-view>
+
+    <view class="input-row">
+      <input
+        class="chat-input"
+        value="{{input}}"
+        placeholder="说说您的感受…"
+        placeholder-class="placeholder"
+        confirm-type="send"
+        adjust-position
+        cursor-spacing="24"
+        bindinput="onInput"
+        bindconfirm="onSend"
+      />
+      <button
+        class="send-btn {{sending || !input ? 'is-disabled' : ''}}"
+        hover-class="send-btn--active"
+        loading="{{sending}}"
+        disabled="{{sending || !input}}"
+        bindtap="onSend"
+      >
+        <text wx:if="{{!sending}}" class="send-arrow">↑</text>
+      </button>
+    </view>
+
+    <text class="composer-note">内容仅用于本次问诊，医生可查看预问诊记录</text>
+  </view>
 </view>

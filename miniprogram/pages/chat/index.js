@@ -18,7 +18,8 @@ Page({
     rounds: 0,
     loading: true,
     sending: false,
-    scrollId: ''
+    scrollId: '',
+    quickReplies: ['没有', '有一点', '不确定']
   },
 
   onLoad(options) {
@@ -104,7 +105,15 @@ Page({
   },
 
   async onSend() {
-    const content = this.data.input.trim()
+    await this.sendContent(this.data.input)
+  },
+
+  async onQuickReply(e) {
+    await this.sendContent(e.currentTarget.dataset.text || '')
+  },
+
+  async sendContent(raw) {
+    const content = String(raw || '').trim()
     if (!content || this.data.sending) return
     this.setData({ sending: true, input: '' })
     try {

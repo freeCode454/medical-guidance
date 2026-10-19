@@ -110,7 +110,7 @@
   margin: 34rpx 6rpx 14rpx;
 }
 
-.section-head > text:first-child {
+.section-head__title {
   font-size: 27rpx;
   font-weight: 600;
   color: #1d2a28;
