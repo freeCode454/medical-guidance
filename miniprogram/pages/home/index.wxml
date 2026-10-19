@@ -21,6 +21,10 @@
       </view>
     </view>
 
+    <view class="assistant__hello">
+      您好，我是智能导诊助手。请用一句话描述不适，我会像门诊医生一样逐层追问。
+    </view>
+
     <view class="input-wrap {{focused ? 'is-focus' : ''}}">
       <textarea
         class="input"
@@ -54,9 +58,22 @@
       <text>允许医生调阅我的历史预问诊病历</text>
     </view>
 
-    <button class="start-btn" loading="{{loading}}" disabled="{{loading}}" bindtap="onStart">
-      开始问诊
-    </button>
+    <view class="action-row">
+      <view class="action-meta">
+        <text class="action-meta__dot"></text>
+        <text>约 3 分钟 · 逐层追问</text>
+      </view>
+      <button
+        class="start-btn"
+        hover-class="start-btn--active"
+        loading="{{loading}}"
+        disabled="{{loading}}"
+        bindtap="onStart"
+      >
+        <text>开始问诊</text>
+        <text class="start-btn__arrow">→</text>
+      </button>
+    </view>
   </view>
 
   <view class="section-head">
