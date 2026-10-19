@@ -1,10 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getToken, getTokenRole } from '@/api/client'
 
+const LOGIN_URL = 'http://127.0.0.1:5173/login'
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/login', name: 'login', component: () => import('@/views/Login.vue') },
+    {
+      path: '/auth-callback',
+      name: 'auth-callback',
+      component: () => import('@/views/AuthCallback.vue'),
+    },
     { path: '/', redirect: () => (getTokenRole() === 'KB_ADMIN' ? '/kb' : '/users') },
     {
       path: '/users',
@@ -47,9 +53,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  if (to.name === 'login') return true
+  if (to.name === 'auth-callback') return true
   if (!getToken()) {
-    return { name: 'login', query: { redirect: to.fullPath } }
+    const next = encodeURIComponent(window.location.href)
+    window.location.replace(`${LOGIN_URL}?redirect=${next}`)
+    return false
   }
   const allowed = to.meta.roles as string[] | undefined
   const role = getTokenRole()

@@ -67,6 +67,13 @@ class PatientAuthResponse(BaseModel):
     need_verify_before: list[str] = Field(default_factory=lambda: ["APPOINTMENT", "EMR_ACCESS"])
 
 
+class UnifiedLoginRequest(BaseModel):
+    """统一登录：账号密码由后端判断患者 / 医生 / 管理员。"""
+
+    account: str = Field(min_length=4, max_length=64)
+    password: str = Field(min_length=8, max_length=64)
+
+
 # --- 院内用户登录（12.1.4） ---------------------------------------------
 
 
@@ -109,3 +116,16 @@ class StaffLoginResponse(BaseModel):
     expires_in: int = Field(default=7200, description="访问令牌有效期（秒）")
     refresh_expires_in: int = Field(default=28800, description="刷新令牌有效期（秒）")
     user: UserInfo = Field(description="用户身份信息")
+
+
+class UnifiedLoginResponse(BaseModel):
+    """统一登录响应：前端据 role 跳转对应端。"""
+
+    access_token: str
+    refresh_token: str
+    token_type: str = "Bearer"
+    expires_in: int = 1800
+    role: str
+    account: str
+    patient_id: str | None = None
+    user: UserInfo | None = None

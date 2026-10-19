@@ -51,8 +51,8 @@
   同时把推理路径挂到结论上供医生查看。
 - **SOAP 病历**：S/O/A/P 四段，A 段仅医生端可见，P 段禁止用药建议；生成失败降级 PARTIAL，不伪造。
 - **既往病历**：患者授权后加载既往 SOAP/文书摘要，注入追问与病历生成；未授权不读取，结果页标注是否参考历史。
-- **账号与登录**：患者可自助注册/登录；医生与管理员账号由机构开通，不能自助注册。三端复用同一套
-  `AuthForm` 登录/注册界面，患者端显示注册入口，院内端只显示登录入口。
+- **账号与登录**：患者可自助注册/登录；医生与管理员账号由机构开通，不能自助注册。全项目只有一个
+  统一登录/注册页，后端按账号密码识别角色，自动跳转患者端、医生工作台或管理后台。
 - **预约挂号**：分诊后展示科室医生的未来 7 天全部号源（日期、时段、职称、专家、余号），支持预约/取消；
   同一号源用 advisory lock 串行化，避免超卖。
 - **医生闭环**：非急诊结论进入待接管队列；医生接管后进入「今日接诊」，确认幂等、修正留痕并作为评测样本。
@@ -175,10 +175,10 @@ python scripts/init_dev_passwords.py   # ⚠️ 种子哈希是占位符，不�
 python scripts/build_kg.py             # 可选，需 Neo4j
 cd ..
 
-# 6. 三端前端
-cd frontend/patient_h5 && npm install && npm run dev   # 5173
-cd frontend/doctor_web && npm install && npm run dev   # 5174
-cd frontend/admin_web  && npm install && npm run dev   # 5175
+# 6. 三端前端（唯一登录/注册入口：http://127.0.0.1:5173/login）
+cd frontend/patient_h5 && npm install && npm run dev   # 5173 患者端 + 统一登录
+cd frontend/doctor_web && npm install && npm run dev   # 5174 医生端（无独立登录页）
+cd frontend/admin_web  && npm install && npm run dev   # 5175 管理后台（无独立登录页）
 ```
 
 演示账号：

@@ -48,9 +48,8 @@ export function clearSession() {
 }
 
 function redirectToLogin() {
-  if (window.location.pathname === '/login') return
-  const redirect = encodeURIComponent(window.location.pathname + window.location.search)
-  window.location.assign(`/login?redirect=${redirect}`)
+  const redirect = encodeURIComponent(window.location.href)
+  window.location.assign(`http://127.0.0.1:5173/login?redirect=${redirect}`)
 }
 
 async function refreshSession(): Promise<boolean> {

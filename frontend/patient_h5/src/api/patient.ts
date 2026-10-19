@@ -15,6 +15,21 @@ export interface PatientAuth {
   expires_in: number
 }
 
+export interface UnifiedAuth {
+  access_token: string
+  refresh_token: string
+  token_type: string
+  expires_in: number
+  role: 'PATIENT' | 'DOCTOR' | 'ORG_ADMIN' | 'KB_ADMIN'
+  account: string
+  patient_id: string | null
+  user: Record<string, unknown> | null
+}
+
+export function unifiedLogin(account: string, password: string) {
+  return http.post<UnifiedAuth>('/auth/login', { account, password })
+}
+
 export function patientRegister(account: string, password: string) {
   return http.post<PatientAuth>('/auth/patient/register', { account, password })
 }

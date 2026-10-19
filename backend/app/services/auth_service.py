@@ -40,6 +40,7 @@ from app.schemas.auth import (
     PatientAuthResponse,
     PatientSessionCreateResponse,
     StaffLoginResponse,
+    UnifiedLoginResponse,
     UserInfo,
 )
 
@@ -220,6 +221,10 @@ async def register_patient(
     )
     if exists is not None:
         raise BizError(AUTH_ACCOUNT_EXISTS)
+    # 患者账号与院内账号共用同一个登录入口，禁止重名导致角色歧义
+    staff_exists = await db.scalar(select(User).where(User.account == account))
+    if staff_exists is not None:
+        raise BizError(AUTH_ACCOUNT_EXISTS)
 
     credential_hash = await asyncio.to_thread(hash_password, password)
     patient_hash = hashlib.sha256(
@@ -301,3 +306,50 @@ async def refresh_patient_session(
     if patient is None or patient.status == "0":
         raise BizError(AUTH_CREDENTIAL_INVALID, "登录状态已失效，请重新登录")
     return _build_patient_auth(patient, patient.tenant_id)
+
+
+async def unified_login(
+    db: AsyncSession, account: str, password: str
+) -> UnifiedLoginResponse:
+    """单入口登录：先识别患者账号，再识别院内账号，返回角色供前端跳转。"""
+    account = account.strip()
+    patient = await db.scalar(
+        select(Patient).where(
+            Patient.tenant_id == settings.default_tenant_id,
+            Patient.account == account,
+            Patient.del_flag == "0",
+        )
+    )
+    if patient is not None and patient.credential_hash:
+        # 患者账号存在时不再落到院内账号，避免同名账号被跨角色试密码
+        patient_data = await patient_login(db, account, password)
+        return UnifiedLoginResponse(
+            access_token=patient_data.access_token,
+            refresh_token=patient_data.refresh_token,
+            expires_in=patient_data.expires_in,
+            role="PATIENT",
+            account=patient_data.account,
+            patient_id=patient_data.patient_id,
+        )
+
+    users = list(
+        (
+            await db.scalars(
+                select(User).where(User.account == account, User.del_flag == "0")
+            )
+        ).all()
+    )
+    if len(users) == 1:
+        staff_data = await staff_login(db, account, password, "WEB")
+        return UnifiedLoginResponse(
+            access_token=staff_data.access_token,
+            refresh_token=staff_data.refresh_token,
+            expires_in=staff_data.expires_in,
+            role=staff_data.user.role.value,
+            account=staff_data.user.account,
+            user=staff_data.user,
+        )
+
+    # 账号不存在 / 多租户同名：走一次 bcrypt，保持与真实校验接近的耗时
+    await asyncio.to_thread(verify_password, password, _DUMMY_HASH)
+    raise BizError(AUTH_CREDENTIAL_INVALID, "账号或口令错误")

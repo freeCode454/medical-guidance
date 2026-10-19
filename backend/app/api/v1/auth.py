@@ -19,6 +19,8 @@ from app.schemas.auth import (
     StaffLoginRequest,
     StaffLoginResponse,
     StaffRefreshRequest,
+    UnifiedLoginRequest,
+    UnifiedLoginResponse,
 )
 from app.schemas.common import ApiResponse
 from app.services import auth_service
@@ -37,6 +39,15 @@ async def create_patient_session(
         db, req.device_id, req.client_type, req.channel
     )
     return ApiResponse(data=data)
+
+
+@router.post("/login", response_model=ApiResponse[UnifiedLoginResponse])
+async def unified_login(
+    req: UnifiedLoginRequest, db: DbSession
+) -> ApiResponse[UnifiedLoginResponse]:
+    """唯一登录入口：后端识别患者/医生/管理员，前端按 role 跳转。"""
+    data = await auth_service.unified_login(db, req.account, req.password)
+    return ApiResponse(data=data, message="登录成功")
 
 
 @router.post("/patient/register", response_model=ApiResponse[PatientAuthResponse])

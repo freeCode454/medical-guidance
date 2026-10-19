@@ -36,12 +36,16 @@ export const useSessionStore = defineStore('session', () => {
   const phase = ref<'idle' | 'chatting' | 'done'>('idle') // 空闲 / 问诊中 / 已出结论
   const isAuthenticated = computed(() => Boolean(getToken() && patientId.value))
 
-  function saveAuth(d: api.PatientAuth) {
+  function applyPatientAuth(d: { access_token: string; patient_id: string; account: string }) {
     setToken(d.access_token)
     patientId.value = d.patient_id
     account.value = d.account
     localStorage.setItem('mg_patient_id', d.patient_id)
     localStorage.setItem('mg_patient_account', d.account)
+  }
+
+  function saveAuth(d: api.PatientAuth) {
+    applyPatientAuth(d)
   }
 
   // 从本地恢复登录态；令牌与患者 ID 必须同时存在
@@ -68,6 +72,18 @@ export const useSessionStore = defineStore('session', () => {
   async function register(accountValue: string, password: string) {
     const d = await api.patientRegister(accountValue, password)
     saveAuth(d)
+  }
+
+  async function loginUnified(accountValue: string, password: string) {
+    const d = await api.unifiedLogin(accountValue, password)
+    if (d.role === 'PATIENT' && d.patient_id) {
+      applyPatientAuth({
+        access_token: d.access_token,
+        patient_id: d.patient_id,
+        account: d.account,
+      })
+    }
+    return d
   }
 
   function logout() {
@@ -150,7 +166,7 @@ export const useSessionStore = defineStore('session', () => {
 
   return {
     deviceId, patientId, account, isAuthenticated, sessionId, sessionNo, messages, route, triage, phase,
-    hydrateAuth, login, register, logout, ensureAuth,
+    hydrateAuth, login, loginUnified, register, logout, ensureAuth,
     startSession, send, refreshMessages, appendAi, loadTriage, grantEmrConsent,
   }
 })

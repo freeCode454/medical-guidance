@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
 
-type Portal = 'PATIENT' | 'DOCTOR' | 'ADMIN'
+type Portal = 'AUTO' | 'PATIENT' | 'DOCTOR' | 'ADMIN'
 type Mode = 'login' | 'register'
 
 interface AuthPayload {
@@ -14,7 +14,7 @@ interface AuthPayload {
 export default defineComponent({
   name: 'AuthForm',
   props: {
-    portal: { type: String as PropType<Portal>, required: true },
+    portal: { type: String as PropType<Portal>, default: 'AUTO' },
     allowRegister: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     error: { type: String, default: '' },
@@ -39,12 +39,19 @@ export default defineComponent({
     portalLabel(): string {
       if (this.portal === 'PATIENT') return '患者'
       if (this.portal === 'DOCTOR') return '医生'
-      return '管理员'
+      if (this.portal === 'ADMIN') return '管理员'
+      return '统一'
     },
     heading(): string {
-      return this.mode === 'login' ? '登录' : '注册'
+      if (this.mode === 'register') return '注册患者账号'
+      return '登录'
     },
     subheading(): string {
+      if (this.portal === 'AUTO') {
+        return this.mode === 'login'
+          ? '输入账号和密码，系统自动识别患者 / 医生 / 管理员并进入对应页面'
+          : '注册患者账号；医生和管理员账号由机构开通，不能自助注册'
+      }
       if (this.portal === 'PATIENT') {
         return this.mode === 'login'
           ? '登录后查看问诊记录、既往病历与预约挂号'
@@ -196,7 +203,7 @@ export default defineComponent({
     </button>
 
     <p v-if="!allowRegister" class="auth-hint">院内账号由机构管理员开通，不支持自助注册。</p>
-    <p v-else class="auth-hint">注册即创建患者账号；医生与管理员请使用对应入口登录。</p>
+    <p v-else class="auth-hint">注册只创建患者账号；医生与管理员请直接使用已开通账号登录。</p>
   </div>
 </template>
 

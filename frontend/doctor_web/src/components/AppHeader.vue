@@ -12,7 +12,7 @@ const initial = computed(() => displayName.value.slice(0, 1))
 
 function logout() {
   auth.logout()
-  router.push('/login')
+  window.location.assign('http://127.0.0.1:5173/login')
 }
 </script>
 

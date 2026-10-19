@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AuthForm from '@/components/AuthForm.vue'
 import { useSessionStore } from '@/stores/session'
+import type { UnifiedAuth } from '@/api/patient'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,14 +11,26 @@ const store = useSessionStore()
 const loading = ref(false)
 const error = ref('')
 
+const DOCTOR_URL = import.meta.env.VITE_DOCTOR_URL || 'http://127.0.0.1:5174'
+const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://127.0.0.1:5175'
+
 onMounted(() => {
   store.hydrateAuth()
-  if (store.isAuthenticated) {
-    router.replace('/')
-  } else if (route.query.expired) {
-    error.value = '登录已过期，请重新登录'
-  }
+  if (store.isAuthenticated) router.replace('/')
+  else if (route.query.expired) error.value = '登录已过期，请重新登录'
 })
+
+function handoff(data: UnifiedAuth) {
+  const target = data.role === 'DOCTOR' ? DOCTOR_URL : ADMIN_URL
+  const params = new URLSearchParams({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    role: data.role,
+    user: JSON.stringify(data.user || {}),
+  })
+  // 令牌放 fragment，不进入服务端访问日志
+  window.location.assign(`${target}/auth-callback#${params.toString()}`)
+}
 
 async function onSubmit(payload: {
   mode: 'login' | 'register'
@@ -29,11 +42,17 @@ async function onSubmit(payload: {
   try {
     if (payload.mode === 'register') {
       await store.register(payload.account, payload.password)
-    } else {
-      await store.login(payload.account, payload.password)
+      const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+      router.replace(redirect)
+      return
     }
-    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-    router.replace(redirect)
+    const data = await store.loginUnified(payload.account, payload.password)
+    if (data.role === 'PATIENT') {
+      const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+      router.replace(redirect)
+      return
+    }
+    handoff(data)
   } catch (e) {
     error.value = (e as Error).message || '登录失败，请稍后重试'
   } finally {
@@ -49,35 +68,30 @@ async function onSubmit(payload: {
         <span class="brand-mark" aria-hidden="true">诊</span>
         <div>
           <b>智能导诊</b>
-          <em>患者端</em>
+          <em>统一登录入口</em>
         </div>
       </div>
-      <p class="eyebrow">预问诊 · 分诊建议 · 预约挂号</p>
-      <h1>把症状说清楚，<br />再决定挂哪个科</h1>
+      <p class="eyebrow">患者 · 医生 · 管理员</p>
+      <h1>一个入口，<br />自动进入你的工作台</h1>
       <p class="lede">
-        登录后可查看自己的问诊记录、既往病历与预约；医生端和管理端使用同一套登录入口。
+        不再区分三套登录页。输入同一个账号和密码，系统判断角色后进入患者端、医生工作台或管理后台。
       </p>
       <ul class="points">
-        <li><span>01</span>多轮追问，不是一次性问答</li>
-        <li><span>02</span>授权后结合既往病历</li>
-        <li><span>03</span>分诊后直接看医生与号源</li>
+        <li><span>01</span>患者注册后直接进入问诊</li>
+        <li><span>02</span>医生账号进入接诊工作台</li>
+        <li><span>03</span>管理员账号进入机构后台</li>
       </ul>
       <p class="foot">本系统仅提供分诊建议，不构成医学诊断。</p>
     </section>
 
     <section class="login-panel">
       <AuthForm
-        portal="PATIENT"
         allow-register
         :loading="loading"
         :error="error"
         @submit="onSubmit"
       />
-      <p class="portal-links">
-        医生入口：<a href="http://127.0.0.1:5174/login">医生工作台</a>
-        <span>·</span>
-        管理员入口：<a href="http://127.0.0.1:5175/login">管理后台</a>
-      </p>
+      <p class="portal-links">患者、医生、管理员共用此登录/注册页</p>
     </section>
   </main>
 </template>
@@ -154,7 +168,7 @@ h1 {
 
 .lede {
   margin-top: 14px;
-  max-width: 420px;
+  max-width: 430px;
   font-size: 13px;
   line-height: 1.85;
   color: var(--c-muted);
@@ -208,15 +222,6 @@ h1 {
   text-align: center;
   color: var(--c-faint);
   font-size: 10.5px;
-}
-
-.portal-links a {
-  color: var(--c-primary);
-  text-decoration: none;
-}
-
-.portal-links span {
-  margin: 0 4px;
 }
 
 @media (min-width: 860px) {
