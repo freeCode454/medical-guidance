@@ -79,7 +79,7 @@ class Settings(BaseSettings):
     # ---------------- 存储 ----------------
     # 向量库：开发/交付统一用 Milvus Standalone（Milvus Lite 不支持 Windows）
     milvus_uri: str = "http://localhost:19530"
-    database_url: str = "postgresql+asyncpg://medguide:medguide@localhost:5434/medguide"
+    database_url: str = "postgresql+asyncpg://medguide:medguide@localhost:5440/medguide"
     redis_url: str = "redis://localhost:6379/0"
 
     # ---------------- 编排检查点 ----------------
