@@ -146,6 +146,7 @@ onMounted(load)
               <span class="patient__text">
                 <b>{{ row.patient_display }}</b>
                 <em class="mono">{{ row.session_no }}</em>
+                <em class="appointment-time">{{ row.schedule_date }} {{ row.time_slot }}</em>
               </span>
             </div>
           </template>
@@ -174,7 +175,7 @@ onMounted(load)
           </template>
         </el-table-column>
         <el-table-column prop="inquiry_rounds" label="追问" width="76" />
-        <el-table-column label="开始时间" width="96">
+        <el-table-column label="问诊开始" width="96">
           <template #default="{ row }">
             <span class="mono time">{{ fmtTime(row.started_time) }}</span>
           </template>
@@ -317,6 +318,13 @@ onMounted(load)
   font-style: normal;
   font-size: 10.5px;
   color: var(--c-faint);
+}
+
+.patient__text .appointment-time {
+  margin-top: 2px;
+  color: var(--c-primary);
+  font-size: 11.5px;
+  font-weight: 600;
 }
 
 .complaint {
