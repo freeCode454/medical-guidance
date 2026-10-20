@@ -134,26 +134,31 @@ async def list_encounters(
     sort_by: str,
     sort_order: str,
 ) -> dict:
-    """今日接诊列表：只返回预约了当前医生号源的患者。"""
+    """预约接诊列表：默认返回今天起、预约了当前医生号源的患者。"""
     if sort_by not in _SORT_WHITELIST:
         sort_by = "started_time"
     order_col = getattr(Session, sort_by)
-    order = order_col.desc() if sort_order == "desc" else order_col.asc()
+    order = (order_col.desc() if sort_order == "desc" else order_col.asc(),)
 
     if encounter_date:
         day = datetime.strptime(encounter_date, "%Y-%m-%d").date()
+        date_cond = Appointment.schedule_date == day
     else:
         day = datetime.now(UTC).date()
+        date_cond = Appointment.schedule_date >= day
 
     conds = [
         Appointment.tenant_id == tenant_id,
         Appointment.doctor_id == doctor_id,
-        Appointment.schedule_date == day,
+        date_cond,
         Appointment.session_id.is_not(None),
         Appointment.status.in_(["BOOKED", "COMPLETED", "NOSHOW"]),
     ]
     if status:
         conds.append(Session.status == status)
+
+    if not encounter_date:
+        order = (Appointment.schedule_date.asc(), Appointment.time_slot.asc())
 
     base = (
         select(Appointment, Session)
@@ -168,7 +173,7 @@ async def list_encounters(
     )
     pairs = (
         await db.execute(
-            base.order_by(order).offset((page - 1) * size).limit(size)
+            base.order_by(*order).offset((page - 1) * size).limit(size)
         )
     ).all()
 

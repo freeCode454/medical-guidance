@@ -13,6 +13,7 @@ const total = ref(0)
 const status = ref('')
 const page = ref(1)
 const size = ref(10)
+const encounterDate = ref('')
 
 const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' | 'primary' }> = {
   IN_PROGRESS: { label: '问诊中', type: 'info' },
@@ -38,8 +39,17 @@ const today = new Intl.DateTimeFormat('zh-CN', {
 
 const riskCount = computed(() => items.value.filter((item) => item.risk_flag).length)
 
+const dateLabel = computed(() => {
+  if (!encounterDate.value) return `今天起 · ${today}`
+  return encounterDate.value
+})
+
 const emptyDescription = computed(() =>
-  status.value ? '当前筛选下没有预约患者' : '今天还没有预约您号源的患者',
+  status.value
+    ? '当前筛选下没有预约患者'
+    : encounterDate.value
+      ? '这一天没有预约您号源的患者'
+      : '接下来还没有预约您号源的患者',
 )
 
 async function load() {
@@ -49,6 +59,7 @@ async function load() {
       status: status.value || null,
       page: page.value,
       size: size.value,
+      encounter_date: encounterDate.value || null,
     })
     items.value = d.items
     total.value = d.total
@@ -57,6 +68,11 @@ async function load() {
   } finally {
     loading.value = false
   }
+}
+
+function onDateChange() {
+  page.value = 1
+  void load()
 }
 
 function changePage(next: number) {
@@ -82,8 +98,8 @@ onMounted(load)
   <main class="page">
     <div class="page-head">
       <div class="page-title">
-        <h1>今日接诊</h1>
-        <p>{{ today }} · 只显示预约您号源的患者</p>
+        <h1>预约接诊</h1>
+        <p>{{ dateLabel }} · 只显示预约您号源的患者</p>
       </div>
       <div class="page-actions">
         <span class="total-chip">共 <b>{{ total }}</b> 位</span>
@@ -92,6 +108,15 @@ onMounted(load)
     </div>
 
     <div class="filter-bar">
+      <el-date-picker
+        v-model="encounterDate"
+        type="date"
+        value-format="YYYY-MM-DD"
+        placeholder="全部未来"
+        clearable
+        style="width: 150px"
+        @change="onDateChange"
+      />
       <button
         v-for="f in filters"
         :key="f.value"
@@ -123,6 +148,11 @@ onMounted(load)
                 <em class="mono">{{ row.session_no }}</em>
               </span>
             </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="预约时间" width="160">
+          <template #default="{ row }">
+            <span class="mono time">{{ row.schedule_date }} {{ row.time_slot }}</span>
           </template>
         </el-table-column>
         <el-table-column label="主诉" min-width="260">

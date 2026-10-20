@@ -21,7 +21,7 @@ from app.ws import events
 logger = logging.getLogger(__name__)
 
 # 追问轮次上限（与 mg_sys_config 的 inquiry.max_rounds 默认一致）
-MAX_ROUNDS = 8
+MAX_ROUNDS = 4
 # 普通问诊至少完成两轮追问（inquiry_rounds 是“评估轮次”，
 # 第 1 轮追问后为 1，因此门槛设为 3 才能保证患者至少回答两次）。
 MIN_ROUNDS = 3

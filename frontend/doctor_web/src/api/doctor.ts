@@ -23,6 +23,8 @@ export interface EncounterItem {
   risk_flag: boolean
   inquiry_rounds: number
   started_time: string | null
+  schedule_date: string
+  time_slot: string
 }
 
 export interface PageData<T> {

@@ -1215,7 +1215,7 @@ ON CONFLICT (id) DO NOTHING;
 -- 默认系统配置
 INSERT INTO mg_sys_config (tenant_id, config_key, config_value, config_type, description, create_by)
 VALUES
-  ('00000000000000000000000000000001', 'inquiry.max_rounds',          '8',      'number',  '澄清追问轮次上限', 'system'),
+  ('00000000000000000000000000000001', 'inquiry.max_rounds',          '4',      'number',  '澄清追问轮次上限', 'system'),
   ('00000000000000000000000000000001', 'triage.sufficiency_threshold', '0.75',   'number',  '信息充分度判定阈值', 'system'),
   ('00000000000000000000000000000001', 'triage.confidence_threshold',  '0.60',   'number',  '分诊置信度阈值，低于则转人工', 'system'),
   ('00000000000000000000000000000001', 'triage.dept_gap_threshold',    '0.10',   'number',  '候选科室置信度差值阈值，低于则触发会诊', 'system'),
