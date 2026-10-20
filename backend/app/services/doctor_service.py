@@ -13,7 +13,7 @@ from datetime import UTC, datetime
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.common.enums import AuditActionType, AuditResult
+from app.common.enums import AuditActionType, AuditResult, SessionStatus
 from app.common.error_codes import (
     FORBIDDEN,
     NOT_FOUND,
@@ -508,7 +508,31 @@ async def confirm_triage(
     )
     if triage is None:
         raise BizError(SESSION_TRIAGE_NOT_READY)
-    if session.doctor_id != doctor_id:
+
+    # 待接管会话：预约当前医生号源的人点击确认时，先原子认领，再确认分诊。
+    if session.doctor_id is None:
+        claimed = await db.execute(
+            update(Session)
+            .where(
+                Session.id == session_id,
+                Session.tenant_id == tenant_id,
+                Session.doctor_id.is_(None),
+            )
+            .values(
+                doctor_id=doctor_id,
+                status=SessionStatus.TAKEN_OVER.value,
+            )
+        )
+        if getattr(claimed, "rowcount", 0) == 1:
+            session.doctor_id = doctor_id
+            session.status = SessionStatus.TAKEN_OVER.value
+            await db.commit()
+            await db.refresh(triage)
+        else:
+            await db.refresh(session)
+            if session.doctor_id != doctor_id:
+                raise BizError(SESSION_TAKEN_BY_OTHER)
+    elif session.doctor_id != doctor_id:
         raise BizError(SESSION_TAKEN_BY_OTHER)
 
     # 幂等：已确认则直接返回
