@@ -4,11 +4,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import AppHeader from '@/components/AppHeader.vue'
 import {
-  getSession, listMessages, getEmr, getDiagnosis, getPatientEmr,
+  getSession, getEmr, getDiagnosis, getPatientEmr,
   confirmTriage, correctTriage, listDepts,
   type SessionDetail, type EmrDoc, type Diagnosis, type PatientHistory,
 } from '@/api/doctor'
-import { fmtDateTime, fmtTime } from '@/utils/format'
+import { fmtDateTime } from '@/utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -16,7 +16,6 @@ const sessionId = route.params.id as string
 const activeTab = ref('overview')
 
 const session = ref<SessionDetail | null>(null)
-const messages = ref<any[]>([])
 const emr = ref<EmrDoc | null>(null)
 const diagnosis = ref<Diagnosis | null>(null)
 const depts = ref<Array<{ dept_code: string; dept_name: string }>>([])
@@ -24,7 +23,6 @@ const loading = ref(true)
 const loadError = ref('')
 const emrError = ref('')
 const diagnosisError = ref('')
-const messagesLoading = ref(false)
 
 const correctVisible = ref(false)
 const afterDept = ref('')
@@ -42,13 +40,6 @@ const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'war
   TAKEN_OVER: { label: '已接管', type: 'primary' },
   CLOSED: { label: '已结束', type: 'info' },
   EMERGENCY: { label: '急诊', type: 'danger' },
-}
-
-const roleMap: Record<string, string> = {
-  PATIENT: '患者',
-  AI: '智能追问',
-  DOCTOR: '医生',
-  SYSTEM: '系统',
 }
 
 const emrStatusLabel: Record<string, string> = {
@@ -114,12 +105,7 @@ async function load() {
   loading.value = true
   loadError.value = ''
   try {
-    const [sessionData, messageData] = await Promise.all([
-      getSession(sessionId),
-      listMessages(sessionId).then((d) => d.items),
-    ])
-    session.value = sessionData
-    messages.value = messageData
+    session.value = await getSession(sessionId)
   } catch (e) {
     loadError.value = errorMessage(e, '会话加载失败')
     loading.value = false
@@ -156,23 +142,6 @@ async function load() {
   }
 
   if (deptResult.status === 'fulfilled') depts.value = deptResult.value
-}
-
-async function loadMessagesOnly() {
-  if (!sessionId || messagesLoading.value) return
-  messagesLoading.value = true
-  try {
-    const data = await listMessages(sessionId)
-    messages.value = data.items
-  } catch (e) {
-    ElMessage.error(errorMessage(e, '对话记录加载失败'))
-  } finally {
-    messagesLoading.value = false
-  }
-}
-
-function onTabChange(name: string) {
-  if (name === 'messages') void loadMessagesOnly()
 }
 
 async function onConfirm() {
@@ -303,7 +272,7 @@ onMounted(load)
 
       <div class="layout">
         <section class="main-col">
-          <el-tabs v-model="activeTab" class="tabs" @tab-change="onTabChange">
+          <el-tabs v-model="activeTab" class="tabs">
             <el-tab-pane label="概览" name="overview">
               <article class="panel complaint-card">
                 <p class="section-label">患者主诉</p>
@@ -336,37 +305,6 @@ onMounted(load)
                     先看右侧分诊结论与置信度，再展开「鉴别诊断」查看知识图谱路径与指南推荐；
                     确认或修正分诊后，本次操作会写入审计日志。
                   </p>
-                </div>
-              </article>
-            </el-tab-pane>
-
-            <el-tab-pane :label="`对话记录 (${messages.length})`" name="messages">
-              <article class="panel chat-panel" v-loading="messagesLoading">
-                <div class="chat-toolbar">
-                  <span class="muted">共 {{ messages.length }} 条消息</span>
-                  <el-button text size="small" @click="loadMessagesOnly">刷新</el-button>
-                </div>
-                <div class="chat-scroll">
-                  <div
-                    v-for="m in messages"
-                    :key="m.message_id"
-                    class="chat-row"
-                    :class="`chat-row--${String(m.role).toLowerCase()}`"
-                  >
-                    <span class="chat-avatar">{{ (roleMap[m.role] || m.role).slice(0, 1) }}</span>
-                    <div class="chat-body">
-                      <header class="chat-meta">
-                        <b>{{ roleMap[m.role] || m.role }}</b>
-                        <time>{{ fmtTime(m.send_time) }}</time>
-                      </header>
-                      <div class="chat-bubble">{{ m.content }}</div>
-                    </div>
-                  </div>
-
-                  <div v-if="!messages.length" class="empty-block">
-                    <p class="empty-block__title">暂无对话记录</p>
-                    <p>患者开始描述症状后，对话会实时出现在这里。</p>
-                  </div>
                 </div>
               </article>
             </el-tab-pane>
