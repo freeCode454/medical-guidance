@@ -360,7 +360,16 @@ class TriageOrchestrator:
             # 会话状态更新
             session = await db.get(Session, session_id)
             if session is not None:
-                session.inquiry_rounds = result.get("inquiry_rounds", 0)
+                actual_rounds = await db.scalar(
+                    select(func.count())
+                    .select_from(SessionMessage)
+                    .where(
+                        SessionMessage.tenant_id == tenant_id,
+                        SessionMessage.session_id == session_id,
+                        SessionMessage.role == MessageRole.AI.value,
+                    )
+                )
+                session.inquiry_rounds = actual_rounds or 0
                 session.risk_flag = "1" if risk_flag else "0"
                 # 只推进仍处于问诊中的会话：医生已接管/已关闭的会话不能被后台覆盖
                 if session.status == SessionStatus.IN_PROGRESS.value:

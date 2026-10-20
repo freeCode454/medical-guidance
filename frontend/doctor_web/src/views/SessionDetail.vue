@@ -59,6 +59,16 @@ const emrStatusLabel: Record<string, string> = {
 const patientName = computed(() => session.value?.patient.patient_display || '患者')
 const patientInitial = computed(() => patientName.value.slice(0, 1))
 const primaryDept = computed(() => diagnosis.value?.candidates?.[0] ?? null)
+const routeLabels: Record<string, string> = {
+  DIRECT: '直接分诊',
+  MDT: '多学科会诊',
+  MANUAL: '转人工',
+  EMERGENCY: '急诊',
+}
+const routeLabel = computed(() => {
+  const route = session.value?.triage_status.route
+  return route ? routeLabels[route] || route : '待生成'
+})
 const allergyHits = computed(() => diagnosis.value?.drug_safety?.allergy_hits || [])
 const contraindicationHits = computed(
   () => diagnosis.value?.drug_safety?.contraindication_hits || [],
@@ -283,7 +293,7 @@ onMounted(load)
                 <div class="info-grid">
                   <div class="info-cell">
                     <span>分诊路由</span>
-                    <b>{{ session.triage_status.route || '待生成' }}</b>
+                    <b>{{ routeLabel }}</b>
                   </div>
                   <div class="info-cell">
                     <span>追问轮次</span>
@@ -604,7 +614,7 @@ onMounted(load)
                 <span>{{ pct(primaryDept.confidence) }}</span>
               </div>
               <dl class="triage-meta">
-                <div><dt>路由</dt><dd>{{ session.triage_status.route || '—' }}</dd></div>
+                <div><dt>路由</dt><dd>{{ routeLabel }}</dd></div>
                 <div><dt>候选</dt><dd>{{ diagnosis?.candidates.length ?? 0 }} 个科室</dd></div>
               </dl>
               <p v-if="confirmed" class="confirmed-note">
