@@ -56,10 +56,11 @@ def _dept_name(dept: Dept | None, code: str) -> str:
 
 def _specialty(dept: Dept | None) -> str:
     if dept and dept.sub_specialty:
-        return "、".join(str(item) for item in dept.sub_specialty if item)
+        focus = "、".join(str(item) for item in dept.sub_specialty if item)
+        return f"{dept.dept_name}常见病与疑难病诊治，尤其{focus}方向经验丰富。"
     if dept:
-        return f"{dept.dept_name}常见病"
-    return "专科常见病"
+        return f"{dept.dept_name}常见病、多发病的诊治与长期健康管理。"
+    return "专科常见病与多发病的诊治及长期健康管理。"
 
 
 def _status_label(status: str) -> str:
