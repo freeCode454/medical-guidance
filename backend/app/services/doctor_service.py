@@ -38,6 +38,7 @@ from app.models import (
     User,
 )
 from app.services.consent_service import has_active_consent
+from app.services import drug_safety_service
 
 # 排序字段白名单（防对未索引字段排序）
 _SORT_WHITELIST = {"started_time", "inquiry_rounds"}
@@ -420,7 +421,7 @@ async def get_diagnosis(
     include_mdt: bool,
 ) -> dict:
     """鉴别诊断候选与依据 + 用药禁忌校验。"""
-    await _get_doctor_session(db, session_id, doctor_id, tenant_id)
+    session = await _get_doctor_session(db, session_id, doctor_id, tenant_id)
 
     triage = await db.scalar(
         select(TriageResult).where(TriageResult.session_id == session_id)
@@ -482,13 +483,12 @@ async def get_diagnosis(
         "kb_version": triage.kb_version,
         "candidates": candidates,
         "mdt": mdt_data,
-        # 用药禁忌校验：禁忌知识库未建立，显式告知未完成（不得静默略过）
-        "drug_safety": {
-            "checked": False,
-            "allergy_hits": [],
-            "contraindication_hits": [],
-            "note": "用药禁忌校验未完成（禁忌知识库尚未建立），请医生自行核对患者过敏史。",
-        },
+        "drug_safety": await drug_safety_service.check_drug_safety(
+            db,
+            tenant_id=tenant_id,
+            patient_id=session.patient_id,
+            session_id=session_id,
+        ),
     }
 
 

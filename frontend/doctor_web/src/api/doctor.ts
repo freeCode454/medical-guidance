@@ -86,6 +86,18 @@ export interface PatientHistory {
   records: PatientHistoryRecord[]
 }
 
+export interface DrugSafetyHit {
+  drug_name: string
+  allergy_item: string
+  population?: string | null
+  severity: 'HIGH' | 'MEDIUM' | 'LOW' | string
+  suggestion: string
+  note?: string | null
+  entry_code?: string
+  match_type?: string
+  matched?: string
+}
+
 export interface Diagnosis {
   triage_result_id: string
   retrieval_mode: string
@@ -96,7 +108,13 @@ export interface Diagnosis {
     consensus_confidence: number
     divergence: { exists: boolean; items: any[] }
   } | null
-  drug_safety: { checked: boolean; allergy_hits: any[]; contraindication_hits: any[]; note: string }
+  drug_safety: {
+    checked: boolean
+    allergy_known?: boolean
+    allergy_hits: DrugSafetyHit[]
+    contraindication_hits: DrugSafetyHit[]
+    note: string
+  }
 }
 
 export function login(account: string, password: string) {

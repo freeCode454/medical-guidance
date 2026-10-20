@@ -59,6 +59,23 @@ const emrStatusLabel: Record<string, string> = {
 const patientName = computed(() => session.value?.patient.patient_display || '患者')
 const patientInitial = computed(() => patientName.value.slice(0, 1))
 const primaryDept = computed(() => diagnosis.value?.candidates?.[0] ?? null)
+const allergyHits = computed(() => diagnosis.value?.drug_safety?.allergy_hits || [])
+const contraindicationHits = computed(
+  () => diagnosis.value?.drug_safety?.contraindication_hits || [],
+)
+const drugSafetyTotal = computed(() => allergyHits.value.length + contraindicationHits.value.length)
+
+function severityType(severity: string): 'danger' | 'warning' | 'info' {
+  if (severity === 'HIGH') return 'danger'
+  if (severity === 'MEDIUM') return 'warning'
+  return 'info'
+}
+
+function severityLabel(severity: string) {
+  if (severity === 'HIGH') return '禁用风险'
+  if (severity === 'MEDIUM') return '慎用'
+  return '注意'
+}
 const confirmed = computed(() => session.value?.triage_status.doctor_confirmed ?? false)
 const canConfirm = computed(
   () => !!session.value?.triage_status.has_result && !confirmed.value,
@@ -487,14 +504,84 @@ onMounted(load)
                 <article class="panel panel--pad">
                   <div class="panel-head">
                     <p class="section-label">用药禁忌校验</p>
+                    <el-tag
+                      v-if="diagnosis.drug_safety.checked"
+                      :type="drugSafetyTotal ? 'danger' : 'success'"
+                      size="small"
+                      effect="plain"
+                    >
+                      {{ drugSafetyTotal ? `${drugSafetyTotal} 项需核对` : '已校验' }}
+                    </el-tag>
                   </div>
+
                   <el-alert
                     v-if="!diagnosis.drug_safety.checked"
                     type="warning"
                     :closable="false"
                     :title="diagnosis.drug_safety.note"
                   />
-                  <p v-else class="soap-text muted">{{ diagnosis.drug_safety.note }}</p>
+
+                  <template v-else>
+                    <el-alert
+                      v-if="diagnosis.drug_safety.allergy_known === false"
+                      type="info"
+                      :closable="false"
+                      title="患者过敏史未记录，以下结果仅基于既往疾病和年龄，仍需人工核对。"
+                    />
+
+                    <div v-if="!drugSafetyTotal" class="drug-safe-empty">
+                      <span class="drug-safe-empty__icon">✓</span>
+                      <span>未发现已知的用药禁忌冲突</span>
+                    </div>
+
+                    <template v-else>
+                      <section v-if="allergyHits.length" class="drug-section">
+                        <p class="drug-section__title">
+                          过敏史冲突
+                          <span>{{ allergyHits.length }} 项</span>
+                        </p>
+                        <div v-for="hit in allergyHits" :key="`a-${hit.entry_code || hit.drug_name}`" class="drug-hit">
+                          <div class="drug-hit__main">
+                            <b>{{ hit.drug_name }}</b>
+                            <span>与「{{ hit.allergy_item }}」冲突</span>
+                          </div>
+                          <div class="drug-hit__side">
+                            <el-tag :type="severityType(hit.severity)" size="small">
+                              {{ severityLabel(hit.severity) }}
+                            </el-tag>
+                            <span>{{ hit.suggestion }}</span>
+                          </div>
+                          <p v-if="hit.note" class="drug-hit__note">{{ hit.note }}</p>
+                        </div>
+                      </section>
+
+                      <section v-if="contraindicationHits.length" class="drug-section">
+                        <p class="drug-section__title">
+                          基础疾病 / 人群禁忌
+                          <span>{{ contraindicationHits.length }} 项</span>
+                        </p>
+                        <div
+                          v-for="hit in contraindicationHits"
+                          :key="`c-${hit.entry_code || hit.drug_name}`"
+                          class="drug-hit"
+                        >
+                          <div class="drug-hit__main">
+                            <b>{{ hit.drug_name }}</b>
+                            <span>与「{{ hit.allergy_item }}」冲突</span>
+                          </div>
+                          <div class="drug-hit__side">
+                            <el-tag :type="severityType(hit.severity)" size="small">
+                              {{ severityLabel(hit.severity) }}
+                            </el-tag>
+                            <span>{{ hit.suggestion }}</span>
+                          </div>
+                          <p v-if="hit.note" class="drug-hit__note">{{ hit.note }}</p>
+                        </div>
+                      </section>
+                    </template>
+
+                    <p class="drug-safe-note">{{ diagnosis.drug_safety.note }}</p>
+                  </template>
                 </article>
               </template>
 
@@ -1561,5 +1648,101 @@ onMounted(load)
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+.drug-safe-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(63, 138, 111, 0.08);
+  color: var(--c-success);
+  font-size: 12.5px;
+}
+
+.drug-safe-empty__icon {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(63, 138, 111, 0.14);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.drug-section {
+  margin-top: 14px;
+}
+
+.drug-section__title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--c-ink);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.drug-section__title span {
+  color: var(--c-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.drug-hit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 14px;
+  padding: 11px 13px;
+  margin-bottom: 8px;
+  border: 1px solid var(--c-line-soft);
+  border-left: 3px solid var(--c-danger);
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+}
+
+.drug-hit__main {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.drug-hit__main b {
+  color: var(--c-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.drug-hit__main span {
+  color: var(--c-muted);
+  font-size: 11.5px;
+}
+
+.drug-hit__side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-muted);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.drug-hit__note {
+  grid-column: 1 / -1;
+  color: var(--c-faint);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.drug-safe-note {
+  margin-top: 12px;
+  color: var(--c-faint);
+  font-size: 11px;
+  line-height: 1.65;
 }
 </style>
