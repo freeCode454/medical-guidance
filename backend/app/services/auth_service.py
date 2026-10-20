@@ -209,9 +209,9 @@ async def create_patient_session(
 
 
 async def register_patient(
-    db: AsyncSession, account: str, password: str
+    db: AsyncSession, account: str, password: str, real_name: str | None = None
 ) -> PatientAuthResponse:
-    """患者自助注册：账号 + 口令，创建正式患者身份。"""
+    """患者自助注册：账号 + 口令 + 姓名，创建正式患者身份。"""
     tenant_id = settings.default_tenant_id
     account = account.strip()
     exists = await db.scalar(
@@ -234,6 +234,7 @@ async def register_patient(
         tenant_id=tenant_id,
         patient_hash=patient_hash,
         account=account,
+        real_name=(real_name or "").strip() or account,
         credential_hash=credential_hash,
         status="1",
     )

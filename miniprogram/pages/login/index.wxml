@@ -19,6 +19,18 @@
       >注册</view>
     </view>
 
+    <view wx:if="{{mode === 'register'}}" class="field">
+      <text class="field-label">姓名</text>
+      <input
+        class="field-input"
+        value="{{realName}}"
+        placeholder="请输入患者姓名"
+        placeholder-class="placeholder"
+        maxlength="32"
+        bindinput="onName"
+      />
+    </view>
+
     <view class="field">
       <text class="field-label">账号</text>
       <input

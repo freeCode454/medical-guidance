@@ -39,6 +39,7 @@ async def get_profile(db: AsyncSession, *, tenant_id: str, patient_id: str) -> d
     return {
         "patient_id": patient.id,
         "account": patient.account,
+        "real_name": patient.real_name,
         "patient_no": patient.patient_no,
         "age": patient.age,
         "gender": patient.gender,

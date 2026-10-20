@@ -9,6 +9,7 @@ interface AuthPayload {
   portal: Portal
   account: string
   password: string
+  name: string
 }
 
 export default defineComponent({
@@ -28,6 +29,7 @@ export default defineComponent({
     return {
       mode: 'login' as Mode,
       account: '',
+      name: '',
       password: '',
       confirm: '',
       showPassword: false,
@@ -88,6 +90,10 @@ export default defineComponent({
         return
       }
       if (this.mode === 'register') {
+        if (this.name.trim().length < 2) {
+          this.localError = '请输入至少 2 个字的患者姓名'
+          return
+        }
         if (this.password !== this.confirm) {
           this.localError = '两次输入的密码不一致'
           return
@@ -102,6 +108,7 @@ export default defineComponent({
         portal: this.portal,
         account: acc,
         password: this.password,
+        name: this.name.trim(),
       })
     },
     fillDemo() {
@@ -147,6 +154,17 @@ export default defineComponent({
     <div v-if="localError" class="auth-error" role="alert">{{ localError }}</div>
 
     <form novalidate @submit.prevent="submit">
+      <label v-if="mode === 'register'" class="auth-field">
+        <span>姓名</span>
+        <input
+          v-model="name"
+          type="text"
+          autocomplete="name"
+          placeholder="请输入患者姓名"
+          maxlength="32"
+        />
+      </label>
+
       <label class="auth-field">
         <span>账号</span>
         <input

@@ -10,6 +10,7 @@ export interface PatientSession {
 export interface PatientProfile {
   patient_id: string
   account: string
+  real_name: string | null
   patient_no: string | null
   age: number | null
   gender: string | null
@@ -64,8 +65,12 @@ export function unifiedLogin(account: string, password: string) {
   return http.post<UnifiedAuth>('/auth/login', { account, password })
 }
 
-export function patientRegister(account: string, password: string) {
-  return http.post<PatientAuth>('/auth/patient/register', { account, password })
+export function patientRegister(account: string, password: string, realName?: string) {
+  return http.post<PatientAuth>('/auth/patient/register', {
+    account,
+    password,
+    ...(realName ? { real_name: realName } : {}),
+  })
 }
 
 export function patientLogin(account: string, password: string) {

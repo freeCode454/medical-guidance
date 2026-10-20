@@ -21,6 +21,7 @@ class Patient(Base, PKMixin, TenantMixin, AuditMixin):
 
     patient_hash: Mapped[str] = mapped_column(String(64), nullable=False, comment="患者标识哈希，加盐后计算")
     patient_no: Mapped[str | None] = mapped_column(String(64), comment="院内患者编号，用于脱敏展示")
+    real_name: Mapped[str | None] = mapped_column(String(64), comment="患者姓名")
     account: Mapped[str | None] = mapped_column(String(64), comment="患者登录账号，租户内唯一")
     credential_hash: Mapped[str | None] = mapped_column(String(255), comment="患者口令哈希，可空表示匿名患者")
     fail_count: Mapped[int] = mapped_column(

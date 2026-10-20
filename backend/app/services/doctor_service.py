@@ -46,9 +46,13 @@ _EVAL_TITLES = {"副主任医师", "主任医师"}
 
 
 def _patient_display(patient: Patient | None) -> str:
-    """患者脱敏展示名：优先院内编号，否则用哈希前缀。"""
+    """医生端患者展示名：优先姓名，其次账号，最后院内编号。"""
     if patient is None:
         return "患者"
+    if patient.real_name:
+        return patient.real_name
+    if patient.account:
+        return patient.account
     if patient.patient_no:
         return patient.patient_no
     return f"患者 {patient.patient_hash[:4] if patient.patient_hash else ''}"
@@ -235,6 +239,8 @@ async def get_session_detail(
             "patient_id": session.patient_id,
             "patient_hash": patient.patient_hash if patient else None,
             "patient_display": _patient_display(patient),
+            "real_name": patient.real_name if patient else None,
+            "account": patient.account if patient else None,
             "age": patient.age if patient else None,
             "gender": _gender_label(patient.gender) if patient else None,
         },

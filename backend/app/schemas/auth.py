@@ -41,10 +41,11 @@ class PatientSessionCreateResponse(BaseModel):
 
 
 class PatientRegisterRequest(BaseModel):
-    """患者注册：账号 + 口令。"""
+    """患者注册：账号 + 口令 + 姓名。"""
 
     account: str = Field(min_length=4, max_length=64, pattern=r"^[A-Za-z0-9_]+$")
     password: str = Field(min_length=8, max_length=64)
+    real_name: str | None = Field(default=None, max_length=64, description="患者姓名")
 
 
 class PatientLoginRequest(BaseModel):

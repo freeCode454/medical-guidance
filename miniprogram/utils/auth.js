@@ -43,11 +43,11 @@ async function login(account, password) {
   return data
 }
 
-async function register(account, password) {
+async function register(account, password, realName) {
   const data = await request('/auth/patient/register', {
     method: 'POST',
     auth: false,
-    data: { account, password }
+    data: { account, password, real_name: realName }
   })
   saveAuth(data)
   return data

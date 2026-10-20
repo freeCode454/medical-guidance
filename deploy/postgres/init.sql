@@ -194,6 +194,7 @@ CREATE TABLE IF NOT EXISTS mg_patient (
     tenant_id       varchar(32)  NOT NULL,
     patient_hash    varchar(64)  NOT NULL,
     patient_no      varchar(64),
+    real_name       varchar(64),
     account         varchar(64),
     credential_hash varchar(255),
     fail_count      integer      NOT NULL DEFAULT 0,
@@ -218,6 +219,7 @@ COMMENT ON COLUMN mg_patient.id             IS '主键';
 COMMENT ON COLUMN mg_patient.tenant_id      IS '租户标识';
 COMMENT ON COLUMN mg_patient.patient_hash   IS '患者标识哈希，加盐后计算，同一患者在不同租户下哈希不同';
 COMMENT ON COLUMN mg_patient.patient_no     IS '院内患者编号，用于脱敏展示';
+COMMENT ON COLUMN mg_patient.real_name      IS '患者姓名，医生接诊时展示';
 COMMENT ON COLUMN mg_patient.age            IS '年龄';
 COMMENT ON COLUMN mg_patient.gender         IS '性别：1 男 / 2 女 / 0 未知';
 COMMENT ON COLUMN mg_patient.phone_masked   IS '手机号脱敏形式，仅用于回显';

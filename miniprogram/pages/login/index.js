@@ -4,6 +4,7 @@ Page({
   data: {
     mode: 'login',
     account: '',
+    realName: '',
     password: '',
     confirm: '',
     showPassword: false,
@@ -23,6 +24,10 @@ Page({
 
   onAccount(e) {
     this.setData({ account: e.detail.value })
+  },
+
+  onName(e) {
+    this.setData({ realName: e.detail.value })
   },
 
   onPassword(e) {
@@ -48,6 +53,10 @@ Page({
       wx.showToast({ title: '密码至少 8 位', icon: 'none' })
       return
     }
+    if (this.data.mode === 'register' && this.data.realName.trim().length < 2) {
+      wx.showToast({ title: '请输入至少 2 个字的姓名', icon: 'none' })
+      return
+    }
     if (this.data.mode === 'register' && password !== this.data.confirm) {
       wx.showToast({ title: '两次密码不一致', icon: 'none' })
       return
@@ -56,7 +65,7 @@ Page({
     this.setData({ loading: true })
     try {
       if (this.data.mode === 'register') {
-        await auth.register(account, password)
+        await auth.register(account, password, this.data.realName.trim())
       } else {
         await auth.login(account, password)
       }

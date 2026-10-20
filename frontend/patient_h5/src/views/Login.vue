@@ -36,12 +36,13 @@ async function onSubmit(payload: {
   mode: 'login' | 'register'
   account: string
   password: string
+  name: string
 }) {
   loading.value = true
   error.value = ''
   try {
     if (payload.mode === 'register') {
-      await store.register(payload.account, payload.password)
+      await store.register(payload.account, payload.password, payload.name)
       const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
       router.replace(redirect)
       return

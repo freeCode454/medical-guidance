@@ -55,7 +55,9 @@ async def patient_register(
     req: PatientRegisterRequest, db: DbSession
 ) -> ApiResponse[PatientAuthResponse]:
     """患者自助注册（仅患者；医生/管理员账号由机构开通）。"""
-    data = await auth_service.register_patient(db, req.account, req.password)
+    data = await auth_service.register_patient(
+        db, req.account, req.password, real_name=req.real_name
+    )
     return ApiResponse(data=data, message="注册成功")
 
 

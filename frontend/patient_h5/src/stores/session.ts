@@ -69,8 +69,8 @@ export const useSessionStore = defineStore('session', () => {
     saveAuth(d)
   }
 
-  async function register(accountValue: string, password: string) {
-    const d = await api.patientRegister(accountValue, password)
+  async function register(accountValue: string, password: string, realName?: string) {
+    const d = await api.patientRegister(accountValue, password, realName)
     saveAuth(d)
   }
 
