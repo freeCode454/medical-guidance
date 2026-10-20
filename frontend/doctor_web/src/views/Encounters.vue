@@ -16,6 +16,7 @@ const size = ref(10)
 const encounterDate = ref('')
 
 const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' | 'primary' }> = {
+  PENDING_TAKEOVER: { label: '待接管', type: 'warning' },
   IN_PROGRESS: { label: '问诊中', type: 'info' },
   FINISHED: { label: '已出结论', type: 'success' },
   TAKEN_OVER: { label: '已接管', type: 'primary' },
@@ -86,6 +87,12 @@ function changeFilter(value: string) {
   void load()
 }
 
+function fmtAppointmentDate(value: string) {
+  const parts = String(value || '').split('-')
+  if (parts.length !== 3) return value || '—'
+  return `${Number(parts[1])}月${Number(parts[2])}日`
+}
+
 function openSession(row: EncounterItem) {
   router.push(`/session/${row.session_id}`)
 }
@@ -146,14 +153,16 @@ onMounted(load)
               <span class="patient__text">
                 <b>{{ row.patient_display }}</b>
                 <em class="mono">{{ row.session_no }}</em>
-                <em class="appointment-time">{{ row.schedule_date }} {{ row.time_slot }}</em>
               </span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="预约时间" width="160">
+        <el-table-column label="预约时间" width="172">
           <template #default="{ row }">
-            <span class="mono time">{{ row.schedule_date }} {{ row.time_slot }}</span>
+            <div class="appointment-cell">
+              <span class="appointment-date">{{ fmtAppointmentDate(row.schedule_date) }}</span>
+              <span class="appointment-slot">{{ row.time_slot }}</span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="主诉" min-width="260">
@@ -320,11 +329,27 @@ onMounted(load)
   color: var(--c-faint);
 }
 
-.patient__text .appointment-time {
-  margin-top: 2px;
+.appointment-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.appointment-date {
   color: var(--c-primary);
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 600;
+}
+
+.appointment-slot {
+  color: var(--c-muted);
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+}
+
+:deep(.el-table td.el-table__cell) {
+  vertical-align: middle;
 }
 
 .complaint {
