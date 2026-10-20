@@ -24,6 +24,7 @@ const loading = ref(true)
 const loadError = ref('')
 const emrError = ref('')
 const diagnosisError = ref('')
+const messagesLoading = ref(false)
 
 const correctVisible = ref(false)
 const afterDept = ref('')
@@ -157,6 +158,23 @@ async function load() {
   if (deptResult.status === 'fulfilled') depts.value = deptResult.value
 }
 
+async function loadMessagesOnly() {
+  if (!sessionId || messagesLoading.value) return
+  messagesLoading.value = true
+  try {
+    const data = await listMessages(sessionId)
+    messages.value = data.items
+  } catch (e) {
+    ElMessage.error(errorMessage(e, '对话记录加载失败'))
+  } finally {
+    messagesLoading.value = false
+  }
+}
+
+function onTabChange(name: string) {
+  if (name === 'messages') void loadMessagesOnly()
+}
+
 async function onConfirm() {
   if (!canConfirm.value) return
   const dept = primaryDept.value?.dept_name
@@ -285,7 +303,7 @@ onMounted(load)
 
       <div class="layout">
         <section class="main-col">
-          <el-tabs v-model="activeTab" class="tabs">
+          <el-tabs v-model="activeTab" class="tabs" @tab-change="onTabChange">
             <el-tab-pane label="概览" name="overview">
               <article class="panel complaint-card">
                 <p class="section-label">患者主诉</p>
@@ -322,8 +340,12 @@ onMounted(load)
               </article>
             </el-tab-pane>
 
-            <el-tab-pane label="对话记录" name="messages">
-              <article class="panel chat-panel">
+            <el-tab-pane :label="`对话记录 (${messages.length})`" name="messages">
+              <article class="panel chat-panel" v-loading="messagesLoading">
+                <div class="chat-toolbar">
+                  <span class="muted">共 {{ messages.length }} 条消息</span>
+                  <el-button text size="small" @click="loadMessagesOnly">刷新</el-button>
+                </div>
                 <div class="chat-scroll">
                   <div
                     v-for="m in messages"
@@ -1007,6 +1029,15 @@ onMounted(load)
 /* ---------- 对话 ---------- */
 .chat-panel {
   padding: 6px 18px;
+}
+
+.chat-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 2px;
+  border-bottom: 1px solid var(--c-line-soft);
+  font-size: 11.5px;
 }
 
 .chat-scroll {
