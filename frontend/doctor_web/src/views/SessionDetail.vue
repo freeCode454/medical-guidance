@@ -51,16 +51,6 @@ const emrStatusLabel: Record<string, string> = {
 const patientName = computed(() => session.value?.patient.patient_display || '患者')
 const patientInitial = computed(() => patientName.value.slice(0, 1))
 const primaryDept = computed(() => diagnosis.value?.candidates?.[0] ?? null)
-const routeLabels: Record<string, string> = {
-  DIRECT: '直接分诊',
-  MDT: '多学科会诊',
-  MANUAL: '转人工',
-  EMERGENCY: '急诊',
-}
-const routeLabel = computed(() => {
-  const route = session.value?.triage_status.route
-  return route ? routeLabels[route] || route : '待生成'
-})
 const allergyHits = computed(() => diagnosis.value?.drug_safety?.allergy_hits || [])
 const contraindicationHits = computed(
   () => diagnosis.value?.drug_safety?.contraindication_hits || [],
@@ -278,14 +268,6 @@ onMounted(load)
                 <p class="section-label">患者主诉</p>
                 <p class="complaint-text">{{ session.chief_complaint || '患者尚未描述症状' }}</p>
                 <div class="info-grid">
-                  <div class="info-cell">
-                    <span>分诊路由</span>
-                    <b>{{ routeLabel }}</b>
-                  </div>
-                  <div class="info-cell">
-                    <span>追问轮次</span>
-                    <b>{{ session.inquiry_rounds }} 轮</b>
-                  </div>
                   <div class="info-cell">
                     <span>状态</span>
                     <b>{{ statusInfo.label }}</b>
@@ -574,7 +556,6 @@ onMounted(load)
                 <span>{{ pct(primaryDept.confidence) }}</span>
               </div>
               <dl class="triage-meta">
-                <div><dt>路由</dt><dd>{{ routeLabel }}</dd></div>
                 <div><dt>候选</dt><dd>{{ diagnosis?.candidates.length ?? 0 }} 个科室</dd></div>
               </dl>
               <p v-if="confirmed" class="confirmed-note">
@@ -595,7 +576,6 @@ onMounted(load)
             <dl class="info-list">
               <div><dt>会话号</dt><dd class="mono">{{ session.session_no }}</dd></div>
               <div><dt>开始时间</dt><dd>{{ fmtDateTime(session.started_time) }}</dd></div>
-              <div><dt>追问轮次</dt><dd>{{ session.inquiry_rounds }} 轮</dd></div>
               <div><dt>患者授权</dt><dd>{{ session.consent_granted ? '已授权历史病历' : '未授权历史病历' }}</dd></div>
             </dl>
           </article>
@@ -905,7 +885,7 @@ onMounted(load)
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 18px;
   padding-top: 16px;
