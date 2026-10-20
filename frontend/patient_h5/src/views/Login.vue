@@ -63,27 +63,6 @@ async function onSubmit(payload: {
 
 <template>
   <main class="login-page">
-    <section class="login-brand">
-      <div class="brand-row">
-        <span class="brand-mark" aria-hidden="true">诊</span>
-        <div>
-          <b>智能导诊</b>
-          <em>统一登录入口</em>
-        </div>
-      </div>
-      <p class="eyebrow">患者 · 医生 · 管理员</p>
-      <h1>一个入口，<br />自动进入你的工作台</h1>
-      <p class="lede">
-        不再区分三套登录页。输入同一个账号和密码，系统判断角色后进入患者端、医生工作台或管理后台。
-      </p>
-      <ul class="points">
-        <li><span>01</span>患者注册后直接进入问诊</li>
-        <li><span>02</span>医生账号进入接诊工作台</li>
-        <li><span>03</span>管理员账号进入机构后台</li>
-      </ul>
-      <p class="foot">本系统仅提供分诊建议，不构成医学诊断。</p>
-    </section>
-
     <section class="login-panel">
       <AuthForm
         allow-register
@@ -101,14 +80,11 @@ async function onSubmit(payload: {
   min-height: 100vh;
   min-height: 100dvh;
   width: 100%;
-  max-width: 1060px;
-  margin: 0 auto;
-  padding: 28px 18px calc(28px + env(safe-area-inset-bottom));
+  padding: 24px 18px calc(24px + env(safe-area-inset-bottom));
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 1fr;
-  align-content: center;
-  gap: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-brand {
@@ -210,6 +186,8 @@ h1 {
 }
 
 .login-panel {
+  width: 100%;
+  max-width: 480px;
   padding: 26px 20px;
   border: 1px solid var(--c-line);
   border-radius: 22px;
@@ -226,14 +204,11 @@ h1 {
 
 @media (min-width: 860px) {
   .login-page {
-    grid-template-columns: 1.15fr 0.85fr;
-    align-items: center;
-    gap: 42px;
     padding: 40px 32px;
   }
 
   .login-panel {
-    padding: 30px 26px;
+    padding: 32px 30px;
   }
 }
 </style>
